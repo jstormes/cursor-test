@@ -35,4 +35,6 @@ abstract class AbstractTreeNode implements TreeNode
     }
 
     abstract public function getType(): string;
+    
+    abstract public function accept(TreeNodeVisitor $visitor): string;
 } 

@@ -11,4 +11,5 @@ interface TreeNode
     public function getChildren(): array;
     public function hasChildren(): bool;
     public function getType(): string;
+    public function accept(TreeNodeVisitor $visitor): string;
 } 

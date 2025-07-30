@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Tree;
 
-class HtmlTreeNodeRenderer implements TreeNodeRenderer
+class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
 {
     public function render(TreeNode $node): string
     {
-        $html = $this->renderNodeContent($node);
+        $html = $node->accept($this);
         
         if ($node->hasChildren()) {
             $html .= '<ul>';
@@ -21,38 +21,26 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer
         return $html;
     }
 
-    private function renderNodeContent(TreeNode $node): string
+    public function visitSimpleNode(SimpleNode $node): string
     {
-        $html = '<div><input type="checkbox"> ' . htmlspecialchars($node->getName());
-        
-        switch ($node->getType()) {
-            case 'button':
-                $html .= $this->renderButtonNode($node);
-                break;
-            case 'simple':
-            default:
-                // Simple node - no additional content
-                break;
-        }
-        
-        $html .= '</div>';
-        
-        return $html;
+        return '<div><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '</div>';
     }
 
-    private function renderButtonNode(TreeNode $node): string
+    public function visitButtonNode(ButtonNode $node): string
     {
-        if (!$node instanceof ButtonNode) {
-            return '';
-        }
+        $html = '<div><input type="checkbox"> ' . htmlspecialchars($node->getName());
         
         $action = $node->getButtonAction();
         $buttonText = htmlspecialchars($node->getButtonText());
         
         if ($action) {
-            return ' <br/> <button onclick="' . htmlspecialchars($action) . '">' . $buttonText . '</button>';
+            $html .= ' <br/> <button onclick="' . htmlspecialchars($action) . '">' . $buttonText . '</button>';
+        } else {
+            $html .= ' <br/> <button>' . $buttonText . '</button>';
         }
         
-        return ' <br/> <button>' . $buttonText . '</button>';
+        $html .= '</div>';
+        
+        return $html;
     }
 } 

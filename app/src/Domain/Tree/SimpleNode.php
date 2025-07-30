@@ -10,4 +10,9 @@ class SimpleNode extends AbstractTreeNode
     {
         return 'simple';
     }
+    
+    public function accept(TreeNodeVisitor $visitor): string
+    {
+        return $visitor->visitSimpleNode($this);
+    }
 } 

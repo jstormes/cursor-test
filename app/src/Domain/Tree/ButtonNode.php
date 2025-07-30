@@ -30,4 +30,9 @@ class ButtonNode extends AbstractTreeNode
     {
         return $this->buttonAction;
     }
+    
+    public function accept(TreeNodeVisitor $visitor): string
+    {
+        return $visitor->visitButtonNode($this);
+    }
 } 
