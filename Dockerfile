@@ -298,6 +298,11 @@ FROM php8base AS php8prod
 ############################################################################
 
 ############################################################################
+# Eable Mod Rewrite
+############################################################################
+RUN a2enmod rewrite
+
+############################################################################
 # Copy production ini file
 ############################################################################
 COPY config/docker/php.ini-production /usr/local/etc/php/php.ini
@@ -306,6 +311,10 @@ COPY config/docker/php.ini-production /usr/local/etc/php/php.ini
 # Copy the source files into the container.
 ############################################################################
 COPY ./app /var/www
+
+RUN chmod -R 777 /var/www/logs
+
+RUN chmod -R 777 /var/www/var
 
 WORKDIR /var/www
 
