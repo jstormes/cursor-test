@@ -126,10 +126,11 @@ HTML;
     width: 0; height: 20px;
 }
 .tree li div{
-    border: 1px solid #ccc;
+    border: 1px solid #1e3a8a;
     padding: 5px 10px;
     text-decoration: none;
-    color: #666;
+    color: #1e3a8a;
+    background-color: #ffffff;
     font-family: arial, verdana, tahoma;
     font-size: 11px;
     display: inline-block;
@@ -143,7 +144,7 @@ HTML;
     -moz-transition: all 0.5s;
 }
 .tree li div:hover, .tree li div:hover+ul li div {
-    background: #c8e4f8; color: #000; border: 1px solid #94a0b4;
+    background: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a;
 }
 .tree li div:hover+ul li::after, 
 .tree li div:hover+ul li::before, 
@@ -155,7 +156,7 @@ HTML;
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
-    background-color: #f5f5f5;
+    background-color: #e8e8e8;
 }
 
 h1 {
