@@ -102,4 +102,25 @@ class DatabaseTreeRepository implements TreeRepository
         $sql = 'DELETE FROM trees WHERE id = ?';
         $this->connection->execute($sql, [$id]);
     }
+
+    public function softDelete(int $id): void
+    {
+        $sql = 'UPDATE trees SET is_active = 0, updated_at = NOW() WHERE id = ?';
+        $this->connection->execute($sql, [$id]);
+    }
+
+    public function restore(int $id): void
+    {
+        $sql = 'UPDATE trees SET is_active = 1, updated_at = NOW() WHERE id = ?';
+        $this->connection->execute($sql, [$id]);
+    }
+
+    public function findDeleted(): array
+    {
+        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 0 ORDER BY name';
+        $statement = $this->connection->query($sql);
+        $data = $statement->fetchAll();
+        
+        return $this->dataMapper->mapToEntities($data);
+    }
 } 

@@ -63,11 +63,12 @@ class ViewTreesAction extends Action
             <p>Showing all active trees from the database.</p>
             <div class="header-actions">
                 <a href="/tree/add" class="btn btn-primary">➕ Add New Tree</a>
+                <a href="/trees/deleted" class="btn btn-secondary">🗑️ View Deleted Trees</a>
             </div>
         </div>
         
         <div class="stats">
-            <p>Total trees found: <strong>{$this->countTrees($trees)}</strong></p>
+            <p>Total active trees found: <strong>{$this->countTrees($trees)}</strong></p>
         </div>
         
         {$treesHtml}
@@ -120,6 +121,7 @@ HTML;
     <div class="tree-actions">
         <a href="/tree/{$tree->getId()}" class="btn btn-small">View Tree</a>
         <a href="/tree/{$tree->getId()}/json" class="btn btn-small btn-secondary">JSON</a>
+        <a href="/tree/{$tree->getId()}/delete" class="btn btn-small btn-danger">🗑️ Delete</a>
     </div>
 </div>
 HTML;
@@ -358,6 +360,17 @@ body {
 .btn-secondary:hover {
     background: #5a6268;
     transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
 }
 
 .btn-small {

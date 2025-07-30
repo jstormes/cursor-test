@@ -32,7 +32,22 @@ interface TreeRepository
     public function save(Tree $tree): void;
 
     /**
-     * Delete a tree by ID
+     * Delete a tree by ID (hard delete)
      */
     public function delete(int $id): void;
+
+    /**
+     * Soft delete a tree by ID
+     */
+    public function softDelete(int $id): void;
+
+    /**
+     * Restore a soft-deleted tree by ID
+     */
+    public function restore(int $id): void;
+
+    /**
+     * Find all deleted trees
+     */
+    public function findDeleted(): array;
 } 
