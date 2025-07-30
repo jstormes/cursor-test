@@ -128,7 +128,7 @@ RUN docker-php-ext-install pdo pdo_mysql && docker-php-ext-configure pdo_mysql
 RUN export XDEBUG_MODE=off \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
     && chmod a+x /usr/local/bin/composer.phar \
-    && echo "#!/usr/bin/env bash\n\nXDEBUG_MODE=off /usr/local/bin/composer.phar \$@" > /usr/local/bin/composer \
+    && echo "#!/usr/bin/env bash\n\nXDEBUG_MODE=coverage /usr/local/bin/composer.phar \$@" > /usr/local/bin/composer \
     && chmod a+x /usr/local/bin/composer
 
 
