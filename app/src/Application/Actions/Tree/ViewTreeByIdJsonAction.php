@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
-class ViewTreeJsonAction extends Action
+class ViewTreeByIdJsonAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
@@ -25,15 +25,18 @@ class ViewTreeJsonAction extends Action
     protected function action(): Response
     {
         try {
-            // Get the first active tree from the database
-            $trees = $this->treeRepository->findActive();
+            // Get the tree ID from the route parameters
+            $treeId = (int) $this->resolveArg('id');
             
-            if (empty($trees)) {
-                return $this->respondWithError('No active trees found in the database');
+            // Get the specific tree from the database
+            $tree = $this->treeRepository->findById($treeId);
+            
+            if (!$tree) {
+                return $this->respondWithError('Tree not found', [
+                    'tree_id' => $treeId,
+                    'message' => "Tree with ID {$treeId} was not found in the database"
+                ]);
             }
-            
-            $tree = $trees[0]; // Use the first active tree
-            $treeId = $tree->getId();
             
             // Get all nodes for this tree
             $nodes = $this->treeNodeRepository->findByTreeId($treeId);
@@ -85,7 +88,7 @@ class ViewTreeJsonAction extends Action
             return $this->response->withHeader('Content-Type', 'application/json');
             
         } catch (\Exception $e) {
-            $this->logger->error('Error loading tree JSON: ' . $e->getMessage());
+            $this->logger->error('Error loading tree JSON by ID: ' . $e->getMessage());
             return $this->respondWithError('Error loading tree structure: ' . $e->getMessage());
         }
     }

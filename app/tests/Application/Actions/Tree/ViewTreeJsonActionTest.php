@@ -5,115 +5,324 @@ declare(strict_types=1);
 namespace App\Tests\Application\Actions\Tree;
 
 use App\Application\Actions\Tree\ViewTreeJsonAction;
+use App\Domain\Tree\TreeRepository;
+use App\Domain\Tree\TreeNodeRepository;
+use App\Domain\Tree\Tree;
+use App\Domain\Tree\SimpleNode;
+use App\Domain\Tree\ButtonNode;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
+use DateTime;
 
 class ViewTreeJsonActionTest extends TestCase
 {
+    private ViewTreeJsonAction $action;
+    private ServerRequestInterface $request;
+    private ResponseInterface $response;
+    private StreamInterface $stream;
+    private LoggerInterface $logger;
+    private TreeRepository $treeRepository;
+    private TreeNodeRepository $treeNodeRepository;
+
+    protected function setUp(): void
+    {
+        $this->request = $this->createMock(ServerRequestInterface::class);
+        $this->response = $this->createMock(ResponseInterface::class);
+        $this->stream = $this->createMock(StreamInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->treeRepository = $this->createMock(TreeRepository::class);
+        $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
+        
+        $this->action = new ViewTreeJsonAction(
+            $this->logger,
+            $this->treeRepository,
+            $this->treeNodeRepository
+        );
+    }
+
     public function testActionReturnsJsonResponse(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        // Mock node data
+        $rootNode = new ButtonNode(1, 'Root', 1, null, 0, ['button_text' => 'Click Me']);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode]);
+
+        $this->response->expects($this->once())
+            ->method('getBody')
+            ->willReturn($this->stream);
+
+        $this->response->expects($this->once())
+            ->method('withHeader')
+            ->with('Content-Type', 'application/json')
+            ->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return $data['success'] === true && 
+                       $data['message'] === 'Tree structure retrieved successfully';
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
     }
 
     public function testJsonStructureIsValid(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $json = (string) $response->getBody();
-        $data = json_decode($json, true);
+        // Mock node data
+        $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode]);
 
-        $this->assertIsArray($data);
-        $this->assertArrayHasKey('success', $data);
-        $this->assertArrayHasKey('message', $data);
-        $this->assertArrayHasKey('data', $data);
-        $this->assertTrue($data['success']);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return is_array($data) &&
+                       array_key_exists('success', $data) &&
+                       array_key_exists('message', $data) &&
+                       array_key_exists('data', $data) &&
+                       $data['success'] === true;
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
     }
 
     public function testTreeDataStructure(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $json = (string) $response->getBody();
-        $data = json_decode($json, true);
+        // Mock node data
+        $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode]);
 
-        $this->assertArrayHasKey('tree', $data['data']);
-        $this->assertArrayHasKey('total_nodes', $data['data']);
-        $this->assertArrayHasKey('total_levels', $data['data']);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
 
-        $tree = $data['data']['tree'];
-        $this->assertArrayHasKey('id', $tree);
-        $this->assertArrayHasKey('name', $tree);
-        $this->assertArrayHasKey('type', $tree);
-        $this->assertArrayHasKey('has_children', $tree);
-        $this->assertArrayHasKey('children_count', $tree);
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return array_key_exists('tree', $data['data']) &&
+                       array_key_exists('total_nodes', $data['data']) &&
+                       array_key_exists('total_levels', $data['data']) &&
+                       array_key_exists('total_root_nodes', $data['data']);
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
     }
 
-    public function testMainNodeHasButtonData(): void
+    public function testButtonNodeData(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $json = (string) $response->getBody();
-        $data = json_decode($json, true);
+        // Mock button node data
+        $rootNode = new ButtonNode(1, 'Root', 1, null, 0, ['button_text' => 'Click Me']);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode]);
 
-        $tree = $data['data']['tree'];
-        $this->assertEquals('ButtonNode', $tree['type']);
-        $this->assertArrayHasKey('button', $tree);
-        $this->assertArrayHasKey('text', $tree['button']);
-        $this->assertArrayHasKey('action', $tree['button']);
-        $this->assertEquals('Test Btn', $tree['button']['text']);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                $rootNodes = $data['data']['tree']['root_nodes'];
+                $firstNode = $rootNodes[0];
+                return $firstNode['type'] === 'ButtonNode' &&
+                       array_key_exists('button', $firstNode) &&
+                       $firstNode['button']['text'] === 'Click Me';
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
     }
 
     public function testChildrenStructure(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $json = (string) $response->getBody();
-        $data = json_decode($json, true);
+        // Mock node data with children
+        $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
+        $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode, $childNode]);
 
-        $tree = $data['data']['tree'];
-        $this->assertTrue($tree['has_children']);
-        $this->assertEquals(2, $tree['children_count']);
-        $this->assertArrayHasKey('children', $tree);
-        $this->assertCount(2, $tree['children']);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
 
-        // Check first child (Sub-1)
-        $sub1 = $tree['children'][0];
-        $this->assertEquals('SimpleNode', $sub1['type']);
-        $this->assertFalse($sub1['has_children']);
-        $this->assertEquals(0, $sub1['children_count']);
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                $rootNodes = $data['data']['tree']['root_nodes'];
+                $firstNode = $rootNodes[0];
+                return $firstNode['has_children'] === true &&
+                       $firstNode['children_count'] === 1 &&
+                       array_key_exists('children', $firstNode) &&
+                       count($firstNode['children']) === 1;
+            }));
 
-        // Check second child (Sub-2)
-        $sub2 = $tree['children'][1];
-        $this->assertEquals('SimpleNode', $sub2['type']);
-        $this->assertTrue($sub2['has_children']);
-        $this->assertEquals(2, $sub2['children_count']);
-        $this->assertCount(2, $sub2['children']);
+        $this->action->__invoke($this->request, $this->response, []);
     }
 
     public function testNodeCounting(): void
     {
-        $app = $this->getAppInstance();
-        $request = $this->createRequest('GET', '/tree/json');
-        $response = $app->handle($request);
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
 
-        $json = (string) $response->getBody();
-        $data = json_decode($json, true);
+        // Mock node data
+        $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
+        $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode, $childNode]);
 
-        // Should have 5 nodes total: Main, Sub-1, Sub-2, Sub-2-1, Sub-2-2
-        $this->assertEquals(5, $data['data']['total_nodes']);
-        $this->assertEquals(2, $data['data']['total_levels']);
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return $data['data']['total_nodes'] === 2 &&
+                       $data['data']['total_root_nodes'] === 1;
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
+    }
+
+    public function testNoTreesFound(): void
+    {
+        // Mock empty tree data
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([]);
+
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return $data['success'] === false &&
+                       $data['error'] === true &&
+                       $data['message'] === 'No active trees found in the database';
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
+    }
+
+    public function testNoNodesFound(): void
+    {
+        // Mock tree data
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
+
+        // Mock empty node data
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([]);
+
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                return $data['success'] === false &&
+                       $data['error'] === true &&
+                       $data['message'] === 'No nodes found for this tree' &&
+                       $data['data']['tree_id'] === 1 &&
+                       $data['data']['tree_name'] === 'Test Tree';
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
+    }
+
+    public function testTreeMetadata(): void
+    {
+        // Mock tree data
+        $createdAt = new DateTime('2023-01-01 10:00:00');
+        $updatedAt = new DateTime('2023-01-01 11:00:00');
+        $tree = new Tree(1, 'Test Tree', 'A test tree', $createdAt, $updatedAt, true);
+        $this->treeRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$tree]);
+
+        // Mock node data
+        $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
+        $this->treeNodeRepository->expects($this->once())
+            ->method('findByTreeId')
+            ->with(1)
+            ->willReturn([$rootNode]);
+
+        $this->response->method('getBody')->willReturn($this->stream);
+        $this->response->method('withHeader')->willReturnSelf();
+
+        $this->stream->expects($this->once())
+            ->method('write')
+            ->with($this->callback(function ($json) {
+                $data = json_decode($json, true);
+                $treeData = $data['data']['tree'];
+                return $treeData['id'] === 1 &&
+                       $treeData['name'] === 'Test Tree' &&
+                       $treeData['description'] === 'A test tree' &&
+                       $treeData['is_active'] === true &&
+                       array_key_exists('created_at', $treeData) &&
+                       array_key_exists('updated_at', $treeData);
+            }));
+
+        $this->action->__invoke($this->request, $this->response, []);
     }
 } 

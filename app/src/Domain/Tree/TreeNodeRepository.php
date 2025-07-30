@@ -9,7 +9,7 @@ interface TreeNodeRepository
     /**
      * Find a tree node by ID
      */
-    public function findById(int $id): ?TreeNode;
+    public function findById(int $id): ?AbstractTreeNode;
 
     /**
      * Find all nodes for a specific tree
@@ -34,7 +34,7 @@ interface TreeNodeRepository
     /**
      * Save a tree node (insert or update)
      */
-    public function save(TreeNode $node): void;
+    public function save(AbstractTreeNode $node): void;
 
     /**
      * Delete a tree node by ID

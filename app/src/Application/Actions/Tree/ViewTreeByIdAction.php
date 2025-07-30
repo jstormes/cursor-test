@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
-class ViewTreeAction extends Action
+class ViewTreeByIdAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
@@ -25,15 +25,15 @@ class ViewTreeAction extends Action
     protected function action(): Response
     {
         try {
-            // Get the first active tree from the database
-            $trees = $this->treeRepository->findActive();
+            // Get the tree ID from the route parameters
+            $treeId = (int) $this->resolveArg('id');
             
-            if (empty($trees)) {
-                return $this->generateNoTreesHTML();
+            // Get the specific tree from the database
+            $tree = $this->treeRepository->findById($treeId);
+            
+            if (!$tree) {
+                return $this->generateTreeNotFoundHTML($treeId);
             }
-            
-            $tree = $trees[0]; // Use the first active tree
-            $treeId = $tree->getId();
             
             // Get all nodes for this tree
             $nodes = $this->treeNodeRepository->findByTreeId($treeId);
@@ -63,7 +63,7 @@ class ViewTreeAction extends Action
             return $this->response->withHeader('Content-Type', 'text/html');
             
         } catch (\Exception $e) {
-            $this->logger->error('Error loading tree: ' . $e->getMessage());
+            $this->logger->error('Error loading tree by ID: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
@@ -124,7 +124,7 @@ class ViewTreeAction extends Action
     
     <div class="navigation">
         <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
-        <a href="/tree/json" class="btn btn-primary">View JSON</a>
+        <a href="/tree/{$tree->getId()}/json" class="btn btn-primary">View JSON</a>
     </div>
     
     {$treeHtml}
@@ -133,7 +133,7 @@ class ViewTreeAction extends Action
 HTML;
     }
     
-    private function generateNoTreesHTML(): Response
+    private function generateTreeNotFoundHTML(int $treeId): Response
     {
         $html = <<<HTML
 <!DOCTYPE html>
@@ -141,17 +141,17 @@ HTML;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No Trees Available</title>
+    <title>Tree Not Found</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
         .message { color: #666; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
     </style>
 </head>
 <body>
-    <h1>No Trees Available</h1>
-    <p class="message">No active trees found in the database.</p>
-    <a href="/trees" class="btn">Go to Trees List</a>
+    <h1>Tree Not Found</h1>
+    <p class="message">Tree with ID {$treeId} was not found in the database.</p>
+    <a href="/trees" class="btn">Back to Trees List</a>
 </body>
 </html>
 HTML;
