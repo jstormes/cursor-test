@@ -8,6 +8,7 @@ use App\Domain\Tree\AbstractTreeNode;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Database\DatabaseConnection;
 use App\Infrastructure\Database\TreeNodeDataMapper;
+use DateTime;
 
 class DatabaseTreeNodeRepository implements TreeNodeRepository
 {
@@ -89,6 +90,7 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     public function save(AbstractTreeNode $node): void
     {
         $data = $this->dataMapper->mapToArray($node);
+        $now = (new DateTime())->format('Y-m-d H:i:s');
         
         if ($node->getId() === null) {
             // Insert
@@ -100,8 +102,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
                 $data['sort_order'],
                 $data['type_class'],
                 $data['type_data'],
-                $data['created_at'],
-                $data['updated_at']
+                $now,
+                $now
             ]);
         } else {
             // Update
@@ -113,7 +115,7 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
                 $data['sort_order'],
                 $data['type_class'],
                 $data['type_data'],
-                $data['updated_at'],
+                $now,
                 $data['id']
             ]);
         }

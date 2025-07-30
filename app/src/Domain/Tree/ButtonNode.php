@@ -49,4 +49,14 @@ class ButtonNode extends AbstractTreeNode
             'button_action' => $this->buttonAction,
         ];
     }
+    
+    public function setButtonText(string $buttonText): void
+    {
+        $this->buttonText = $buttonText;
+    }
+    
+    public function setButtonAction(string $buttonAction): void
+    {
+        $this->buttonAction = $buttonAction;
+    }
 } 

@@ -124,7 +124,8 @@ class ViewTreeByIdAction extends Action
     
     <div class="navigation">
         <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
-        <a href="/tree/{$tree->getId()}/json" class="btn btn-primary">View JSON</a>
+        <a href="/tree/{$tree->getId()}/add-node" class="btn btn-primary">➕ Add Node</a>
+        <a href="/tree/{$tree->getId()}/json" class="btn btn-secondary">View JSON</a>
     </div>
     
     {$treeHtml}
