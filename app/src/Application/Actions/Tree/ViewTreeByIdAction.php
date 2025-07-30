@@ -164,6 +164,7 @@ HTML;
     private function generateNoNodesHTML($tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
+        $treeId = $tree->getId();
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -172,15 +173,65 @@ HTML;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Empty Tree - {$treeName}</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .message { color: #666; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            color: #333;
+        }
+        .message { 
+            color: #666; 
+            margin: 20px 0; 
+            font-size: 1.1em;
+        }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin: 0 10px; 
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Empty Tree: {$treeName}</h1>
-    <p class="message">This tree has no nodes yet.</p>
-    <a href="/trees" class="btn">Back to Trees List</a>
+    <div class="container">
+        <h1>Empty Tree: {$treeName}</h1>
+        <p class="message">This tree has no nodes yet. Add your first node to get started!</p>
+        <div style="margin-top: 30px;">
+            <a href="/tree/{$treeId}/add-node" class="btn btn-primary">➕ Add First Node</a>
+            <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
+        </div>
+    </div>
 </body>
 </html>
 HTML;

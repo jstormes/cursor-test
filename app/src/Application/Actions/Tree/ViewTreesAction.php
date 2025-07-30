@@ -58,8 +58,13 @@ class ViewTreesAction extends Action
 </head>
 <body>
     <div class="container">
-        <h1>Trees List</h1>
-        <p>Showing all active trees from the database.</p>
+        <div class="header">
+            <h1>Trees List</h1>
+            <p>Showing all active trees from the database.</p>
+            <div class="header-actions">
+                <a href="/tree/add" class="btn btn-primary">➕ Add New Tree</a>
+            </div>
+        </div>
         
         <div class="stats">
             <p>Total trees found: <strong>{$this->countTrees($trees)}</strong></p>
@@ -186,23 +191,36 @@ body {
     overflow: hidden;
 }
 
-h1 {
+.header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 30px;
     text-align: center;
     margin: 0;
+}
+
+.header h1 {
+    margin: 0 0 10px 0;
     font-size: 2.5em;
     font-weight: 300;
 }
 
-.container > p {
-    padding: 20px 30px;
-    color: #666;
-    text-align: center;
+.header p {
+    margin: 0 0 20px 0;
     font-size: 1.1em;
-    margin: 0;
-    border-bottom: 1px solid #eee;
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.header-actions .btn {
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: 600;
 }
 
 .stats {
