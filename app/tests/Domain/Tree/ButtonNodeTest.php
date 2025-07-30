@@ -11,10 +11,13 @@ class ButtonNodeTest extends TestCase
 {
     public function testConstructorAndGetters(): void
     {
-        $node = new ButtonNode('Test Node', 'Click Me', 'alert("test")');
+        $node = new ButtonNode(1, 'Test Node', 1, null, 0, [
+            'button_text' => 'Click Me',
+            'button_action' => 'alert("test")'
+        ]);
         
         $this->assertEquals('Test Node', $node->getName());
-        $this->assertEquals('button', $node->getType());
+        $this->assertEquals('ButtonNode', $node->getType());
         $this->assertEquals('Click Me', $node->getButtonText());
         $this->assertEquals('alert("test")', $node->getButtonAction());
         $this->assertFalse($node->hasChildren());
@@ -23,18 +26,18 @@ class ButtonNodeTest extends TestCase
 
     public function testConstructorWithDefaults(): void
     {
-        $node = new ButtonNode('Test Node');
+        $node = new ButtonNode(1, 'Test Node', 1);
         
         $this->assertEquals('Test Node', $node->getName());
-        $this->assertEquals('button', $node->getType());
+        $this->assertEquals('ButtonNode', $node->getType());
         $this->assertEquals('Test Btn', $node->getButtonText());
         $this->assertEquals('', $node->getButtonAction());
     }
 
     public function testAddChild(): void
     {
-        $parent = new ButtonNode('Parent', 'Parent Button');
-        $child = new ButtonNode('Child', 'Child Button');
+        $parent = new ButtonNode(1, 'Parent', 1, null, 0, ['button_text' => 'Parent Button']);
+        $child = new ButtonNode(2, 'Child', 1, 1, 0, ['button_text' => 'Child Button']);
         
         $parent->addChild($child);
         
@@ -45,9 +48,9 @@ class ButtonNodeTest extends TestCase
 
     public function testAddMultipleChildren(): void
     {
-        $parent = new ButtonNode('Parent', 'Parent Button');
-        $child1 = new ButtonNode('Child 1', 'Button 1');
-        $child2 = new ButtonNode('Child 2', 'Button 2');
+        $parent = new ButtonNode(1, 'Parent', 1, null, 0, ['button_text' => 'Parent Button']);
+        $child1 = new ButtonNode(2, 'Child 1', 1, 1, 0, ['button_text' => 'Button 1']);
+        $child2 = new ButtonNode(3, 'Child 2', 1, 1, 1, ['button_text' => 'Button 2']);
         
         $parent->addChild($child1);
         $parent->addChild($child2);
@@ -60,7 +63,7 @@ class ButtonNodeTest extends TestCase
 
     public function testEmptyChildrenArray(): void
     {
-        $node = new ButtonNode('Test', 'Test Button');
+        $node = new ButtonNode(1, 'Test', 1, null, 0, ['button_text' => 'Test Button']);
         
         $this->assertEmpty($node->getChildren());
         $this->assertFalse($node->hasChildren());
@@ -68,8 +71,8 @@ class ButtonNodeTest extends TestCase
 
     public function testHasChildrenAfterAdding(): void
     {
-        $parent = new ButtonNode('Parent', 'Parent Button');
-        $child = new ButtonNode('Child', 'Child Button');
+        $parent = new ButtonNode(1, 'Parent', 1, null, 0, ['button_text' => 'Parent Button']);
+        $child = new ButtonNode(2, 'Child', 1, 1, 0, ['button_text' => 'Child Button']);
         
         $this->assertFalse($parent->hasChildren());
         

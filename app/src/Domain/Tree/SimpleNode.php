@@ -8,11 +8,16 @@ class SimpleNode extends AbstractTreeNode
 {
     public function getType(): string
     {
-        return 'simple';
+        return 'SimpleNode';
     }
     
     public function accept(TreeNodeVisitor $visitor): string
     {
         return $visitor->visitSimpleNode($this);
+    }
+
+    public function getTypeData(): array
+    {
+        return [];
     }
 } 

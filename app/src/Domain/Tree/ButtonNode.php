@@ -9,16 +9,22 @@ class ButtonNode extends AbstractTreeNode
     private string $buttonText;
     private string $buttonAction;
 
-    public function __construct(string $name, string $buttonText = 'Test Btn', string $buttonAction = '')
-    {
-        parent::__construct($name);
-        $this->buttonText = $buttonText;
-        $this->buttonAction = $buttonAction;
+    public function __construct(
+        ?int $id,
+        string $name,
+        int $treeId,
+        ?int $parentId = null,
+        int $sortOrder = 0,
+        array $typeData = []
+    ) {
+        parent::__construct($id, $name, $treeId, $parentId, $sortOrder);
+        $this->buttonText = $typeData['button_text'] ?? 'Test Btn';
+        $this->buttonAction = $typeData['button_action'] ?? '';
     }
 
     public function getType(): string
     {
-        return 'button';
+        return 'ButtonNode';
     }
 
     public function getButtonText(): string
@@ -34,5 +40,13 @@ class ButtonNode extends AbstractTreeNode
     public function accept(TreeNodeVisitor $visitor): string
     {
         return $visitor->visitButtonNode($this);
+    }
+
+    public function getTypeData(): array
+    {
+        return [
+            'button_text' => $this->buttonText,
+            'button_action' => $this->buttonAction,
+        ];
     }
 } 

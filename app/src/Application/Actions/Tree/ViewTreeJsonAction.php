@@ -16,13 +16,13 @@ class ViewTreeJsonAction extends Action
     protected function action(): Response
     {
         // Build the tree structure using the same hierarchy as HTML view
-        $main = new ButtonNode('Main', 'Test Btn'); // Main has a button
+        $main = new ButtonNode(1, 'Main', 1, null, 0, ['button_text' => 'Test Btn']); // Main has a button
         
-        $sub1 = new SimpleNode('Sub-1');
-        $sub2 = new SimpleNode('Sub-2');
+        $sub1 = new SimpleNode(2, 'Sub-1', 1, 1, 0);
+        $sub2 = new SimpleNode(3, 'Sub-2', 1, 1, 1);
         
-        $sub21 = new SimpleNode('Sub-2-1');
-        $sub22 = new SimpleNode('Sub-2-2');
+        $sub21 = new SimpleNode(4, 'Sub-2-1', 1, 3, 0);
+        $sub22 = new SimpleNode(5, 'Sub-2-2', 1, 3, 1);
         
         // Add children to Sub-2
         $sub2->addChild($sub21);

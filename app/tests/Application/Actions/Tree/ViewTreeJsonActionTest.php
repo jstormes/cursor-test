@@ -67,7 +67,7 @@ class ViewTreeJsonActionTest extends TestCase
         $data = json_decode($json, true);
 
         $tree = $data['data']['tree'];
-        $this->assertEquals('button', $tree['type']);
+        $this->assertEquals('ButtonNode', $tree['type']);
         $this->assertArrayHasKey('button', $tree);
         $this->assertArrayHasKey('text', $tree['button']);
         $this->assertArrayHasKey('action', $tree['button']);
@@ -91,13 +91,13 @@ class ViewTreeJsonActionTest extends TestCase
 
         // Check first child (Sub-1)
         $sub1 = $tree['children'][0];
-        $this->assertEquals('simple', $sub1['type']);
+        $this->assertEquals('SimpleNode', $sub1['type']);
         $this->assertFalse($sub1['has_children']);
         $this->assertEquals(0, $sub1['children_count']);
 
         // Check second child (Sub-2)
         $sub2 = $tree['children'][1];
-        $this->assertEquals('simple', $sub2['type']);
+        $this->assertEquals('SimpleNode', $sub2['type']);
         $this->assertTrue($sub2['has_children']);
         $this->assertEquals(2, $sub2['children_count']);
         $this->assertCount(2, $sub2['children']);

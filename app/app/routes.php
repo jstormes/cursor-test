@@ -6,6 +6,7 @@ use App\Application\Actions\User\ListUsersAction;
 use App\Application\Actions\User\ViewUserAction;
 use App\Application\Actions\Tree\ViewTreeAction;
 use App\Application\Actions\Tree\ViewTreeJsonAction;
+use App\Application\Actions\Tree\ViewTreesAction;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -27,6 +28,7 @@ return function (App $app) {
         $group->get('/{id}', ViewUserAction::class);
     });
 
+    $app->get('/trees', ViewTreesAction::class);
     $app->get('/tree', ViewTreeAction::class);
     $app->get('/tree/json', ViewTreeJsonAction::class);
 };
