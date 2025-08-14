@@ -420,7 +420,7 @@ HTML;
 }
 .tree li div{
     border: 1px solid #1e3a8a;
-    padding: 5px 10px 15px 10px;
+    padding: 15px 10px 15px 10px;
     text-decoration: none;
     color: #1e3a8a;
     background-color: #ffffff;
@@ -454,7 +454,7 @@ HTML;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 10;
     transition: all 0.3s;
     -webkit-transition: all 0.3s;
@@ -465,6 +465,34 @@ HTML;
     background-color: #0f172a;
     transform: translateX(-50%) scale(1.1);
 }
+
+.tree li div .remove-icon {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background-color: #dc3545;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 10;
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+}
+
+.tree li div .remove-icon:hover {
+    background-color: #a71e2a;
+    transform: translateX(-50%) scale(1.1);
+}
 .tree li div:hover, .tree li div:hover+ul li div {
     background: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a;
 }
@@ -472,6 +500,34 @@ HTML;
 .tree li div:hover .add-icon {
     background-color: #ffffff;
     color: #1e3a8a;
+}
+
+.tree li div:hover .remove-icon {
+    background-color: #ffffff;
+    color: #dc3545;
+}
+
+.tree li div input[type="checkbox"] {
+    margin: 0 4px 0 0;
+    transform: scale(1.1);
+    accent-color: #1e3a8a;
+    vertical-align: middle;
+}
+
+.tree li div button {
+    margin-top: 8px;
+    padding: 4px 8px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tree li div button:hover {
+    background-color: #5a6268;
 }
 .tree li div:hover+ul li::after, 
 .tree li div:hover+ul li::before, 

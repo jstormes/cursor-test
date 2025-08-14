@@ -23,12 +23,12 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
 
     public function visitSimpleNode(SimpleNode $node): string
     {
-        return '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<span class="add-icon">+</span></div>';
+        return '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<span class="add-icon">+</span></div>';
     }
 
     public function visitButtonNode(ButtonNode $node): string
     {
-        $html = '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName());
+        $html = '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName());
         
         $action = $node->getButtonAction();
         $buttonText = htmlspecialchars($node->getButtonText());
