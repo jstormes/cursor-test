@@ -52,9 +52,16 @@ class ViewTreeByIdAction extends Action
             // Generate HTML using the renderer
             $renderer = new HtmlTreeNodeRenderer();
             $treeHtml = '<div class="tree"><ul>';
+            
+            // Add top-level add icon
+            $treeHtml .= '<li><div class="tree-node-no-box"><span class="add-icon">+</span></div>';
+            $treeHtml .= '<ul>';
+            
             foreach ($rootNodes as $rootNode) {
                 $treeHtml .= '<li>' . $renderer->render($rootNode) . '</li>';
             }
+            
+            $treeHtml .= '</ul></li>';
             $treeHtml .= '</ul></div>';
             
             $html = $this->generateHTML($treeHtml, $tree);
@@ -165,73 +172,40 @@ HTML;
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
+        $css = $this->getCSS();
+        
+        $treeHtml = '<div class="tree"><ul>';
+        $treeHtml .= '<li><div class="tree-node-no-box"><span class="add-icon">+</span></div></li>';
+        $treeHtml .= '</ul></div>';
+        
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empty Tree - {$treeName}</title>
+    <title>Tree Structure - {$treeName}</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            color: #333;
-        }
-        .message { 
-            color: #666; 
-            margin: 20px 0; 
-            font-size: 1.1em;
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 12px 24px; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            margin: 0 10px; 
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
+        {$css}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Empty Tree: {$treeName}</h1>
-        <p class="message">This tree has no nodes yet. Add your first node to get started!</p>
-        <div style="margin-top: 30px;">
-            <a href="/tree/{$treeId}/add-node" class="btn btn-primary">➕ Add First Node</a>
-            <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
+    <div class="header">
+        <h1>Tree Structure: {$treeName}</h1>
+        <p class="description">Empty tree - add your first node</p>
+        <div class="tree-info">
+            <span class="tree-id">Tree ID: {$tree->getId()}</span>
+            <span class="created">Created: {$tree->getCreatedAt()->format('M j, Y g:i A')}</span>
         </div>
     </div>
+    
+    <div class="navigation">
+        <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
+        <a href="/tree/{$tree->getId()}/add-node" class="btn btn-primary">➕ Add Node</a>
+        <a href="/tree/{$tree->getId()}/json" class="btn btn-secondary">View JSON</a>
+    </div>
+    
+    {$treeHtml}
 </body>
 </html>
 HTML;
@@ -528,6 +502,20 @@ HTML;
 
 .tree li div button:hover {
     background-color: #5a6268;
+}
+
+.tree li div.tree-node-no-box {
+    border: none;
+    background: transparent;
+    padding: 0;
+    position: relative;
+    display: inline-block;
+}
+
+.tree li div.tree-node-no-box:hover+ul li div {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
+    border: 1px solid #1e3a8a !important;
 }
 
 .tree li div:hover+ul li::after, 

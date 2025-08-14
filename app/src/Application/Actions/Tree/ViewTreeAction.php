@@ -478,6 +478,7 @@ HTML;
     background-color: #5a6268;
 }
 
+
 .tree li div:hover+ul li::after, 
 .tree li div:hover+ul li::before, 
 .tree li div:hover+ul::before, 
