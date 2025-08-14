@@ -1,0 +1,249 @@
+# Always Run in Docker - Development Rule
+
+## Overview
+This project MUST always run in Docker containers. No local PHP, database, or development tools should be installed or used outside of Docker. This ensures consistent development environments across all team members and deployment scenarios.
+
+## Core Principle
+**Everything runs in Docker - no exceptions.**
+
+## Docker Services Available
+
+### Development Services
+- **php-dev**: Main development server (port 8088)
+- **php-prod**: Production testing server (port 9088)
+- **mariadb**: Database server (port 5000)
+- **phpmyadmin**: Database management (port 7088)
+
+## Mandatory Docker Workflow
+
+### 1. Environment Startup
+**ALWAYS** start with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+### 2. Code Execution
+**NEVER** run PHP locally. All PHP execution must happen in containers:
+- Web requests: Access via http://localhost:8088
+- CLI commands: Execute inside container
+- Tests: Run inside container
+- Composer: Use inside container
+
+### 3. Database Operations
+**NEVER** connect to database locally:
+- Use `mariadb:3306` from within containers
+- Use phpMyAdmin at http://localhost:7088
+- Connection string: `mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password`
+
+### 4. Container Access Commands
+
+#### Access PHP Development Container
+```bash
+# Linux/macOS
+docker exec -it $(docker-compose ps -q php-dev) bash
+
+# Windows PowerShell
+docker exec -it cursor-test-php-dev-1 bash
+```
+
+#### Run PHP Commands in Container
+```bash
+docker exec -it $(docker-compose ps -q php-dev) php /app/public/index.php
+```
+
+#### Run Composer in Container
+```bash
+docker exec -it $(docker-compose ps -q php-dev) composer install
+```
+
+#### Run Tests in Container
+```bash
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit
+```
+
+### 5. File Development
+- All PHP code goes in `app/` directory
+- Files are automatically mounted to `/app` in container
+- Changes are immediately reflected due to volume mounting
+- **NEVER** edit files outside the mapped volumes
+
+### 6. Development Tools
+All development tools must run in containers:
+- **PHP**: Use container PHP 8.1
+- **Composer**: Use container composer
+- **Database**: Use container MariaDB
+- **Testing**: Use container PHPUnit
+- **Debugging**: Use container XDebug
+
+### 7. Testing Strategy
+**ALWAYS** run tests in containers:
+```bash
+# Run all tests
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit
+
+# Run specific test file
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit tests/Domain/Tree/TreeTest.php
+
+# Run with coverage
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit --coverage-html coverage/
+
+# Run verbose tests
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit --verbose
+```
+
+### 8. Production Testing
+Use the production container for testing:
+```bash
+# Access production container
+docker exec -it $(docker-compose ps -q php-prod) bash
+
+# Test production environment
+curl http://localhost:9088
+```
+
+### 9. Database Development
+**NEVER** use local database:
+- All database operations through containers
+- Use phpMyAdmin at http://localhost:7088
+- Database initialization scripts in `database/` directory
+- Connection from containers: `mariadb:3306`
+
+### 10. Environment Variables
+All environment variables are managed in `docker-compose.yml`:
+- `MYSQL_DSN`: Database connection string
+- `TZ`: Timezone (America/Chicago)
+- `XDEBUG_MODE`: Debugging configuration
+
+## Prohibited Actions
+❌ **NEVER** install PHP locally
+❌ **NEVER** install Composer locally  
+❌ **NEVER** install MariaDB/MySQL locally
+❌ **NEVER** run PHPUnit locally
+❌ **NEVER** connect to database from host
+❌ **NEVER** edit files outside mapped volumes
+❌ **NEVER** use local development tools
+
+## Required Actions
+✅ **ALWAYS** use Docker Compose for environment
+✅ **ALWAYS** execute PHP in containers
+✅ **ALWAYS** run tests in containers
+✅ **ALWAYS** use container database
+✅ **ALWAYS** access services via container ports
+✅ **ALWAYS** develop within mapped volumes
+
+## Service URLs
+- **Development App**: http://localhost:8088
+- **Production App**: http://localhost:9088
+- **phpMyAdmin**: http://localhost:7088
+- **Database**: localhost:5000 (from host) / mariadb:3306 (from containers)
+
+## Troubleshooting
+If services aren't working:
+1. Check if containers are running: `docker-compose ps`
+2. Restart containers: `docker-compose restart`
+3. Rebuild containers: `docker-compose up --build`
+4. Check logs: `docker-compose logs php-dev`
+
+## File Structure Compliance
+```
+app/                    # ✅ All PHP code here
+├── src/               # ✅ Application source
+├── public/            # ✅ Web root
+├── tests/             # ✅ Test files
+└── composer.json      # ✅ Dependencies
+config/docker/         # ✅ Docker configs
+database/              # ✅ Database scripts
+docker-compose.yml     # ✅ Service definitions
+Dockerfile            # ✅ Container definitions
+```
+
+## Direct Docker Commands
+
+### Environment Management
+```bash
+# Start development environment
+docker-compose up -d
+
+# Stop development environment
+docker-compose down
+
+# Restart environment
+docker-compose restart
+
+# Show status
+docker-compose ps
+
+# View logs
+docker-compose logs -f php-dev
+```
+
+### Container Access
+```bash
+# Access PHP development container shell
+docker exec -it $(docker-compose ps -q php-dev) bash
+
+# Access database container shell
+docker exec -it $(docker-compose ps -q mariadb) bash
+
+# Windows PowerShell alternative
+docker exec -it cursor-test-php-dev-1 bash
+```
+
+### PHP Development
+```bash
+# Run PHP command in container
+docker exec -it $(docker-compose ps -q php-dev) php -v
+
+# Run Composer in container
+docker exec -it $(docker-compose ps -q php-dev) composer install
+
+# Run specific PHP file
+docker exec -it $(docker-compose ps -q php-dev) php /app/public/index.php
+```
+
+### Testing
+```bash
+# Run all tests
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit
+
+# Run specific test suite
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit tests/Domain/Tree/
+
+# Run with coverage
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit --coverage-html coverage/
+
+# Run verbose tests
+docker exec -it $(docker-compose ps -q php-dev) vendor/bin/phpunit --verbose
+```
+
+### Database Operations
+```bash
+# Access database directly
+docker exec -it $(docker-compose ps -q mariadb) mysql -u root -ppassword app
+
+# Run database queries
+docker exec -it $(docker-compose ps -q mariadb) mysql -u root -ppassword -e "SHOW TABLES;" app
+```
+
+### Container Management
+```bash
+# Rebuild containers
+docker-compose build --no-cache
+docker-compose up -d
+
+# View container resources
+docker stats
+
+# Clean up containers
+docker-compose down --volumes --remove-orphans
+```
+
+## Always Apply
+This rule must be followed for all development activities. No exceptions.
+
+alwaysApply: true
+---
+description:
+globs:
+alwaysApply: false
+---
