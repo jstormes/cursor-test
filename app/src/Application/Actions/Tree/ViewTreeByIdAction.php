@@ -336,8 +336,15 @@ HTML;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
+.tree {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
 .tree ul {
     padding-top: 20px; position: relative;
+    display: flex;
+    flex-wrap: nowrap;
     
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
@@ -345,7 +352,8 @@ HTML;
 }
 
 .tree li {
-    float: left; text-align: center;
+    flex-shrink: 0;
+    text-align: center;
     list-style-type: none;
     position: relative;
     padding: 20px 5px 0 5px;
