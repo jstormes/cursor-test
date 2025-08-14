@@ -368,13 +368,14 @@ HTML;
 }
 .tree li div{
     border: 1px solid #1e3a8a;
-    padding: 5px 10px;
+    padding: 5px 10px 15px 10px;
     text-decoration: none;
     color: #1e3a8a;
     background-color: #ffffff;
     font-family: arial, verdana, tahoma;
     font-size: 11px;
     display: inline-block;
+    position: relative;
     
     border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -384,8 +385,41 @@ HTML;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
 }
+
+.tree li div .add-icon {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #1e3a8a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+}
+
+.tree li div .add-icon:hover {
+    background-color: #0f172a;
+    transform: translateX(-50%) scale(1.1);
+}
 .tree li div:hover, .tree li div:hover+ul li div {
     background: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a;
+}
+
+.tree li div:hover .add-icon {
+    background-color: #ffffff;
+    color: #1e3a8a;
 }
 .tree li div:hover+ul li::after, 
 .tree li div:hover+ul li::before, 

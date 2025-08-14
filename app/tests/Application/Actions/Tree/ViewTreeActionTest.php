@@ -222,7 +222,8 @@ class ViewTreeActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($html) {
                 return str_contains($html, 'Root') &&
-                       str_contains($html, '<div>');
+                       str_contains($html, '<div class="tree-node">') &&
+                       str_contains($html, '<span class="add-icon">+</span>');
             }));
 
         $this->action->__invoke($this->request, $this->response, []);
