@@ -119,7 +119,8 @@ HTML;
         </div>
     </div>
     <div class="tree-actions">
-        <a href="/tree/{$tree->getId()}" class="btn btn-small">View Tree</a>
+        <a href="/tree/{$tree->getId()}/view" class="btn btn-small btn-info">👁️ View Tree</a>
+        <a href="/tree/{$tree->getId()}" class="btn btn-small btn-primary">✏️ Edit Tree</a>
         <a href="/tree/{$tree->getId()}/json" class="btn btn-small btn-secondary">JSON</a>
         <a href="/tree/{$tree->getId()}/delete" class="btn btn-small btn-danger">🗑️ Delete</a>
     </div>
@@ -365,6 +366,17 @@ body {
 .btn-danger {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     color: white;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(23, 162, 184, 0.3);
 }
 
 .btn-danger:hover {

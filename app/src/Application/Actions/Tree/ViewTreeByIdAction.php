@@ -50,7 +50,7 @@ class ViewTreeByIdAction extends Action
             }
             
             // Generate HTML using the renderer
-            $renderer = new HtmlTreeNodeRenderer();
+            $renderer = new HtmlTreeNodeRenderer(true);
             $treeHtml = '<div class="tree"><ul>';
             
             // Add top-level add icon

@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
-class ViewTreeAction extends Action
+class ViewTreeByIdReadOnlyAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
@@ -25,15 +25,15 @@ class ViewTreeAction extends Action
     protected function action(): Response
     {
         try {
-            // Get the first active tree from the database
-            $trees = $this->treeRepository->findActive();
+            // Get the tree ID from the route parameters
+            $treeId = (int) $this->resolveArg('id');
             
-            if (empty($trees)) {
-                return $this->generateNoTreesHTML();
+            // Get the specific tree from the database
+            $tree = $this->treeRepository->findById($treeId);
+            
+            if (!$tree) {
+                return $this->generateTreeNotFoundHTML($treeId);
             }
-            
-            $tree = $trees[0]; // Use the first active tree
-            $treeId = $tree->getId();
             
             // Get all nodes for this tree
             $nodes = $this->treeNodeRepository->findByTreeId($treeId);
@@ -49,12 +49,14 @@ class ViewTreeAction extends Action
                 return $this->generateNoRootNodesHTML($tree);
             }
             
-            // Generate HTML using the renderer
-            $renderer = new HtmlTreeNodeRenderer(true);
+            // Generate HTML using the renderer (read-only mode)
+            $renderer = new HtmlTreeNodeRenderer(false);
             $treeHtml = '<div class="tree"><ul>';
+            
             foreach ($rootNodes as $rootNode) {
                 $treeHtml .= '<li>' . $renderer->render($rootNode) . '</li>';
             }
+            
             $treeHtml .= '</ul></div>';
             
             $html = $this->generateHTML($treeHtml, $tree);
@@ -63,7 +65,7 @@ class ViewTreeAction extends Action
             return $this->response->withHeader('Content-Type', 'text/html');
             
         } catch (\Exception $e) {
-            $this->logger->error('Error loading tree: ' . $e->getMessage());
+            $this->logger->error('Error loading tree by ID: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
@@ -107,14 +109,14 @@ class ViewTreeAction extends Action
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Structure - {$treeName}</title>
+    <title>Tree Structure - {$treeName} (Read Only)</title>
     <style>
         {$css}
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Tree Structure: {$treeName}</h1>
+        <h1>Tree Structure: {$treeName} (Read Only)</h1>
         <p class="description">{$treeDescription}</p>
         <div class="tree-info">
             <span class="tree-id">Tree ID: {$tree->getId()}</span>
@@ -124,7 +126,8 @@ class ViewTreeAction extends Action
     
     <div class="navigation">
         <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
-        <a href="/tree/json" class="btn btn-primary">View JSON</a>
+        <a href="/tree/{$tree->getId()}" class="btn btn-primary">Edit Tree</a>
+        <a href="/tree/{$tree->getId()}/json" class="btn btn-secondary">View JSON</a>
     </div>
     
     {$treeHtml}
@@ -133,7 +136,7 @@ class ViewTreeAction extends Action
 HTML;
     }
     
-    private function generateNoTreesHTML(): Response
+    private function generateTreeNotFoundHTML(int $treeId): Response
     {
         $html = <<<HTML
 <!DOCTYPE html>
@@ -141,17 +144,17 @@ HTML;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No Trees Available</title>
+    <title>Tree Not Found</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
         .message { color: #666; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
     </style>
 </head>
 <body>
-    <h1>No Trees Available</h1>
-    <p class="message">No active trees found in the database.</p>
-    <a href="/trees" class="btn">Go to Trees List</a>
+    <h1>Tree Not Found</h1>
+    <p class="message">Tree with ID {$treeId} was not found in the database.</p>
+    <a href="/trees" class="btn">Back to Trees List</a>
 </body>
 </html>
 HTML;
@@ -163,23 +166,41 @@ HTML;
     private function generateNoNodesHTML($tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
+        $treeId = $tree->getId();
+        $css = $this->getCSS();
+        
+        $treeHtml = '<div class="tree"><ul>';
+        $treeHtml .= '<li><div class="tree-node">Empty Tree</div></li>';
+        $treeHtml .= '</ul></div>';
+        
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empty Tree - {$treeName}</title>
+    <title>Tree Structure - {$treeName} (Read Only)</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .message { color: #666; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
+        {$css}
     </style>
 </head>
 <body>
-    <h1>Empty Tree: {$treeName}</h1>
-    <p class="message">This tree has no nodes yet.</p>
-    <a href="/trees" class="btn">Back to Trees List</a>
+    <div class="header">
+        <h1>Tree Structure: {$treeName} (Read Only)</h1>
+        <p class="description">Empty tree</p>
+        <div class="tree-info">
+            <span class="tree-id">Tree ID: {$tree->getId()}</span>
+            <span class="created">Created: {$tree->getCreatedAt()->format('M j, Y g:i A')}</span>
+        </div>
+    </div>
+    
+    <div class="navigation">
+        <a href="/trees" class="btn btn-secondary">← Back to Trees List</a>
+        <a href="/tree/{$tree->getId()}" class="btn btn-primary">Edit Tree</a>
+        <a href="/tree/{$tree->getId()}/json" class="btn btn-secondary">View JSON</a>
+    </div>
+    
+    {$treeHtml}
 </body>
 </html>
 HTML;
@@ -310,8 +331,15 @@ HTML;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
+.tree {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
 .tree ul {
     padding-top: 20px; position: relative;
+    display: flex;
+    flex-wrap: nowrap;
     
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
@@ -319,7 +347,8 @@ HTML;
 }
 
 .tree li {
-    float: left; text-align: center;
+    flex-shrink: 0;
+    text-align: center;
     list-style-type: none;
     position: relative;
     padding: 20px 5px 0 5px;
@@ -386,73 +415,8 @@ HTML;
     -moz-transition: all 0.5s;
 }
 
-.tree li div .add-icon {
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #1e3a8a;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    pointer-events: auto;
-    z-index: 10;
-    transition: all 0.3s;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-}
-
-.tree li div .add-icon:hover {
-    background-color: #0f172a;
-    transform: translateX(-50%) scale(1.1);
-}
-
-.tree li div .remove-icon {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    background-color: #dc3545;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    pointer-events: auto;
-    z-index: 10;
-    transition: all 0.3s;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-}
-
-.tree li div .remove-icon:hover {
-    background-color: #a71e2a;
-    transform: translateX(-50%) scale(1.1);
-}
 .tree li div:hover, .tree li div:hover+ul li div {
     background: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a;
-}
-
-.tree li div:hover .add-icon {
-    background-color: #ffffff;
-    color: #1e3a8a;
-}
-
-.tree li div:hover .remove-icon {
-    background-color: #ffffff;
-    color: #dc3545;
 }
 
 .tree li div input[type="checkbox"] {
@@ -477,7 +441,6 @@ HTML;
 .tree li div button:hover {
     background-color: #5a6268;
 }
-
 
 .tree li div:hover+ul li::after, 
 .tree li div:hover+ul li::before, 

@@ -8,6 +8,7 @@ use App\Application\Actions\Tree\ViewTreeAction;
 use App\Application\Actions\Tree\ViewTreeJsonAction;
 use App\Application\Actions\Tree\ViewTreesAction;
 use App\Application\Actions\Tree\ViewTreeByIdAction;
+use App\Application\Actions\Tree\ViewTreeByIdReadOnlyAction;
 use App\Application\Actions\Tree\ViewTreeByIdJsonAction;
 use App\Application\Actions\Tree\AddNodeAction;
 use App\Application\Actions\Tree\AddNodeJsonAction;
@@ -51,6 +52,7 @@ return function (App $app) {
     $app->post('/tree/add/json', AddTreeJsonAction::class);
     
     // View tree routes (parameterized routes after specific)
+    $app->get('/tree/{id}/view', ViewTreeByIdReadOnlyAction::class);
     $app->get('/tree/{id}', ViewTreeByIdAction::class);
     $app->get('/tree/{id}/json', ViewTreeByIdJsonAction::class);
     

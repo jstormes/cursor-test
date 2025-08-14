@@ -6,6 +6,13 @@ namespace App\Domain\Tree;
 
 class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
 {
+    private bool $allowEdit;
+    
+    public function __construct(bool $allowEdit = true)
+    {
+        $this->allowEdit = $allowEdit;
+    }
+    
     public function render(TreeNode $node): string
     {
         $html = $node->accept($this);
@@ -23,12 +30,20 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
 
     public function visitSimpleNode(SimpleNode $node): string
     {
-        return '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<span class="add-icon">+</span></div>';
+        if ($this->allowEdit) {
+            return '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<span class="add-icon">+</span></div>';
+        } else {
+            return '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '</div>';
+        }
     }
 
     public function visitButtonNode(ButtonNode $node): string
     {
-        $html = '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName());
+        if ($this->allowEdit) {
+            $html = '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName());
+        } else {
+            $html = '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName());
+        }
         
         $action = $node->getButtonAction();
         $buttonText = htmlspecialchars($node->getButtonText());
@@ -39,7 +54,11 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
             $html .= ' <br/> <button>' . $buttonText . '</button>';
         }
         
-        $html .= '<span class="add-icon">+</span></div>';
+        if ($this->allowEdit) {
+            $html .= '<span class="add-icon">+</span></div>';
+        } else {
+            $html .= '</div>';
+        }
         
         return $html;
     }
