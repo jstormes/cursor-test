@@ -81,15 +81,11 @@ class DatabaseTreeRepository implements TreeRepository
                 $data['is_active']
             ]);
 
-            // Set the ID
-            new Tree(
-                (int) $this->connection->lastInsertId(),
-                $tree->getName(),
-                $tree->getDescription(),
-                $tree->getCreatedAt(),
-                $tree->getUpdatedAt(),
-                $tree->isActive()
-            );
+            // Set the ID using reflection since there's no setId method
+            $reflection = new \ReflectionClass($tree);
+            $idProperty = $reflection->getProperty('id');
+            $idProperty->setAccessible(true);
+            $idProperty->setValue($tree, (int) $this->connection->lastInsertId());
         } else {
             // Update
             $sql = 'UPDATE trees SET name = ?, description = ?, updated_at = ?, is_active = ? WHERE id = ?';

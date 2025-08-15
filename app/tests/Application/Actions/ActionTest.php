@@ -25,7 +25,12 @@ class ActionTest extends TestCase
         parent::setUp();
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->responseFactory = new ResponseFactory();
-        $this->action = new TestAction($this->logger, $this->responseFactory);
+        $this->action = new class ($this->logger, $this->responseFactory) extends Action {
+            public function action(): ResponseInterface
+            {
+                return $this->respondWithData(['test' => 'value']);
+            }
+        };
     }
 
     public function testActionErrorCreation(): void
@@ -121,14 +126,5 @@ class ActionTest extends TestCase
             $error = new ActionError($type, 'Test error');
             $this->assertEquals($type, $error->getType());
         }
-    }
-}
-
-// Test implementation of Action for testing
-class TestAction extends Action
-{
-    public function action(): ResponseInterface
-    {
-        return $this->respondWithData(['test' => 'value']);
     }
 }

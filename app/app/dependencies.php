@@ -50,7 +50,12 @@ return function (ContainerBuilder $containerBuilder) {
 
         // Unit of Work
         UnitOfWork::class => function (ContainerInterface $c) {
-            return new DatabaseUnitOfWork($c->get(DatabaseConnection::class));
+            return new DatabaseUnitOfWork(
+                $c->get(DatabaseConnection::class),
+                $c->get(TreeDataMapper::class),
+                $c->get(TreeNodeDataMapper::class),
+                $c->get(UserDataMapper::class)
+            );
         },
 
         // Data Mappers

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Database;
 
+use App\Domain\Tree\Tree;
+use App\Domain\Tree\AbstractTreeNode;
+use App\Domain\User\User;
+
 class DatabaseUnitOfWork implements UnitOfWork
 {
     private array $newEntities = [];
@@ -11,8 +15,15 @@ class DatabaseUnitOfWork implements UnitOfWork
     private array $deletedEntities = [];
 
     public function __construct(
-        private DatabaseConnection $connection
+        private DatabaseConnection $connection,
+        private ?TreeDataMapper $treeMapper = null,
+        private ?TreeNodeDataMapper $nodeMapper = null,
+        private ?UserDataMapper $userMapper = null
     ) {
+        // Initialize mappers if not provided
+        $this->treeMapper ??= new TreeDataMapper();
+        $this->nodeMapper ??= new TreeNodeDataMapper();
+        $this->userMapper ??= new UserDataMapper();
     }
 
     #[\Override]
@@ -81,20 +92,155 @@ class DatabaseUnitOfWork implements UnitOfWork
 
     private function processNewEntity(object $entity): void
     {
-        // This would be implemented by specific repositories
-        // For now, we'll leave it as a placeholder
+        match (true) {
+            $entity instanceof Tree => $this->insertTree($entity),
+            $entity instanceof AbstractTreeNode => $this->insertTreeNode($entity),
+            $entity instanceof User => $this->insertUser($entity),
+            default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
+        };
     }
 
     private function processDirtyEntity(object $entity): void
     {
-        // This would be implemented by specific repositories
-        // For now, we'll leave it as a placeholder
+        match (true) {
+            $entity instanceof Tree => $this->updateTree($entity),
+            $entity instanceof AbstractTreeNode => $this->updateTreeNode($entity),
+            $entity instanceof User => $this->updateUser($entity),
+            default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
+        };
     }
 
     private function processDeletedEntity(object $entity): void
     {
-        // This would be implemented by specific repositories
-        // For now, we'll leave it as a placeholder
+        match (true) {
+            $entity instanceof Tree => $this->deleteTree($entity),
+            $entity instanceof AbstractTreeNode => $this->deleteTreeNode($entity),
+            $entity instanceof User => $this->deleteUser($entity),
+            default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
+        };
+    }
+
+    private function insertTree(Tree $tree): void
+    {
+        $data = $this->treeMapper->mapToArray($tree);
+        $sql = 'INSERT INTO trees (name, description, created_at, updated_at, is_active) VALUES (?, ?, ?, ?, ?)';
+        $this->connection->execute($sql, [
+            $data['name'],
+            $data['description'],
+            $data['created_at'],
+            $data['updated_at'],
+            $data['is_active']
+        ]);
+
+        // Set the ID using reflection
+        $reflection = new \ReflectionClass($tree);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($tree, (int) $this->connection->lastInsertId());
+    }
+
+    private function updateTree(Tree $tree): void
+    {
+        $data = $this->treeMapper->mapToArray($tree);
+        $sql = 'UPDATE trees SET name = ?, description = ?, updated_at = ?, is_active = ? WHERE id = ?';
+        $this->connection->execute($sql, [
+            $data['name'],
+            $data['description'],
+            $data['updated_at'],
+            $data['is_active'],
+            $data['id']
+        ]);
+    }
+
+    private function deleteTree(Tree $tree): void
+    {
+        if ($tree->getId() === null) {
+            throw new \InvalidArgumentException('Cannot delete tree without ID');
+        }
+        $sql = 'DELETE FROM trees WHERE id = ?';
+        $this->connection->execute($sql, [$tree->getId()]);
+    }
+
+    private function insertTreeNode(AbstractTreeNode $node): void
+    {
+        $data = $this->nodeMapper->mapToArray($node);
+        $sql = 'INSERT INTO tree_nodes (name, tree_id, parent_id, sort_order, type_class, type_data) VALUES (?, ?, ?, ?, ?, ?)';
+        $this->connection->execute($sql, [
+            $data['name'],
+            $data['tree_id'],
+            $data['parent_id'],
+            $data['sort_order'],
+            $data['type_class'],
+            $data['type_data']
+        ]);
+
+        // Set the ID using reflection
+        $reflection = new \ReflectionClass($node);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($node, (int) $this->connection->lastInsertId());
+    }
+
+    private function updateTreeNode(AbstractTreeNode $node): void
+    {
+        $data = $this->nodeMapper->mapToArray($node);
+        $sql = 'UPDATE tree_nodes SET name = ?, tree_id = ?, parent_id = ?, sort_order = ?, type_class = ?, type_data = ? WHERE id = ?';
+        $this->connection->execute($sql, [
+            $data['name'],
+            $data['tree_id'],
+            $data['parent_id'],
+            $data['sort_order'],
+            $data['type_class'],
+            $data['type_data'],
+            $data['id']
+        ]);
+    }
+
+    private function deleteTreeNode(AbstractTreeNode $node): void
+    {
+        if ($node->getId() === null) {
+            throw new \InvalidArgumentException('Cannot delete tree node without ID');
+        }
+        $sql = 'DELETE FROM tree_nodes WHERE id = ?';
+        $this->connection->execute($sql, [$node->getId()]);
+    }
+
+    private function insertUser(User $user): void
+    {
+        $data = $this->userMapper->mapToArray($user);
+        $sql = 'INSERT INTO users (username, first_name, last_name) VALUES (?, ?, ?)';
+        $this->connection->execute($sql, [
+            $data['username'],
+            $data['first_name'],
+            $data['last_name']
+        ]);
+
+        // Set the ID using reflection
+        $reflection = new \ReflectionClass($user);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($user, (int) $this->connection->lastInsertId());
+    }
+
+    private function updateUser(User $user): void
+    {
+        $data = $this->userMapper->mapToArray($user);
+        $sql = 'UPDATE users SET username = ?, first_name = ?, last_name = ? WHERE id = ?';
+        $this->connection->execute($sql, [
+            $data['username'],
+            $data['first_name'],
+            $data['last_name'],
+            $data['id']
+        ]);
+    }
+
+    private function deleteUser(User $user): void
+    {
+        if ($user->getId() === null) {
+            throw new \InvalidArgumentException('Cannot delete user without ID');
+        }
+        $sql = 'DELETE FROM users WHERE id = ?';
+        $this->connection->execute($sql, [$user->getId()]);
     }
 
     private function clear(): void

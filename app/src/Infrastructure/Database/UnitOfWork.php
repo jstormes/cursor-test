@@ -11,4 +11,12 @@ interface UnitOfWork
     public function commit(): void;
 
     public function rollback(): void;
+
+    public function registerNew(object $entity): void;
+
+    public function registerDirty(object $entity): void;
+
+    public function registerDeleted(object $entity): void;
+
+    public function inTransaction(): bool;
 }

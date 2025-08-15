@@ -35,7 +35,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findByTreeId(int $treeId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
+        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
+               'FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
         $statement = $this->connection->query($sql, [$treeId]);
         $data = $statement->fetchAll();
 
@@ -45,7 +46,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findChildren(int $parentId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data FROM tree_nodes WHERE parent_id = ? ORDER BY sort_order';
+        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
+               'FROM tree_nodes WHERE parent_id = ? ORDER BY sort_order';
         $statement = $this->connection->query($sql, [$parentId]);
         $data = $statement->fetchAll();
 
@@ -55,7 +57,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findRootNodes(int $treeId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data FROM tree_nodes WHERE tree_id = ? AND parent_id IS NULL ORDER BY sort_order';
+        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
+               'FROM tree_nodes WHERE tree_id = ? AND parent_id IS NULL ORDER BY sort_order';
         $statement = $this->connection->query($sql, [$treeId]);
         $data = $statement->fetchAll();
 
@@ -65,7 +68,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findTreeStructure(int $treeId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
+        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
+               'FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
         $statement = $this->connection->query($sql, [$treeId]);
         $data = $statement->fetchAll();
 
@@ -101,7 +105,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
 
         if ($node->getId() === null) {
             // Insert
-            $sql = 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            $sql = 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, ' .
+                   'created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
             $this->connection->execute($sql, [
                 $data['tree_id'],
                 $data['parent_id'],
@@ -114,7 +119,8 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
             ]);
         } else {
             // Update
-            $sql = 'UPDATE tree_nodes SET tree_id = ?, parent_id = ?, name = ?, sort_order = ?, type_class = ?, type_data = ?, updated_at = ? WHERE id = ?';
+            $sql = 'UPDATE tree_nodes SET tree_id = ?, parent_id = ?, name = ?, sort_order = ?, ' .
+                   'type_class = ?, type_data = ?, updated_at = ? WHERE id = ?';
             $this->connection->execute($sql, [
                 $data['tree_id'],
                 $data['parent_id'],
