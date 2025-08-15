@@ -223,8 +223,8 @@ class ViewTreeActionTest extends TestCase
             ->with($this->callback(function ($html) {
                 return str_contains($html, 'Root') &&
                        str_contains($html, '<div class="tree-node">') &&
-                       str_contains($html, '<span class="remove-icon">×</span>') &&
-                       str_contains($html, '<span class="add-icon">+</span>');
+                       str_contains($html, 'class="remove-icon">×</a>') &&
+                       str_contains($html, 'class="add-icon">+</a>');
             }));
 
         $this->action->__invoke($this->request, $this->response, []);

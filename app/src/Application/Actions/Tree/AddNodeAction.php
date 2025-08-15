@@ -49,7 +49,17 @@ class AddNodeAction extends Action
                 return $this->generateTreeNotFoundHTML($treeId);
             }
             
-            $html = $this->generateFormHTML($tree);
+            // Get parent_id from query parameters if provided
+            $queryParams = $this->request->getQueryParams();
+            $parentId = !empty($queryParams['parent_id']) ? (int) $queryParams['parent_id'] : null;
+            
+            // Prepare form data with pre-selected parent
+            $formData = [];
+            if ($parentId !== null) {
+                $formData['parent_id'] = $parentId;
+            }
+            
+            $html = $this->generateFormHTML($tree, '', $formData);
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
             

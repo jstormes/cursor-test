@@ -20,6 +20,7 @@ use App\Application\Actions\Tree\RestoreTreeAction;
 use App\Application\Actions\Tree\RestoreTreeJsonAction;
 use App\Application\Actions\Tree\ViewDeletedTreesAction;
 use App\Application\Actions\Tree\ViewDeletedTreesJsonAction;
+use App\Application\Actions\Tree\DeleteNodeAction;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -65,4 +66,7 @@ return function (App $app) {
     // Add node routes
     $app->map(['GET', 'POST'], '/tree/{treeId}/add-node', AddNodeAction::class);
     $app->post('/tree/{treeId}/add-node/json', AddNodeJsonAction::class);
+    
+    // Delete node routes
+    $app->map(['GET', 'POST'], '/tree/{treeId}/node/{nodeId}/delete', DeleteNodeAction::class);
 };

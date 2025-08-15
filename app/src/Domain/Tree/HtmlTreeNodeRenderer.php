@@ -31,7 +31,9 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
     public function visitSimpleNode(SimpleNode $node): string
     {
         if ($this->allowEdit) {
-            return '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<span class="add-icon">+</span></div>';
+            $nodeId = $node->getId();
+            $treeId = $node->getTreeId();
+            return '<div class="tree-node"><a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<a href="/tree/' . $treeId . '/add-node?parent_id=' . $nodeId . '" class="add-icon">+</a></div>';
         } else {
             return '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '</div>';
         }
@@ -40,7 +42,9 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
     public function visitButtonNode(ButtonNode $node): string
     {
         if ($this->allowEdit) {
-            $html = '<div class="tree-node"><span class="remove-icon">×</span><input type="checkbox"> ' . htmlspecialchars($node->getName());
+            $nodeId = $node->getId();
+            $treeId = $node->getTreeId();
+            $html = '<div class="tree-node"><a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a><input type="checkbox"> ' . htmlspecialchars($node->getName());
         } else {
             $html = '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName());
         }
@@ -55,7 +59,9 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         }
         
         if ($this->allowEdit) {
-            $html .= '<span class="add-icon">+</span></div>';
+            $nodeId = $node->getId();
+            $treeId = $node->getTreeId();
+            $html .= '<a href="/tree/' . $treeId . '/add-node?parent_id=' . $nodeId . '" class="add-icon">+</a></div>';
         } else {
             $html .= '</div>';
         }

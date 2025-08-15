@@ -141,9 +141,9 @@ class ViewTreeByIdActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Empty Tree: Empty Tree') &&
-                       str_contains($html, 'This tree has no nodes yet') &&
-                       str_contains($html, 'Add First Node') &&
+                return str_contains($html, 'Tree Structure: Empty Tree') &&
+                       str_contains($html, 'Empty tree - add your first node') &&
+                       str_contains($html, 'Add Node') &&
                        str_contains($html, 'Back to Trees List');
             }));
 

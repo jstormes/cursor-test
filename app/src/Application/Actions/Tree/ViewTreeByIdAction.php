@@ -54,7 +54,7 @@ class ViewTreeByIdAction extends Action
             $treeHtml = '<div class="tree"><ul>';
             
             // Add top-level add icon
-            $treeHtml .= '<li><div class="tree-node-no-box"><span class="add-icon">+</span></div>';
+            $treeHtml .= '<li><div class="tree-node-no-box"><a href="/tree/' . $treeId . '/add-node" class="add-icon">+</a></div>';
             $treeHtml .= '<ul>';
             
             foreach ($rootNodes as $rootNode) {
@@ -175,7 +175,7 @@ HTML;
         $css = $this->getCSS();
         
         $treeHtml = '<div class="tree"><ul>';
-        $treeHtml .= '<li><div class="tree-node-no-box"><span class="add-icon">+</span></div></li>';
+        $treeHtml .= '<li><div class="tree-node-no-box"><a href="/tree/' . $treeId . '/add-node" class="add-icon">+</a></div></li>';
         $treeHtml .= '</ul></div>';
         
         $html = <<<HTML
@@ -441,6 +441,7 @@ HTML;
     transition: all 0.3s;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
+    text-decoration: none;
 }
 
 .tree li div .add-icon:hover {
@@ -469,6 +470,7 @@ HTML;
     transition: all 0.3s;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
+    text-decoration: none;
 }
 
 .tree li div .remove-icon:hover {
