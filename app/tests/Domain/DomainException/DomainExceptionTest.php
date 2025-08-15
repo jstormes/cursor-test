@@ -47,4 +47,4 @@ class DomainExceptionTest extends TestCase
         $this->assertInstanceOf(DomainException::class, $exception);
         $this->assertInstanceOf(\Exception::class, $exception);
     }
-} 
+}

@@ -12,16 +12,6 @@ interface TreeRepository
     public function findById(int $id): ?Tree;
 
     /**
-     * Find a tree by name
-     */
-    public function findByName(string $name): ?Tree;
-
-    /**
-     * Find all trees
-     */
-    public function findAll(): array;
-
-    /**
      * Find all active trees
      */
     public function findActive(): array;
@@ -30,11 +20,6 @@ interface TreeRepository
      * Save a tree (insert or update)
      */
     public function save(Tree $tree): void;
-
-    /**
-     * Delete a tree by ID (hard delete)
-     */
-    public function delete(int $id): void;
 
     /**
      * Soft delete a tree by ID
@@ -50,4 +35,29 @@ interface TreeRepository
      * Find all deleted trees
      */
     public function findDeleted(): array;
-} 
+
+    /**
+     * Delete all nodes associated with a tree
+     */
+    public function deleteByTreeId(int $treeId): void;
+
+    /**
+     * Find tree structure with all nodes
+     */
+    public function findTreeStructure(int $treeId): ?Tree;
+
+    /**
+     * Find a tree by name
+     */
+    public function findByName(string $name): ?Tree;
+
+    /**
+     * Find all trees
+     */
+    public function findAll(): array;
+
+    /**
+     * Delete a tree by ID
+     */
+    public function delete(int $id): void;
+}

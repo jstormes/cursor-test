@@ -35,7 +35,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
-        
+
         $this->action = new ViewTreeByIdJsonAction(
             $this->logger,
             $this->treeRepository,
@@ -48,7 +48,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
         $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime('2023-01-01'), new DateTime('2023-01-02'), true);
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -124,7 +124,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
     public function testTreeWithNoNodes(): void
     {
         $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -162,11 +162,11 @@ class ViewTreeByIdJsonActionTest extends TestCase
     public function testTreeWithNoRootNodes(): void
     {
         $tree = new Tree(1, 'Broken Tree', 'A broken tree', new DateTime(), new DateTime(), true);
-        
+
         // All nodes have parents (no root nodes)
         $childNode1 = new SimpleNode(1, 'Child1', 1, 999, 0); // Parent doesn't exist
         $childNode2 = new SimpleNode(2, 'Child2', 1, 888, 0); // Parent doesn't exist
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -206,7 +206,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Button Tree', 'A tree with buttons', new DateTime(), new DateTime(), true);
         $buttonNode = new ButtonNode(1, 'Root Button', 1, null, 0, ['button_text' => 'Click Me', 'button_action' => 'alert("clicked")']);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -245,13 +245,13 @@ class ViewTreeByIdJsonActionTest extends TestCase
     public function testComplexTreeStructure(): void
     {
         $tree = new Tree(1, 'Complex Tree', 'Multi-level tree', new DateTime(), new DateTime(), true);
-        
+
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $child1 = new SimpleNode(2, 'Child1', 1, 1, 0);
         $child2 = new SimpleNode(3, 'Child2', 1, 1, 1);
         $grandChild1 = new SimpleNode(4, 'GrandChild1', 1, 2, 0);
         $grandChild2 = new SimpleNode(5, 'GrandChild2', 1, 2, 1);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -276,7 +276,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
                 $rootNode = $data['data']['tree']['root_nodes'][0];
-                
+
                 return $data['success'] === true &&
                        $data['data']['total_nodes'] === 5 &&
                        $data['data']['total_levels'] >= 2 &&
@@ -296,7 +296,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Data Test Tree', 'Testing node data', new DateTime(), new DateTime(), true);
         $rootNode = new SimpleNode(1, 'Root Node', 1, null, 5);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -349,11 +349,11 @@ class ViewTreeByIdJsonActionTest extends TestCase
     public function testMultipleRootNodes(): void
     {
         $tree = new Tree(1, 'Multi-Root Tree', 'Tree with multiple root nodes', new DateTime(), new DateTime(), true);
-        
+
         $rootNode1 = new SimpleNode(1, 'Root1', 1, null, 0);
         $rootNode2 = new SimpleNode(2, 'Root2', 1, null, 1);
         $child1 = new SimpleNode(3, 'Child1', 1, 1, 0);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -377,7 +377,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 return $data['success'] === true &&
                        $data['data']['total_nodes'] === 3 &&
                        $data['data']['total_root_nodes'] === 2 &&
@@ -429,13 +429,13 @@ class ViewTreeByIdJsonActionTest extends TestCase
     public function testTreeMetricsCalculation(): void
     {
         $tree = new Tree(1, 'Metrics Tree', 'For testing metrics', new DateTime(), new DateTime(), true);
-        
+
         // Create a 3-level tree: Root -> Child1 -> GrandChild, Root -> Child2
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $child1 = new SimpleNode(2, 'Child1', 1, 1, 0);
         $child2 = new SimpleNode(3, 'Child2', 1, 1, 1);
         $grandChild = new SimpleNode(4, 'GrandChild', 1, 2, 0);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -459,7 +459,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 return $data['success'] === true &&
                        $data['data']['total_nodes'] === 4 &&
                        $data['data']['total_levels'] === 2 && // 0=Root, 1=Child, 2=GrandChild
@@ -476,7 +476,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
         $updatedAt = new DateTime('2023-06-20 09:15:30');
         $tree = new Tree(1, 'Date Tree', 'Testing dates', $createdAt, $updatedAt, true);
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
-        
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -500,7 +500,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 return $data['data']['tree']['created_at'] === '2023-05-15 14:30:00' &&
                        $data['data']['tree']['updated_at'] === '2023-06-20 09:15:30';
             }));

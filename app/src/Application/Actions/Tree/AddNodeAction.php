@@ -25,76 +25,76 @@ class AddNodeAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         $request = $this->request;
         $method = $request->getMethod();
-        
+
         if ($method === 'GET') {
             return $this->showForm();
         } elseif ($method === 'POST') {
             return $this->handleFormSubmission();
         }
-        
+
         return $this->response->withStatus(405);
     }
-    
+
     private function showForm(): Response
     {
         try {
             $treeId = (int) $this->resolveArg('treeId');
             $tree = $this->treeRepository->findById($treeId);
-            
+
             if (!$tree) {
                 return $this->generateTreeNotFoundHTML($treeId);
             }
-            
+
             // Get parent_id from query parameters if provided
             $queryParams = $this->request->getQueryParams();
             $parentId = !empty($queryParams['parent_id']) ? (int) $queryParams['parent_id'] : null;
-            
+
             // Prepare form data with pre-selected parent
             $formData = [];
             if ($parentId !== null) {
                 $formData['parent_id'] = $parentId;
             }
-            
+
             $html = $this->generateFormHTML($tree, '', $formData);
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error showing add node form: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function handleFormSubmission(): Response
     {
         try {
             $treeId = (int) $this->resolveArg('treeId');
             $tree = $this->treeRepository->findById($treeId);
-            
+
             if (!$tree) {
                 return $this->generateTreeNotFoundHTML($treeId);
             }
-            
+
             $parsedBody = $this->request->getParsedBody();
-            
+
             // Validate required fields
             $name = trim($parsedBody['name'] ?? '');
             if (empty($name)) {
                 return $this->showFormWithError($tree, 'Node name is required');
             }
-            
+
             if (strlen($name) > 255) {
                 return $this->showFormWithError($tree, 'Node name must be 255 characters or less');
             }
-            
+
             $parentId = !empty($parsedBody['parent_id']) ? (int) $parsedBody['parent_id'] : null;
             $nodeType = $parsedBody['node_type'] ?? 'SimpleNode';
             $sortOrder = (int) ($parsedBody['sort_order'] ?? 0);
-            
+
             // Validate parent node if specified
             if ($parentId !== null) {
                 $parentNode = $this->treeNodeRepository->findById($parentId);
@@ -102,24 +102,24 @@ class AddNodeAction extends Action
                     return $this->showFormWithError($tree, 'Invalid parent node selected');
                 }
             }
-            
+
             // Create node based on type
             if ($nodeType === 'ButtonNode') {
                 $buttonText = trim($parsedBody['button_text'] ?? '');
                 $buttonAction = trim($parsedBody['button_action'] ?? '');
-                
+
                 if (empty($buttonText)) {
                     return $this->showFormWithError($tree, 'Button text is required for ButtonNode');
                 }
-                
+
                 if (strlen($buttonText) > 100) {
                     return $this->showFormWithError($tree, 'Button text must be 100 characters or less');
                 }
-                
+
                 if (strlen($buttonAction) > 255) {
                     return $this->showFormWithError($tree, 'Button action must be 255 characters or less');
                 }
-                
+
                 $node = new ButtonNode(
                     null,
                     $name,
@@ -127,7 +127,7 @@ class AddNodeAction extends Action
                     $parentId,
                     $sortOrder
                 );
-                
+
                 // Set button properties
                 $node->setButtonText($buttonText);
                 if (!empty($buttonAction)) {
@@ -142,18 +142,17 @@ class AddNodeAction extends Action
                     $sortOrder
                 );
             }
-            
+
             // Save the node
             $this->treeNodeRepository->save($node);
-            
+
             return $this->generateSuccessHTML($tree, $node);
-            
         } catch (\Exception $e) {
             $this->logger->error('Error creating node: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function generateFormHTML(Tree $tree, string $error = '', array $formData = []): string
     {
         $treeName = htmlspecialchars($tree->getName());
@@ -165,7 +164,7 @@ class AddNodeAction extends Action
         $buttonAction = htmlspecialchars($formData['button_action'] ?? '');
         $sortOrder = $formData['sort_order'] ?? '0';
         $errorHtml = $error ? "<div class='error-message'>{$this->escapeHtml($error)}</div>" : '';
-        
+
         // Get available parent nodes
         $parentNodes = $this->treeNodeRepository->findByTreeId($treeId);
         $parentOptions = '<option value="">No Parent (Root Node)</option>';
@@ -173,13 +172,13 @@ class AddNodeAction extends Action
             $selected = $parentId == $parentNode->getId() ? 'selected' : '';
             $parentOptions .= "<option value=\"{$parentNode->getId()}\" {$selected}>{$this->escapeHtml($parentNode->getName())}</option>";
         }
-        
+
         $css = $this->getCSS();
-        
+
         $simpleNodeSelected = $nodeType === 'SimpleNode' ? 'selected' : '';
         $buttonNodeSelected = $nodeType === 'ButtonNode' ? 'selected' : '';
         $buttonFieldsDisplay = $nodeType === 'ButtonNode' ? 'block' : 'none';
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -272,7 +271,7 @@ class AddNodeAction extends Action
 </html>
 HTML;
     }
-    
+
     private function showFormWithError(Tree $tree, string $error): Response
     {
         $parsedBody = $this->request->getParsedBody();
@@ -280,14 +279,17 @@ HTML;
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
+    /**
+     * @param ButtonNode|SimpleNode $node
+     */
     private function generateSuccessHTML(Tree $tree, $node): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $nodeName = htmlspecialchars($node->getName());
         $nodeType = $node->getType();
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -322,11 +324,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateTreeNotFoundHTML(int $treeId): Response
     {
         $html = <<<HTML
@@ -349,11 +351,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateErrorHTML(string $errorMessage): Response
     {
         $html = <<<HTML
@@ -376,16 +378,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
-    
+
     private function getCSS(): string
     {
         return <<<CSS
@@ -540,4 +542,4 @@ body {
 }
 CSS;
     }
-} 
+}

@@ -22,6 +22,7 @@ class ButtonNode extends AbstractTreeNode
         $this->buttonAction = $typeData['button_action'] ?? '';
     }
 
+    #[\Override]
     public function getType(): string
     {
         return 'ButtonNode';
@@ -36,12 +37,14 @@ class ButtonNode extends AbstractTreeNode
     {
         return $this->buttonAction;
     }
-    
+
+    #[\Override]
     public function accept(TreeNodeVisitor $visitor): string
     {
         return $visitor->visitButtonNode($this);
     }
 
+    #[\Override]
     public function getTypeData(): array
     {
         return [
@@ -49,14 +52,14 @@ class ButtonNode extends AbstractTreeNode
             'button_action' => $this->buttonAction,
         ];
     }
-    
+
     public function setButtonText(string $buttonText): void
     {
         $this->buttonText = $buttonText;
     }
-    
+
     public function setButtonAction(string $buttonAction): void
     {
         $this->buttonAction = $buttonAction;
     }
-} 
+}

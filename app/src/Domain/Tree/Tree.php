@@ -80,6 +80,7 @@ class Tree implements JsonSerializable
         $this->updatedAt = new DateTime();
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         return [
@@ -91,4 +92,4 @@ class Tree implements JsonSerializable
             'isActive' => $this->isActive,
         ];
     }
-} 
+}

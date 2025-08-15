@@ -58,4 +58,4 @@ class TreeNodeDataMapper implements DataMapper
     {
         return array_map([$this, 'mapToEntity'], $data);
     }
-} 
+}

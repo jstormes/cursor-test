@@ -168,4 +168,4 @@ class TreeQueryTest extends TestCase
             $sql
         );
     }
-} 
+}

@@ -30,7 +30,7 @@ class DeleteTreeActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new DeleteTreeAction(
             $this->logger,
             $this->treeRepository
@@ -40,11 +40,11 @@ class DeleteTreeActionTest extends TestCase
     public function testGetRequestShowsConfirmationForm(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -78,7 +78,7 @@ class DeleteTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(999)
@@ -107,11 +107,11 @@ class DeleteTreeActionTest extends TestCase
     public function testGetRequestWithAlreadyDeletedTree(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -141,11 +141,11 @@ class DeleteTreeActionTest extends TestCase
     public function testPostRequestDeletesTree(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -181,7 +181,7 @@ class DeleteTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(999)
@@ -213,11 +213,11 @@ class DeleteTreeActionTest extends TestCase
     public function testPostRequestWithAlreadyDeletedTree(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -265,7 +265,7 @@ class DeleteTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -298,11 +298,11 @@ class DeleteTreeActionTest extends TestCase
     public function testConfirmationFormHtmlStructure(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Test description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -340,11 +340,11 @@ class DeleteTreeActionTest extends TestCase
     public function testSuccessHtmlContent(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)

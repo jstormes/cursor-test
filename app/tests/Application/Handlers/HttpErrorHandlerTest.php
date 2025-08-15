@@ -26,7 +26,7 @@ class HttpErrorHandlerTest extends TestCase
         parent::setUp();
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->responseFactory = new ResponseFactory();
-        
+
         // Create a mock callable resolver
         $callableResolver = $this->createMock(\Slim\Interfaces\CallableResolverInterface::class);
         $this->errorHandler = new HttpErrorHandler($callableResolver, $this->responseFactory);
@@ -36,7 +36,7 @@ class HttpErrorHandlerTest extends TestCase
     {
         $exception = new \Exception('Test exception');
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         // HttpErrorHandler doesn't use the logger we provide
         $this->logger->expects($this->never())
             ->method('error');
@@ -45,10 +45,10 @@ class HttpErrorHandlerTest extends TestCase
 
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
-        
+
         $body = (string) $response->getBody();
         $data = json_decode($body, true);
-        
+
         $this->assertIsArray($data);
         $this->assertArrayHasKey('error', $data);
         $this->assertEquals('SERVER_ERROR', $data['error']['type']);
@@ -58,7 +58,7 @@ class HttpErrorHandlerTest extends TestCase
     {
         $exception = new \Exception('Test exception');
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         // HttpErrorHandler doesn't use the logger we provide
         $this->logger->expects($this->never())
             ->method('error');
@@ -66,10 +66,10 @@ class HttpErrorHandlerTest extends TestCase
         $response = $this->errorHandler->__invoke($request, $exception, true, false, false);
 
         $this->assertEquals(500, $response->getStatusCode());
-        
+
         $body = (string) $response->getBody();
         $data = json_decode($body, true);
-        
+
         $this->assertIsArray($data);
         $this->assertArrayHasKey('error', $data);
         $this->assertArrayHasKey('description', $data['error']);
@@ -80,7 +80,7 @@ class HttpErrorHandlerTest extends TestCase
     {
         $exception = new \Exception('Test exception');
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         // The HttpErrorHandler doesn't actually log to the logger we provide
         // It uses Slim's internal logging mechanism
         $this->logger->expects($this->never())
@@ -95,7 +95,7 @@ class HttpErrorHandlerTest extends TestCase
     {
         $exception = new \Exception('Test exception');
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         $this->logger->expects($this->never())
             ->method('error');
 
@@ -103,4 +103,4 @@ class HttpErrorHandlerTest extends TestCase
 
         $this->assertEquals(500, $response->getStatusCode());
     }
-} 
+}

@@ -30,7 +30,7 @@ class DeleteTreeJsonActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new DeleteTreeJsonAction(
             $this->logger,
             $this->treeRepository
@@ -40,11 +40,11 @@ class DeleteTreeJsonActionTest extends TestCase
     public function testSuccessfulTreeDeletion(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -91,7 +91,7 @@ class DeleteTreeJsonActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(999)
@@ -130,11 +130,11 @@ class DeleteTreeJsonActionTest extends TestCase
     public function testTreeAlreadyDeleted(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -212,7 +212,7 @@ class DeleteTreeJsonActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -253,11 +253,11 @@ class DeleteTreeJsonActionTest extends TestCase
     public function testDeleteMethodCallsRepositoryOnce(): void
     {
         $tree = new Tree(5, 'Another Tree', 'Another description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(5)
@@ -299,11 +299,11 @@ class DeleteTreeJsonActionTest extends TestCase
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-02 15:30:00');
         $tree = new Tree(10, 'Data Test Tree', 'Test description', $createdAt, $updatedAt, true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(10)
@@ -346,11 +346,11 @@ class DeleteTreeJsonActionTest extends TestCase
     public function testResponseContainsCorrectLinks(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)

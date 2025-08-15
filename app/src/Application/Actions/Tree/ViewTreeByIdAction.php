@@ -22,69 +22,69 @@ class ViewTreeByIdAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             // Get the tree ID from the route parameters
             $treeId = (int) $this->resolveArg('id');
-            
+
             // Get the specific tree from the database
             $tree = $this->treeRepository->findById($treeId);
-            
+
             if (!$tree) {
                 return $this->generateTreeNotFoundHTML($treeId);
             }
-            
+
             // Get all nodes for this tree
             $nodes = $this->treeNodeRepository->findByTreeId($treeId);
-            
+
             if (empty($nodes)) {
                 return $this->generateNoNodesHTML($tree);
             }
-            
+
             // Build the tree structure from database nodes
             $rootNodes = $this->buildTreeFromNodes($nodes);
-            
+
             if (empty($rootNodes)) {
                 return $this->generateNoRootNodesHTML($tree);
             }
-            
+
             // Generate HTML using the renderer
             $renderer = new HtmlTreeNodeRenderer(true);
             $treeHtml = '<div class="tree"><ul>';
-            
+
             // Add top-level add icon
             $treeHtml .= '<li><div class="tree-node-no-box"><a href="/tree/' . $treeId . '/add-node" class="add-icon">+</a></div>';
             $treeHtml .= '<ul>';
-            
+
             foreach ($rootNodes as $rootNode) {
                 $treeHtml .= '<li>' . $renderer->render($rootNode) . '</li>';
             }
-            
+
             $treeHtml .= '</ul></li>';
             $treeHtml .= '</ul></div>';
-            
+
             $html = $this->generateHTML($treeHtml, $tree);
-            
+
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error loading tree by ID: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function buildTreeFromNodes(array $nodes): array
     {
         $nodeMap = [];
         $rootNodes = [];
-        
+
         // Create a map of all nodes by ID
         foreach ($nodes as $node) {
             $nodeMap[$node->getId()] = $node;
         }
-        
+
         // Build the tree structure
         foreach ($nodes as $node) {
             if ($node->getParentId() === null) {
@@ -98,16 +98,16 @@ class ViewTreeByIdAction extends Action
                 }
             }
         }
-        
+
         return $rootNodes;
     }
-    
-    private function generateHTML(string $treeHtml, $tree): string
+
+    private function generateHTML(string $treeHtml, \App\Domain\Tree\Tree $tree): string
     {
         $css = $this->getCSS();
         $treeName = htmlspecialchars($tree->getName());
         $treeDescription = htmlspecialchars($tree->getDescription() ?: 'No description available');
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -140,7 +140,7 @@ class ViewTreeByIdAction extends Action
 </html>
 HTML;
     }
-    
+
     private function generateTreeNotFoundHTML(int $treeId): Response
     {
         $html = <<<HTML
@@ -163,21 +163,21 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
-    private function generateNoNodesHTML($tree): Response
+
+    private function generateNoNodesHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $css = $this->getCSS();
-        
+
         $treeHtml = '<div class="tree"><ul>';
         $treeHtml .= '<li><div class="tree-node-no-box"><a href="/tree/' . $treeId . '/add-node" class="add-icon">+</a></div></li>';
         $treeHtml .= '</ul></div>';
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -209,12 +209,12 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
-    private function generateNoRootNodesHTML($tree): Response
+
+    private function generateNoRootNodesHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $html = <<<HTML
@@ -237,11 +237,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateErrorHTML(string $errorMessage): Response
     {
         $html = <<<HTML
@@ -264,16 +264,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
-    
+
     private function getCSS(): string
     {
         return <<<CSS
@@ -553,4 +553,4 @@ body {
 }
 CSS;
     }
-} 
+}

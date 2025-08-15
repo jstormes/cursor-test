@@ -30,7 +30,7 @@ class AddTreeJsonActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new AddTreeJsonAction(
             $this->logger,
             $this->treeRepository
@@ -191,7 +191,7 @@ class AddTreeJsonActionTest extends TestCase
     public function testTreeNameTooLong(): void
     {
         $longName = str_repeat('A', 256);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -226,7 +226,7 @@ class AddTreeJsonActionTest extends TestCase
     public function testDescriptionTooLong(): void
     {
         $longDescription = str_repeat('A', 1001);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -261,7 +261,7 @@ class AddTreeJsonActionTest extends TestCase
     public function testDuplicateTreeName(): void
     {
         $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -300,7 +300,7 @@ class AddTreeJsonActionTest extends TestCase
     public function testCaseInsensitiveDuplicateCheck(): void
     {
         $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([

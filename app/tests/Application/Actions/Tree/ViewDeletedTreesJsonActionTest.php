@@ -30,7 +30,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new ViewDeletedTreesJsonAction(
             $this->logger,
             $this->treeRepository
@@ -41,7 +41,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
     {
         $deletedTree1 = new Tree(1, 'Deleted Tree 1', 'First deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false);
         $deletedTree2 = new Tree(2, 'Deleted Tree 2', 'Second deleted tree', new DateTime('2023-02-01 09:15:00'), new DateTime('2023-02-02 14:45:00'), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
@@ -281,7 +281,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
     public function testTreeWithNullDescription(): void
     {
         $deletedTree = new Tree(1, 'Tree No Description', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
@@ -323,7 +323,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
         for ($i = 1; $i <= 5; $i++) {
             $trees[] = new Tree($i, "Tree $i", "Description $i", new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
         }
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
@@ -365,14 +365,14 @@ class ViewDeletedTreesJsonActionTest extends TestCase
     public function testJsonResponseFormat(): void
     {
         $deletedTree = new Tree(
-            42, 
-            'Format Test Tree', 
-            'Testing JSON format', 
-            new DateTime('2023-05-15 14:30:00'), 
-            new DateTime('2023-06-20 09:15:30'), 
+            42,
+            'Format Test Tree',
+            'Testing JSON format',
+            new DateTime('2023-05-15 14:30:00'),
+            new DateTime('2023-06-20 09:15:30'),
             false
         );
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
@@ -399,7 +399,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 // Verify top-level structure
                 $expectedKeys = ['success', 'message', 'stats', 'trees', 'links'];
                 foreach ($expectedKeys as $key) {
@@ -407,7 +407,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 // Verify tree data structure
                 $tree = $data['trees'][0];
                 $expectedTreeKeys = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at'];
@@ -416,7 +416,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 // Verify links structure
                 $expectedLinkKeys = ['back_to_active_trees', 'view_active_trees_html'];
                 foreach ($expectedLinkKeys as $key) {
@@ -424,7 +424,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 return $tree['id'] === 42 &&
                        $tree['name'] === 'Format Test Tree' &&
                        $tree['description'] === 'Testing JSON format' &&

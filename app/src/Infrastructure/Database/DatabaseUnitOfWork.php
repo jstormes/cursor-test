@@ -12,28 +12,34 @@ class DatabaseUnitOfWork implements UnitOfWork
 
     public function __construct(
         private DatabaseConnection $connection
-    ) {}
+    ) {
+    }
 
+    #[\Override]
     public function registerNew(object $entity): void
     {
         $this->newEntities[] = $entity;
     }
 
+    #[\Override]
     public function registerDirty(object $entity): void
     {
         $this->dirtyEntities[] = $entity;
     }
 
+    #[\Override]
     public function registerDeleted(object $entity): void
     {
         $this->deletedEntities[] = $entity;
     }
 
+    #[\Override]
     public function beginTransaction(): void
     {
         $this->connection->beginTransaction();
     }
 
+    #[\Override]
     public function commit(): void
     {
         try {
@@ -60,12 +66,14 @@ class DatabaseUnitOfWork implements UnitOfWork
         }
     }
 
+    #[\Override]
     public function rollback(): void
     {
         $this->connection->rollback();
         $this->clear();
     }
 
+    #[\Override]
     public function inTransaction(): bool
     {
         return $this->connection->inTransaction();
@@ -95,4 +103,4 @@ class DatabaseUnitOfWork implements UnitOfWork
         $this->dirtyEntities = [];
         $this->deletedEntities = [];
     }
-} 
+}

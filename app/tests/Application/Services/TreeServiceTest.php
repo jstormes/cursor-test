@@ -24,11 +24,11 @@ class TreeServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockTreeRepository = $this->createMock(TreeRepository::class);
         $this->mockNodeRepository = $this->createMock(TreeNodeRepository::class);
         $this->mockUnitOfWork = $this->createMock(UnitOfWork::class);
-        
+
         $this->service = new TreeService(
             $this->mockTreeRepository,
             $this->mockNodeRepository,
@@ -629,4 +629,4 @@ class TreeServiceTest extends TestCase
 
         $this->service->moveNode(1, 0);
     }
-} 
+}

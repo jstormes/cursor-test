@@ -116,4 +116,4 @@ class TreeDataMapperTest extends TestCase
         $this->assertTrue($trees[0]->isActive());
         $this->assertFalse($trees[1]->isActive());
     }
-} 
+}

@@ -14,6 +14,7 @@ class SessionMiddleware implements Middleware
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function process(Request $request, RequestHandler $handler): Response
     {
         if (isset($_SERVER['HTTP_AUTHORIZATION'])) {

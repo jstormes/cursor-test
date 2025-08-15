@@ -19,12 +19,13 @@ class ViewDeletedTreesAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $deletedTrees = $this->treeRepository->findDeleted();
             $html = $this->generateHTML($deletedTrees);
-            
+
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
         } catch (\Exception $e) {
@@ -37,7 +38,7 @@ class ViewDeletedTreesAction extends Action
     {
         $css = $this->getCSS();
         $treesHtml = $this->generateTreesList($deletedTrees);
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -87,7 +88,7 @@ HTML;
             $description = htmlspecialchars($tree->getDescription() ?: 'No description');
             $createdAt = $tree->getCreatedAt()->format('M j, Y g:i A');
             $updatedAt = $tree->getUpdatedAt()->format('M j, Y g:i A');
-            
+
             $treesHtml .= <<<HTML
         <div class="tree-card deleted">
             <div class="tree-info">
@@ -177,7 +178,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -400,4 +401,4 @@ body {
 }
 CSS;
     }
-} 
+}

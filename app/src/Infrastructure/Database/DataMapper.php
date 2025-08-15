@@ -20,4 +20,4 @@ interface DataMapper
      * Map multiple database rows to domain entities
      */
     public function mapToEntities(array $data): array;
-} 
+}

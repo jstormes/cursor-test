@@ -35,7 +35,7 @@ class AddNodeJsonActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
-        
+
         $this->action = new AddNodeJsonAction(
             $this->logger,
             $this->treeRepository,
@@ -46,7 +46,7 @@ class AddNodeJsonActionTest extends TestCase
     public function testCreateSimpleNodeSuccess(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -54,7 +54,7 @@ class AddNodeJsonActionTest extends TestCase
                 'node_type' => 'SimpleNode',
                 'sort_order' => 0
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -94,7 +94,7 @@ class AddNodeJsonActionTest extends TestCase
     public function testCreateButtonNodeSuccess(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -104,7 +104,7 @@ class AddNodeJsonActionTest extends TestCase
                 'button_action' => 'alert("clicked")',
                 'sort_order' => 1
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -172,11 +172,11 @@ class AddNodeJsonActionTest extends TestCase
     public function testInvalidJsonData(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn(null);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -206,14 +206,14 @@ class AddNodeJsonActionTest extends TestCase
     public function testEmptyNodeName(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
                 'name' => '',
                 'node_type' => 'SimpleNode'
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -247,14 +247,14 @@ class AddNodeJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
         $longName = str_repeat('A', 256);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
                 'name' => $longName,
                 'node_type' => 'SimpleNode'
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -287,7 +287,7 @@ class AddNodeJsonActionTest extends TestCase
     public function testButtonNodeWithoutButtonText(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -295,7 +295,7 @@ class AddNodeJsonActionTest extends TestCase
                 'node_type' => 'ButtonNode',
                 'button_text' => ''
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -328,7 +328,7 @@ class AddNodeJsonActionTest extends TestCase
     public function testInvalidParentNode(): void
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -336,7 +336,7 @@ class AddNodeJsonActionTest extends TestCase
                 'parent_id' => 999,
                 'node_type' => 'SimpleNode'
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -375,7 +375,7 @@ class AddNodeJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
         $parentNode = new SimpleNode(5, 'Parent', 1, null, 0);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -383,7 +383,7 @@ class AddNodeJsonActionTest extends TestCase
                 'parent_id' => 5,
                 'node_type' => 'SimpleNode'
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -459,7 +459,7 @@ class AddNodeJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
         $longButtonText = str_repeat('A', 101);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -467,7 +467,7 @@ class AddNodeJsonActionTest extends TestCase
                 'node_type' => 'ButtonNode',
                 'button_text' => $longButtonText
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)
@@ -501,7 +501,7 @@ class AddNodeJsonActionTest extends TestCase
     {
         $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
         $longButtonAction = str_repeat('A', 256);
-        
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -510,7 +510,7 @@ class AddNodeJsonActionTest extends TestCase
                 'button_text' => 'Click Me',
                 'button_action' => $longButtonAction
             ]);
-            
+
         $this->treeRepository->expects($this->once())
             ->method('findById')
             ->with(1)

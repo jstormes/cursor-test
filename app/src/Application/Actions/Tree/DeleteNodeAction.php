@@ -23,91 +23,90 @@ class DeleteNodeAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         $request = $this->request;
         $method = $request->getMethod();
-        
+
         if ($method === 'GET') {
             return $this->showConfirmationForm();
         } elseif ($method === 'POST') {
             return $this->handleDeletion();
         }
-        
+
         return $this->response->withStatus(405);
     }
-    
+
     private function showConfirmationForm(): Response
     {
         try {
             $treeId = (int) $this->resolveArg('treeId');
             $nodeId = (int) $this->resolveArg('nodeId');
-            
+
             $tree = $this->treeRepository->findById($treeId);
             if (!$tree) {
                 return $this->generateTreeNotFoundHTML($treeId);
             }
-            
+
             $node = $this->treeNodeRepository->findById($nodeId);
             if (!$node || $node->getTreeId() !== $treeId) {
                 return $this->generateNodeNotFoundHTML($treeId, $nodeId);
             }
-            
+
             // Get all descendants that will be deleted
             $descendants = $this->getAllDescendants($nodeId);
-            
+
             $html = $this->generateConfirmationHTML($tree, $node, $descendants);
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error showing delete confirmation: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function handleDeletion(): Response
     {
         try {
             $treeId = (int) $this->resolveArg('treeId');
             $nodeId = (int) $this->resolveArg('nodeId');
-            
+
             $tree = $this->treeRepository->findById($treeId);
             if (!$tree) {
                 return $this->generateTreeNotFoundHTML($treeId);
             }
-            
+
             $node = $this->treeNodeRepository->findById($nodeId);
             if (!$node || $node->getTreeId() !== $treeId) {
                 return $this->generateNodeNotFoundHTML($treeId, $nodeId);
             }
-            
+
             // Delete the node and all its descendants
             $this->deleteNodeAndDescendants($nodeId);
-            
+
             return $this->generateSuccessHTML($tree, $node);
-            
         } catch (\Exception $e) {
             $this->logger->error('Error deleting node: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function getAllDescendants(int $nodeId): array
     {
         $descendants = [];
         $directChildren = $this->treeNodeRepository->findChildren($nodeId);
-        
+
         foreach ($directChildren as $child) {
             $descendants[] = $child;
             // Recursively get descendants of this child
             $childDescendants = $this->getAllDescendants($child->getId());
             $descendants = array_merge($descendants, $childDescendants);
         }
-        
+
         return $descendants;
     }
-    
+
     private function deleteNodeAndDescendants(int $nodeId): void
     {
         // First delete all descendants
@@ -115,19 +114,19 @@ class DeleteNodeAction extends Action
         foreach ($descendants as $descendant) {
             $this->treeNodeRepository->delete($descendant->getId());
         }
-        
+
         // Then delete the node itself
         $this->treeNodeRepository->delete($nodeId);
     }
-    
+
     private function generateConfirmationHTML(Tree $tree, AbstractTreeNode $node, array $descendants): string
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $nodeName = htmlspecialchars($node->getName());
-        $nodeId = $node->getId();
+        $node->getId();
         $descendantCount = count($descendants);
-        
+
         $descendantsList = '';
         if (!empty($descendants)) {
             $descendantsList = '<h3>The following child nodes will also be deleted:</h3><ul class="descendants-list">';
@@ -136,9 +135,9 @@ class DeleteNodeAction extends Action
             }
             $descendantsList .= '</ul>';
         }
-        
+
         $css = $this->getCSS();
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -181,13 +180,13 @@ class DeleteNodeAction extends Action
 </html>
 HTML;
     }
-    
+
     private function generateSuccessHTML(Tree $tree, AbstractTreeNode $node): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $nodeName = htmlspecialchars($node->getName());
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -212,11 +211,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateTreeNotFoundHTML(int $treeId): Response
     {
         $html = <<<HTML
@@ -239,11 +238,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateNodeNotFoundHTML(int $treeId, int $nodeId): Response
     {
         $html = <<<HTML
@@ -266,11 +265,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateErrorHTML(string $errorMessage): Response
     {
         $html = <<<HTML
@@ -293,16 +292,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
-    
+
     private function getCSS(): string
     {
         return <<<CSS

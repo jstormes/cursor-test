@@ -22,6 +22,7 @@ class HttpErrorHandler extends SlimErrorHandler
     /**
      * @inheritdoc
      */
+    #[\Override]
     protected function respond(): Response
     {
         $exception = $this->exception;

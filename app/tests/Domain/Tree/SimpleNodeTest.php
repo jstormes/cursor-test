@@ -12,7 +12,7 @@ class SimpleNodeTest extends TestCase
     public function testConstructorAndGetters(): void
     {
         $node = new SimpleNode(1, 'Test Node', 1);
-        
+
         $this->assertEquals('Test Node', $node->getName());
         $this->assertEquals('SimpleNode', $node->getType());
         $this->assertFalse($node->hasChildren());
@@ -23,9 +23,9 @@ class SimpleNodeTest extends TestCase
     {
         $parent = new SimpleNode(1, 'Parent', 1);
         $child = new SimpleNode(2, 'Child', 1, 1);
-        
+
         $parent->addChild($child);
-        
+
         $this->assertTrue($parent->hasChildren());
         $this->assertCount(1, $parent->getChildren());
         $this->assertSame($child, $parent->getChildren()[0]);
@@ -36,10 +36,10 @@ class SimpleNodeTest extends TestCase
         $parent = new SimpleNode(1, 'Parent', 1);
         $child1 = new SimpleNode(2, 'Child 1', 1, 1, 0);
         $child2 = new SimpleNode(3, 'Child 2', 1, 1, 1);
-        
+
         $parent->addChild($child1);
         $parent->addChild($child2);
-        
+
         $this->assertTrue($parent->hasChildren());
         $this->assertCount(2, $parent->getChildren());
         $this->assertSame($child1, $parent->getChildren()[0]);
@@ -49,7 +49,7 @@ class SimpleNodeTest extends TestCase
     public function testEmptyChildrenArray(): void
     {
         $node = new SimpleNode(1, 'Test', 1);
-        
+
         $this->assertEmpty($node->getChildren());
         $this->assertFalse($node->hasChildren());
     }
@@ -58,12 +58,12 @@ class SimpleNodeTest extends TestCase
     {
         $parent = new SimpleNode(1, 'Parent', 1);
         $child = new SimpleNode(2, 'Child', 1, 1);
-        
+
         $this->assertFalse($parent->hasChildren());
-        
+
         $parent->addChild($child);
         $this->assertTrue($parent->hasChildren());
-        
+
         $this->assertCount(1, $parent->getChildren());
     }
-} 
+}

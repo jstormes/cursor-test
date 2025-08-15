@@ -11,6 +11,7 @@ class ListUsersAction extends UserAction
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function action(): Response
     {
         $users = $this->userRepository->findAll();

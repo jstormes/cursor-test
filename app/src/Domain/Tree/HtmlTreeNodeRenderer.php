@@ -7,16 +7,17 @@ namespace App\Domain\Tree;
 class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
 {
     private bool $allowEdit;
-    
+
     public function __construct(bool $allowEdit = true)
     {
         $this->allowEdit = $allowEdit;
     }
-    
+
+    #[\Override]
     public function render(TreeNode $node): string
     {
         $html = $node->accept($this);
-        
+
         if ($node->hasChildren()) {
             $html .= '<ul>';
             foreach ($node->getChildren() as $child) {
@@ -24,10 +25,11 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
             }
             $html .= '</ul>';
         }
-        
+
         return $html;
     }
 
+    #[\Override]
     public function visitSimpleNode(SimpleNode $node): string
     {
         if ($this->allowEdit) {
@@ -39,6 +41,7 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         }
     }
 
+    #[\Override]
     public function visitButtonNode(ButtonNode $node): string
     {
         if ($this->allowEdit) {
@@ -48,16 +51,16 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         } else {
             $html = '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName());
         }
-        
+
         $action = $node->getButtonAction();
         $buttonText = htmlspecialchars($node->getButtonText());
-        
+
         if ($action) {
             $html .= ' <br/> <button onclick="' . htmlspecialchars($action) . '">' . $buttonText . '</button>';
         } else {
             $html .= ' <br/> <button>' . $buttonText . '</button>';
         }
-        
+
         if ($this->allowEdit) {
             $nodeId = $node->getId();
             $treeId = $node->getTreeId();
@@ -65,7 +68,7 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         } else {
             $html .= '</div>';
         }
-        
+
         return $html;
     }
-} 
+}

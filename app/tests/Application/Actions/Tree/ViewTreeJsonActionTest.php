@@ -35,7 +35,7 @@ class ViewTreeJsonActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
-        
+
         $this->action = new ViewTreeJsonAction(
             $this->logger,
             $this->treeRepository,
@@ -71,7 +71,7 @@ class ViewTreeJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                return $data['success'] === true && 
+                return $data['success'] === true &&
                        $data['message'] === 'Tree structure retrieved successfully';
             }));
 
@@ -325,4 +325,4 @@ class ViewTreeJsonActionTest extends TestCase
 
         $this->action->__invoke($this->request, $this->response, []);
     }
-} 
+}

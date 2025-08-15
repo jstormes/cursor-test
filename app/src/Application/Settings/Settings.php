@@ -16,6 +16,7 @@ class Settings implements SettingsInterface
     /**
      * @return mixed
      */
+    #[\Override]
     public function get(string $key = '')
     {
         return (empty($key)) ? $this->settings : $this->settings[$key];

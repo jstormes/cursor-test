@@ -19,18 +19,19 @@ class DeleteTreeAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $request = $this->request;
             $method = $request->getMethod();
-            
+
             if ($method === 'GET') {
                 return $this->showConfirmationForm();
             } elseif ($method === 'POST') {
                 return $this->handleDeletion();
             }
-            
+
             return $this->response->withStatus(405);
         } catch (\Exception $e) {
             $this->logger->error('Error in delete tree action: ' . $e->getMessage());
@@ -42,15 +43,15 @@ class DeleteTreeAction extends Action
     {
         $treeId = (int) $this->resolveArg('id');
         $tree = $this->treeRepository->findById($treeId);
-        
+
         if (!$tree) {
             return $this->generateTreeNotFoundHTML($treeId);
         }
-        
+
         if (!$tree->isActive()) {
             return $this->generateAlreadyDeletedHTML($tree);
         }
-        
+
         $html = $this->generateConfirmationHTML($tree);
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
@@ -60,29 +61,29 @@ class DeleteTreeAction extends Action
     {
         $treeId = (int) $this->resolveArg('id');
         $tree = $this->treeRepository->findById($treeId);
-        
+
         if (!$tree) {
             return $this->generateTreeNotFoundHTML($treeId);
         }
-        
+
         if (!$tree->isActive()) {
             return $this->generateAlreadyDeletedHTML($tree);
         }
-        
+
         // Perform soft delete
         $this->treeRepository->softDelete($treeId);
-        
+
         return $this->generateSuccessHTML($tree);
     }
 
-    private function generateConfirmationHTML($tree): string
+    private function generateConfirmationHTML(\App\Domain\Tree\Tree $tree): string
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $description = htmlspecialchars($tree->getDescription() ?: 'No description');
-        
+
         $css = $this->getCSS();
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -135,11 +136,11 @@ class DeleteTreeAction extends Action
 HTML;
     }
 
-    private function generateSuccessHTML($tree): Response
+    private function generateSuccessHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
-        $treeId = $tree->getId();
-        
+        $tree->getId();
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -226,7 +227,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -284,16 +285,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
 
-    private function generateAlreadyDeletedHTML($tree): Response
+    private function generateAlreadyDeletedHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
-        $treeId = $tree->getId();
-        
+        $tree->getId();
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -370,7 +371,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -428,7 +429,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -582,4 +583,4 @@ body {
 }
 CSS;
     }
-} 
+}

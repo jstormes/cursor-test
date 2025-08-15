@@ -11,9 +11,9 @@ class TreeQuery
     private ?int $limit = null;
     private int $offset = 0;
 
-    public function withActive(bool $active = true): self
+    public function withActive(bool $isActive): self
     {
-        $this->filters['is_active'] = $active ? 1 : 0;
+        $this->filters['is_active'] = $isActive ? 1 : 0;
         return $this;
     }
 
@@ -29,15 +29,15 @@ class TreeQuery
         return $this;
     }
 
-    public function orderByCreatedAt(string $direction = 'DESC'): self
+    public function orderByCreatedAt(string $direction = 'ASC'): self
     {
-        $this->orderBy['created_at'] = strtoupper($direction);
+        $this->orderBy['created_at'] = $direction;
         return $this;
     }
 
     public function orderByName(string $direction = 'ASC'): self
     {
-        $this->orderBy['name'] = strtoupper($direction);
+        $this->orderBy['name'] = $direction;
         return $this;
     }
 
@@ -76,31 +76,26 @@ class TreeQuery
     public function buildSql(): string
     {
         $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees';
-        
         $conditions = [];
-        $params = [];
-        
+
         foreach ($this->filters as $key => $value) {
             switch ($key) {
                 case 'is_active':
                     $conditions[] = 'is_active = ?';
-                    $params[] = $value;
                     break;
                 case 'name_like':
                     $conditions[] = 'name LIKE ?';
-                    $params[] = "%{$value}%";
                     break;
                 case 'description_like':
                     $conditions[] = 'description LIKE ?';
-                    $params[] = "%{$value}%";
                     break;
             }
         }
-        
+
         if (!empty($conditions)) {
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
-        
+
         if (!empty($this->orderBy)) {
             $orderClauses = [];
             foreach ($this->orderBy as $column => $direction) {
@@ -108,17 +103,15 @@ class TreeQuery
             }
             $sql .= ' ORDER BY ' . implode(', ', $orderClauses);
         }
-        
+
         if ($this->limit !== null) {
             $sql .= ' LIMIT ?';
-            $params[] = $this->limit;
         }
-        
+
         if ($this->offset > 0) {
             $sql .= ' OFFSET ?';
-            $params[] = $this->offset;
         }
-        
+
         return $sql;
     }
-} 
+}

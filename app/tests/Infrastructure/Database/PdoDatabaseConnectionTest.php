@@ -34,4 +34,4 @@ class PdoDatabaseConnectionTest extends TestCase
         // Skip this test for now since we can't easily mock PDO constructor
         $this->markTestSkipped('PDO mocking requires complex setup');
     }
-} 
+}

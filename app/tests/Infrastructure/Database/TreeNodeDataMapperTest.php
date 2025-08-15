@@ -162,4 +162,4 @@ class TreeNodeDataMapperTest extends TestCase
         $this->assertEquals('Root', $nodes[0]->getName());
         $this->assertEquals('Child', $nodes[1]->getName());
     }
-} 
+}

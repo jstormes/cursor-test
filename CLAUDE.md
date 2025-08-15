@@ -44,8 +44,20 @@ composer test:coverage
 # Code style checking (PHP_CodeSniffer)
 vendor/bin/phpcs
 
+# Auto-fix coding standard violations
+vendor/bin/phpcbf
+
 # Static analysis (PHPStan)
 vendor/bin/phpstan analyse
+
+# Advanced static analysis (Psalm)
+vendor/bin/psalm
+
+# Auto-fix type and style issues with Psalm
+vendor/bin/psalm --alter --issues=InvalidNullableReturnType,MissingOverrideAttribute,UnusedVariable,PossiblyUnusedMethod,ClassMustBeFinal,MissingParamType
+
+# Code complexity analysis (PHPMD)
+vendor/bin/phpmd src text cleancode,codesize,controversial,design,naming,unusedcode
 
 # Start PHP development server (if needed)
 composer start
@@ -57,11 +69,23 @@ composer start
 # Run tests from host without entering container
 docker-compose exec php-dev bash -c "cd /app && composer test"
 
+# Run tests with coverage from host
+docker-compose exec php-dev bash -c "cd /app && composer test:coverage"
+
 # Run code style check from host
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpcs"
 
+# Auto-fix coding standards from host
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpcbf"
+
 # Run static analysis from host  
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse"
+
+# Run advanced static analysis from host
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/psalm"
+
+# Run code complexity analysis from host
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpmd src text cleancode,codesize,controversial,design,naming,unusedcode"
 
 # Install dependencies from host
 docker-compose exec php-dev bash -c "cd /app && composer install"
@@ -128,7 +152,50 @@ This is a **PHP web application** built with the **Slim Framework** following **
 - Test configuration in `phpunit.xml`
 - Coverage reporting available via `composer test:coverage`
 
-## Code Quality
-- **PHP_CodeSniffer** with PSR-12 coding standards
-- **PHPStan** level 4 static analysis
-- Configuration files: `phpcs.xml`, `phpstan.neon.dist`
+## Code Quality Tools
+
+This project maintains high code quality through multiple automated tools:
+
+### Static Analysis & Type Checking
+- **PHPStan** (Level 4): Advanced static analysis with type checking
+- **Psalm** (Level 3): Type inference and advanced static analysis
+- Both tools help catch bugs before runtime and ensure type safety
+
+### Coding Standards
+- **PHP_CodeSniffer** (PHPCS): Enforces PSR-12 coding standards
+- **PHP Code Beautifier** (PHPCBF): Auto-fixes coding standard violations
+- Configuration: `phpcs.xml`
+
+### Code Complexity & Design Quality  
+- **PHP Mess Detector** (PHPMD): Detects code smells, complexity issues, and design problems
+- Checks for: cyclomatic complexity, method length, coupling, unused code
+
+### Testing & Coverage
+- **PHPUnit**: Unit testing framework with 478+ tests
+- **Test Coverage**: 84%+ line coverage reporting
+- Configuration: `phpunit.xml`
+
+### Quality Metrics (Current Status)
+- ✅ **Tests**: 478/478 passing (100%)
+- ✅ **Coverage**: 84.10% line coverage  
+- ✅ **PHPStan**: 0 errors (Level 4)
+- ✅ **Psalm**: 0 errors (Level 3)
+- ⚠️ **PHPCS**: 1 error, 88 warnings (mostly line length)
+- ⚠️ **PHPMD**: Some complex methods identified
+
+### Configuration Files
+- `phpcs.xml` - PHP_CodeSniffer rules
+- `phpstan.neon.dist` - PHPStan configuration
+- `psalm.xml` - Psalm configuration (auto-generated)
+- `phpunit.xml` - PHPUnit test configuration
+
+### Recommended Workflow
+```bash
+# Before committing, run full quality check:
+composer test                    # Run all tests
+vendor/bin/phpcbf                # Auto-fix coding standards
+vendor/bin/phpcs                 # Check remaining violations
+vendor/bin/phpstan analyse       # Static analysis
+vendor/bin/psalm                 # Advanced type checking
+vendor/bin/phpmd src text cleancode,codesize,design,naming,unusedcode
+```

@@ -7,4 +7,4 @@ namespace App\Domain\Tree;
 interface TreeNodeRenderer
 {
     public function render(TreeNode $node): string;
-} 
+}

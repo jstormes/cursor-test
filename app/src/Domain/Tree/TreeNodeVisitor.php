@@ -8,4 +8,4 @@ interface TreeNodeVisitor
 {
     public function visitSimpleNode(SimpleNode $node): string;
     public function visitButtonNode(ButtonNode $node): string;
-} 
+}

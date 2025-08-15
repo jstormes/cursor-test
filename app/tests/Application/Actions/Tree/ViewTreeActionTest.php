@@ -35,7 +35,7 @@ class ViewTreeActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
-        
+
         $this->action = new ViewTreeAction(
             $this->logger,
             $this->treeRepository,
@@ -308,4 +308,4 @@ class ViewTreeActionTest extends TestCase
 
         $this->action->__invoke($this->request, $this->response, []);
     }
-} 
+}

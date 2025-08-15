@@ -32,6 +32,7 @@ class InMemoryUserRepository implements UserRepository
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function findAll(): array
     {
         return array_values($this->users);
@@ -40,6 +41,7 @@ class InMemoryUserRepository implements UserRepository
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function findUserOfId(int $id): User
     {
         if (!isset($this->users[$id])) {

@@ -22,16 +22,6 @@ interface TreeNodeRepository
     public function findChildren(int $parentId): array;
 
     /**
-     * Find root nodes (nodes with no parent) for a specific tree
-     */
-    public function findRootNodes(int $treeId): array;
-
-    /**
-     * Find a complete tree structure
-     */
-    public function findTreeStructure(int $treeId): array;
-
-    /**
      * Save a tree node (insert or update)
      */
     public function save(AbstractTreeNode $node): void;
@@ -45,4 +35,9 @@ interface TreeNodeRepository
      * Delete all nodes for a specific tree
      */
     public function deleteByTreeId(int $treeId): void;
-} 
+
+    /**
+     * Find tree structure for a specific tree
+     */
+    public function findTreeStructure(int $treeId): array;
+}

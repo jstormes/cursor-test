@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Tree;
@@ -11,27 +12,23 @@ use Psr\Log\LoggerInterface;
 
 class ViewDeletedTreesJsonAction extends Action
 {
-    public function __construct(
-        LoggerInterface $logger,
-        private TreeRepository $treeRepository
-    ) {
+    public function __construct(LoggerInterface $logger, private TreeRepository $treeRepository)
+    {
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $request = $this->request;
             $method = $request->getMethod();
-            
             if ($method !== 'GET') {
                 return $this->respondWithError('Method not allowed. Must be GET.', 405);
             }
 
             $deletedTrees = $this->treeRepository->findDeleted();
-            
             return $this->respondWithSuccess($deletedTrees);
-            
         } catch (\Exception $e) {
             $this->logger->error('Error in view deleted trees JSON action: ' . $e->getMessage());
             return $this->respondWithError('Internal server error: ' . $e->getMessage(), 500);
@@ -64,7 +61,6 @@ class ViewDeletedTreesJsonAction extends Action
                 'view_active_trees_html' => '/trees'
             ]
         ];
-
         $this->response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $this->response
             ->withHeader('Content-Type', 'application/json')
@@ -80,10 +76,9 @@ class ViewDeletedTreesJsonAction extends Action
                 'status_code' => $statusCode
             ]
         ];
-
         $this->response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $this->response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus($statusCode);
     }
-} 
+}

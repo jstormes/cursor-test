@@ -21,30 +21,31 @@ class AddTreeJsonAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $parsedBody = $this->request->getParsedBody();
-            
+
             if (!$parsedBody) {
                 return $this->respondWithError('Invalid JSON data provided');
             }
-            
+
             // Validate required fields
             $name = trim($parsedBody['name'] ?? '');
             if (empty($name)) {
                 return $this->respondWithError('Tree name is required');
             }
-            
+
             if (strlen($name) > 255) {
                 return $this->respondWithError('Tree name must be 255 characters or less');
             }
-            
+
             $description = trim($parsedBody['description'] ?? '');
             if (strlen($description) > 1000) {
                 return $this->respondWithError('Description must be 1000 characters or less');
             }
-            
+
             // Check if tree name already exists
             $existingTrees = $this->treeRepository->findActive();
             foreach ($existingTrees as $existingTree) {
@@ -52,17 +53,17 @@ class AddTreeJsonAction extends Action
                     return $this->respondWithError('A tree with this name already exists');
                 }
             }
-            
+
             // Create the tree
             $tree = new Tree(
                 null,
                 $name,
                 $description ?: null
             );
-            
+
             // Save the tree
             $this->treeRepository->save($tree);
-            
+
             // Return success response with tree details
             $response = [
                 'success' => true,
@@ -82,16 +83,15 @@ class AddTreeJsonAction extends Action
                     'view_trees' => "/trees"
                 ]
             ];
-            
+
             $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
             return $this->response->withHeader('Content-Type', 'application/json');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error creating tree via JSON: ' . $e->getMessage());
             return $this->respondWithError('An error occurred while creating the tree: ' . $e->getMessage());
         }
     }
-    
+
     private function respondWithError(string $message, array $details = []): Response
     {
         $response = [
@@ -101,8 +101,8 @@ class AddTreeJsonAction extends Action
                 'details' => $details
             ]
         ];
-        
+
         $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
         return $this->response->withHeader('Content-Type', 'application/json');
     }
-} 
+}

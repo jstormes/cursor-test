@@ -83,4 +83,4 @@ class UserDataMapperTest extends TestCase
         $this->assertEquals('john.doe', $users[0]->getUsername());
         $this->assertEquals('jane.smith', $users[1]->getUsername());
     }
-} 
+}

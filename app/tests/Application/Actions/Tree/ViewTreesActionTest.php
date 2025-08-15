@@ -19,10 +19,10 @@ class ViewTreesActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockTreeRepository = $this->createMock(TreeRepository::class);
         $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
-        
+
         $this->action = new ViewTreesAction($logger, $this->mockTreeRepository);
     }
 
@@ -565,4 +565,4 @@ class ViewTreesActionTest extends TestCase
         $this->assertStringContainsString('View Tree Structure', $html);
         $this->assertStringContainsString('View JSON Data', $html);
     }
-} 
+}

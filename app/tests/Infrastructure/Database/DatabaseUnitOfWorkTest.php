@@ -17,7 +17,7 @@ class DatabaseUnitOfWorkTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockConnection = $this->createMock(DatabaseConnection::class);
         $this->unitOfWork = new DatabaseUnitOfWork($this->mockConnection);
     }
@@ -101,4 +101,4 @@ class DatabaseUnitOfWorkTest extends TestCase
 
         $this->assertTrue($result);
     }
-} 
+}

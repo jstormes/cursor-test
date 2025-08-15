@@ -22,35 +22,36 @@ class ViewTreeByIdJsonAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             // Get the tree ID from the route parameters
             $treeId = (int) $this->resolveArg('id');
-            
+
             // Get the specific tree from the database
             $tree = $this->treeRepository->findById($treeId);
-            
+
             if (!$tree) {
                 return $this->respondWithError('Tree not found', [
                     'tree_id' => $treeId,
                     'message' => "Tree with ID {$treeId} was not found in the database"
                 ]);
             }
-            
+
             // Get all nodes for this tree
             $nodes = $this->treeNodeRepository->findByTreeId($treeId);
-            
+
             if (empty($nodes)) {
                 return $this->respondWithError('No nodes found for this tree', [
                     'tree_id' => $treeId,
                     'tree_name' => $tree->getName()
                 ]);
             }
-            
+
             // Build the tree structure from database nodes
             $rootNodes = $this->buildTreeFromNodes($nodes);
-            
+
             if (empty($rootNodes)) {
                 return $this->respondWithError('Invalid tree structure - no root nodes found', [
                     'tree_id' => $treeId,
@@ -58,13 +59,13 @@ class ViewTreeByIdJsonAction extends Action
                     'total_nodes' => count($nodes)
                 ]);
             }
-            
+
             // Convert tree to JSON structure
             $treeData = [];
             foreach ($rootNodes as $rootNode) {
                 $treeData[] = $this->convertTreeToArray($rootNode);
             }
-            
+
             $response = [
                 'success' => true,
                 'message' => 'Tree structure retrieved successfully',
@@ -83,26 +84,25 @@ class ViewTreeByIdJsonAction extends Action
                     'total_root_nodes' => count($rootNodes)
                 ]
             ];
-            
+
             $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
             return $this->response->withHeader('Content-Type', 'application/json');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error loading tree JSON by ID: ' . $e->getMessage());
             return $this->respondWithError('Error loading tree structure: ' . $e->getMessage());
         }
     }
-    
+
     private function buildTreeFromNodes(array $nodes): array
     {
         $nodeMap = [];
         $rootNodes = [];
-        
+
         // Create a map of all nodes by ID
         foreach ($nodes as $node) {
             $nodeMap[$node->getId()] = $node;
         }
-        
+
         // Build the tree structure
         foreach ($nodes as $node) {
             if ($node->getParentId() === null) {
@@ -116,10 +116,10 @@ class ViewTreeByIdJsonAction extends Action
                 }
             }
         }
-        
+
         return $rootNodes;
     }
-    
+
     private function convertTreeToArray(TreeNode $node): array
     {
         $nodeData = [
@@ -133,7 +133,7 @@ class ViewTreeByIdJsonAction extends Action
             'children_count' => count($node->getChildren()),
             'type_data' => $node->getTypeData()
         ];
-        
+
         // Add button-specific data if it's a ButtonNode
         if ($node->getType() === 'ButtonNode') {
             $typeData = $node->getTypeData();
@@ -142,7 +142,7 @@ class ViewTreeByIdJsonAction extends Action
                 'action' => $typeData['button_action'] ?? ''
             ];
         }
-        
+
         // Add children recursively
         if ($node->hasChildren()) {
             $nodeData['children'] = [];
@@ -150,10 +150,10 @@ class ViewTreeByIdJsonAction extends Action
                 $nodeData['children'][] = $this->convertTreeToArray($child);
             }
         }
-        
+
         return $nodeData;
     }
-    
+
     private function countNodes(array $rootNodes): int
     {
         $count = 0;
@@ -162,7 +162,7 @@ class ViewTreeByIdJsonAction extends Action
         }
         return $count;
     }
-    
+
     private function countNodesRecursive(TreeNode $node): int
     {
         $count = 1; // Count this node
@@ -171,7 +171,7 @@ class ViewTreeByIdJsonAction extends Action
         }
         return $count;
     }
-    
+
     private function getMaxDepth(array $rootNodes): int
     {
         $maxDepth = 0;
@@ -181,22 +181,22 @@ class ViewTreeByIdJsonAction extends Action
         }
         return $maxDepth;
     }
-    
+
     private function getMaxDepthRecursive(TreeNode $node, int $currentDepth = 0): int
     {
         if (!$node->hasChildren()) {
             return $currentDepth;
         }
-        
+
         $maxDepth = $currentDepth;
         foreach ($node->getChildren() as $child) {
             $childDepth = $this->getMaxDepthRecursive($child, $currentDepth + 1);
             $maxDepth = max($maxDepth, $childDepth);
         }
-        
+
         return $maxDepth;
     }
-    
+
     private function respondWithError(string $message, array $additionalData = []): Response
     {
         $response = [
@@ -204,12 +204,12 @@ class ViewTreeByIdJsonAction extends Action
             'message' => $message,
             'error' => true
         ];
-        
+
         if (!empty($additionalData)) {
             $response['data'] = $additionalData;
         }
-        
+
         $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
         return $this->response->withHeader('Content-Type', 'application/json');
     }
-} 
+}

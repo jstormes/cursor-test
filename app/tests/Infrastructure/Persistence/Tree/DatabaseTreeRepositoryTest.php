@@ -21,7 +21,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockConnection = $this->createMock(DatabaseConnection::class);
         $this->mockDataMapper = $this->createMock(TreeDataMapper::class);
         $this->repository = new DatabaseTreeRepository($this->mockConnection, $this->mockDataMapper);
@@ -332,7 +332,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     public function testSaveInsert(): void
     {
         $tree = new Tree(null, 'New Tree', 'A new tree');
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($tree)
@@ -362,7 +362,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     public function testSaveUpdate(): void
     {
         $tree = new Tree(1, 'Updated Tree', 'An updated tree');
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($tree)
@@ -388,7 +388,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     public function testSaveWithZeroId(): void
     {
         $tree = new Tree(0, 'Tree with Zero ID', 'A tree with zero ID');
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($tree)
@@ -468,7 +468,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     public function testSaveWithNullDescription(): void
     {
         $tree = new Tree(null, 'Tree with Null Description', null);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($tree)
@@ -498,7 +498,7 @@ class DatabaseTreeRepositoryTest extends TestCase
     public function testSaveWithEmptyName(): void
     {
         $tree = new Tree(null, '', 'Empty name tree');
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($tree)
@@ -524,4 +524,4 @@ class DatabaseTreeRepositoryTest extends TestCase
 
         $this->repository->save($tree);
     }
-} 
+}

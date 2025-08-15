@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Application\Actions\Tree;
@@ -11,46 +12,41 @@ use Psr\Log\LoggerInterface;
 
 class DeleteTreeJsonAction extends Action
 {
-    public function __construct(
-        LoggerInterface $logger,
-        private TreeRepository $treeRepository
-    ) {
+    public function __construct(LoggerInterface $logger, private TreeRepository $treeRepository)
+    {
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $request = $this->request;
             $method = $request->getMethod();
-            
             if ($method !== 'POST') {
                 return $this->respondWithError('Method not allowed. Must be POST.', 405);
             }
 
             $treeId = (int) $this->resolveArg('id');
             $tree = $this->treeRepository->findById($treeId);
-            
             if (!$tree) {
                 return $this->respondWithError("Tree with ID {$treeId} was not found.", 404);
             }
-            
+
             if (!$tree->isActive()) {
                 return $this->respondWithError("Tree '{$tree->getName()}' has already been deleted.", 400);
             }
 
             // Perform soft delete
             $this->treeRepository->softDelete($treeId);
-            
             return $this->respondWithSuccess($tree);
-            
         } catch (\Exception $e) {
             $this->logger->error('Error in delete tree JSON action: ' . $e->getMessage());
             return $this->respondWithError('Internal server error: ' . $e->getMessage(), 500);
         }
     }
 
-    private function respondWithSuccess($tree): Response
+    private function respondWithSuccess(\App\Domain\Tree\Tree $tree): Response
     {
         $data = [
             'success' => true,
@@ -68,7 +64,6 @@ class DeleteTreeJsonAction extends Action
                 'back_to_trees' => '/trees/json'
             ]
         ];
-
         $this->response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $this->response
             ->withHeader('Content-Type', 'application/json')
@@ -84,10 +79,9 @@ class DeleteTreeJsonAction extends Action
                 'status_code' => $statusCode
             ]
         ];
-
         $this->response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
         return $this->response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus($statusCode);
     }
-} 
+}

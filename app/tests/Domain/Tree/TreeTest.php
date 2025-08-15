@@ -368,7 +368,7 @@ class TreeTest extends TestCase
     {
         $customCreatedAt = new DateTime('2022-12-31 23:59:59');
         $customUpdatedAt = new DateTime('2023-01-01 00:00:01');
-        
+
         $tree = new Tree(1, 'Custom Tree', 'Custom Description', $customCreatedAt, $customUpdatedAt, true);
 
         $this->assertEquals($customCreatedAt, $tree->getCreatedAt());
@@ -394,4 +394,4 @@ class TreeTest extends TestCase
         $this->assertEquals($customUpdatedAt, $tree->getUpdatedAt());
         $this->assertNotEquals($customUpdatedAt, $tree->getCreatedAt());
     }
-} 
+}

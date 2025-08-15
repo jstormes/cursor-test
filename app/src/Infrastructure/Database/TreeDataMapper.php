@@ -9,6 +9,7 @@ use DateTime;
 
 class TreeDataMapper implements DataMapper
 {
+    #[\Override]
     public function mapToEntity(array $data): Tree
     {
         return new Tree(
@@ -21,6 +22,7 @@ class TreeDataMapper implements DataMapper
         );
     }
 
+    #[\Override]
     public function mapToArray(object $entity): array
     {
         if (!$entity instanceof Tree) {
@@ -37,8 +39,9 @@ class TreeDataMapper implements DataMapper
         ];
     }
 
+    #[\Override]
     public function mapToEntities(array $data): array
     {
         return array_map([$this, 'mapToEntity'], $data);
     }
-} 
+}

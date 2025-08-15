@@ -21,7 +21,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockConnection = $this->createMock(DatabaseConnection::class);
         $this->mockDataMapper = $this->createMock(TreeNodeDataMapper::class);
         $this->repository = new DatabaseTreeNodeRepository($this->mockConnection, $this->mockDataMapper);
@@ -414,7 +414,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     public function testSaveInsert(): void
     {
         $node = new SimpleNode(null, 'New Node', 1, null, 0);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($node)
@@ -433,13 +433,13 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
             ->with(
                 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 $this->callback(function ($params) {
-                    return $params[0] === 1 && 
-                           $params[1] === null && 
-                           $params[2] === 'New Node' && 
-                           $params[3] === 0 && 
-                           $params[4] === 'SimpleNode' && 
+                    return $params[0] === 1 &&
+                           $params[1] === null &&
+                           $params[2] === 'New Node' &&
+                           $params[3] === 0 &&
+                           $params[4] === 'SimpleNode' &&
                            $params[5] === '{}' &&
-                           is_string($params[6]) && 
+                           is_string($params[6]) &&
                            is_string($params[7]);
                 })
             );
@@ -450,7 +450,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     public function testSaveUpdate(): void
     {
         $node = new SimpleNode(1, 'Updated Node', 1, null, 1);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($node)
@@ -469,13 +469,13 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
             ->with(
                 'UPDATE tree_nodes SET tree_id = ?, parent_id = ?, name = ?, sort_order = ?, type_class = ?, type_data = ?, updated_at = ? WHERE id = ?',
                 $this->callback(function ($params) {
-                    return $params[0] === 1 && 
-                           $params[1] === null && 
-                           $params[2] === 'Updated Node' && 
-                           $params[3] === 1 && 
-                           $params[4] === 'SimpleNode' && 
+                    return $params[0] === 1 &&
+                           $params[1] === null &&
+                           $params[2] === 'Updated Node' &&
+                           $params[3] === 1 &&
+                           $params[4] === 'SimpleNode' &&
                            $params[5] === '{}' &&
-                           is_string($params[6]) && 
+                           is_string($params[6]) &&
                            $params[7] === 1;
                 })
             );
@@ -486,7 +486,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     public function testSaveWithZeroId(): void
     {
         $node = new SimpleNode(0, 'Node with Zero ID', 1, null, 0);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($node)
@@ -505,13 +505,13 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
             ->with(
                 'UPDATE tree_nodes SET tree_id = ?, parent_id = ?, name = ?, sort_order = ?, type_class = ?, type_data = ?, updated_at = ? WHERE id = ?',
                 $this->callback(function ($params) {
-                    return $params[0] === 1 && 
-                           $params[1] === null && 
-                           $params[2] === 'Node with Zero ID' && 
-                           $params[3] === 0 && 
-                           $params[4] === 'SimpleNode' && 
+                    return $params[0] === 1 &&
+                           $params[1] === null &&
+                           $params[2] === 'Node with Zero ID' &&
+                           $params[3] === 0 &&
+                           $params[4] === 'SimpleNode' &&
                            $params[5] === '{}' &&
-                           is_string($params[6]) && 
+                           is_string($params[6]) &&
                            $params[7] === 0;
                 })
             );
@@ -522,7 +522,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     public function testSaveWithEmptyName(): void
     {
         $node = new SimpleNode(null, '', 1, null, 0);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($node)
@@ -541,13 +541,13 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
             ->with(
                 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 $this->callback(function ($params) {
-                    return $params[0] === 1 && 
-                           $params[1] === null && 
-                           $params[2] === '' && 
-                           $params[3] === 0 && 
-                           $params[4] === 'SimpleNode' && 
+                    return $params[0] === 1 &&
+                           $params[1] === null &&
+                           $params[2] === '' &&
+                           $params[3] === 0 &&
+                           $params[4] === 'SimpleNode' &&
                            $params[5] === '{}' &&
-                           is_string($params[6]) && 
+                           is_string($params[6]) &&
                            is_string($params[7]);
                 })
             );
@@ -594,7 +594,7 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
     public function testSaveWithComplexTypeData(): void
     {
         $node = new SimpleNode(null, 'Complex Node', 1, null, 0);
-        
+
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
             ->with($node)
@@ -613,13 +613,13 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
             ->with(
                 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 $this->callback(function ($params) {
-                    return $params[0] === 1 && 
-                           $params[1] === null && 
-                           $params[2] === 'Complex Node' && 
-                           $params[3] === 0 && 
-                           $params[4] === 'SimpleNode' && 
+                    return $params[0] === 1 &&
+                           $params[1] === null &&
+                           $params[2] === 'Complex Node' &&
+                           $params[3] === 0 &&
+                           $params[4] === 'SimpleNode' &&
                            $params[5] === '{"key": "value", "nested": {"data": "test"}}' &&
-                           is_string($params[6]) && 
+                           is_string($params[6]) &&
                            is_string($params[7]);
                 })
             );
@@ -670,4 +670,4 @@ class DatabaseTreeNodeRepositoryTest extends TestCase
 
         $this->assertEquals($expectedNodes, $result);
     }
-} 
+}

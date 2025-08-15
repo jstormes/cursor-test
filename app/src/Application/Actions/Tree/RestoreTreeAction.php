@@ -19,18 +19,19 @@ class RestoreTreeAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             $request = $this->request;
             $method = $request->getMethod();
-            
+
             if ($method === 'GET') {
                 return $this->showConfirmationForm();
             } elseif ($method === 'POST') {
                 return $this->handleRestoration();
             }
-            
+
             return $this->response->withStatus(405);
         } catch (\Exception $e) {
             $this->logger->error('Error in restore tree action: ' . $e->getMessage());
@@ -42,15 +43,15 @@ class RestoreTreeAction extends Action
     {
         $treeId = (int) $this->resolveArg('id');
         $tree = $this->treeRepository->findById($treeId);
-        
+
         if (!$tree) {
             return $this->generateTreeNotFoundHTML($treeId);
         }
-        
+
         if ($tree->isActive()) {
             return $this->generateAlreadyActiveHTML($tree);
         }
-        
+
         $html = $this->generateConfirmationHTML($tree);
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
@@ -60,29 +61,29 @@ class RestoreTreeAction extends Action
     {
         $treeId = (int) $this->resolveArg('id');
         $tree = $this->treeRepository->findById($treeId);
-        
+
         if (!$tree) {
             return $this->generateTreeNotFoundHTML($treeId);
         }
-        
+
         if ($tree->isActive()) {
             return $this->generateAlreadyActiveHTML($tree);
         }
-        
+
         // Perform restore
         $this->treeRepository->restore($treeId);
-        
+
         return $this->generateSuccessHTML($tree);
     }
 
-    private function generateConfirmationHTML($tree): string
+    private function generateConfirmationHTML(\App\Domain\Tree\Tree $tree): string
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $description = htmlspecialchars($tree->getDescription() ?: 'No description');
-        
+
         $css = $this->getCSS();
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -136,11 +137,11 @@ class RestoreTreeAction extends Action
 HTML;
     }
 
-    private function generateSuccessHTML($tree): Response
+    private function generateSuccessHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -227,7 +228,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -285,16 +286,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
 
-    private function generateAlreadyActiveHTML($tree): Response
+    private function generateAlreadyActiveHTML(\App\Domain\Tree\Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -371,7 +372,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -429,7 +430,7 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
@@ -583,4 +584,4 @@ body {
 }
 CSS;
     }
-} 
+}

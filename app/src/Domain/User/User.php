@@ -44,6 +44,7 @@ class User implements JsonSerializable
         return $this->lastName;
     }
 
+    #[\Override]
     #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {

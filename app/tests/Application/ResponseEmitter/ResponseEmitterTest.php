@@ -54,7 +54,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithDifferentStatusCodes(): void
     {
         $statusCodes = [200, 201, 400, 404, 500];
-        
+
         foreach ($statusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write('test content');
@@ -95,7 +95,7 @@ class ResponseEmitterTest extends TestCase
     {
         // Set up the HTTP_ORIGIN server variable
         $_SERVER['HTTP_ORIGIN'] = 'https://example.com';
-        
+
         $response = $this->responseFactory->createResponse(200);
         $response->getBody()->write('test content');
 
@@ -104,7 +104,7 @@ class ResponseEmitterTest extends TestCase
         $output = ob_get_clean();
 
         $this->assertStringContainsString('test content', $output);
-        
+
         // Clean up
         unset($_SERVER['HTTP_ORIGIN']);
     }
@@ -113,7 +113,7 @@ class ResponseEmitterTest extends TestCase
     {
         // Ensure HTTP_ORIGIN is not set
         unset($_SERVER['HTTP_ORIGIN']);
-        
+
         $response = $this->responseFactory->createResponse(200);
         $response->getBody()->write('test content');
 
@@ -128,7 +128,7 @@ class ResponseEmitterTest extends TestCase
     {
         // Set empty origin
         $_SERVER['HTTP_ORIGIN'] = '';
-        
+
         $response = $this->responseFactory->createResponse(200);
         $response->getBody()->write('test content');
 
@@ -137,7 +137,7 @@ class ResponseEmitterTest extends TestCase
         $output = ob_get_clean();
 
         $this->assertStringContainsString('test content', $output);
-        
+
         // Clean up
         unset($_SERVER['HTTP_ORIGIN']);
     }
@@ -305,7 +305,7 @@ class ResponseEmitterTest extends TestCase
                 'updated' => '2023-01-02'
             ]
         ];
-        
+
         $response = $this->responseFactory->createResponse(200);
         $response->getBody()->write(json_encode($jsonData));
 
@@ -358,7 +358,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithErrorStatusCodes(): void
     {
         $errorStatusCodes = [400, 401, 403, 404, 405, 500, 502, 503];
-        
+
         foreach ($errorStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Error {$statusCode}");
@@ -374,7 +374,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithRedirectStatusCodes(): void
     {
         $redirectStatusCodes = [301, 302, 303, 307, 308];
-        
+
         foreach ($redirectStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Redirect {$statusCode}");
@@ -390,7 +390,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithInformationalStatusCodes(): void
     {
         $informationalStatusCodes = [100, 101, 102, 103];
-        
+
         foreach ($informationalStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Info {$statusCode}");
@@ -406,7 +406,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithSuccessStatusCodes(): void
     {
         $successStatusCodes = [200, 201, 202, 203, 206, 207, 208, 226];
-        
+
         foreach ($successStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Success {$statusCode}");
@@ -446,7 +446,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithClientErrorStatusCodes(): void
     {
         $clientErrorStatusCodes = [400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 421, 422, 423, 424, 425, 426, 428, 429, 431, 451];
-        
+
         foreach ($clientErrorStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Client Error {$statusCode}");
@@ -462,7 +462,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithServerErrorStatusCodes(): void
     {
         $serverErrorStatusCodes = [500, 501, 502, 503, 504, 505, 506, 507, 508, 510, 511];
-        
+
         foreach ($serverErrorStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Server Error {$statusCode}");
@@ -478,7 +478,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithCustomStatusCodes(): void
     {
         $customStatusCodes = [299, 399, 499, 599];
-        
+
         foreach ($customStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Custom Status {$statusCode}");
@@ -494,7 +494,7 @@ class ResponseEmitterTest extends TestCase
     public function testEmitResponseWithValidCustomStatusCodes(): void
     {
         $validCustomStatusCodes = [299, 399, 499, 599];
-        
+
         foreach ($validCustomStatusCodes as $statusCode) {
             $response = $this->responseFactory->createResponse($statusCode);
             $response->getBody()->write("Custom Status {$statusCode}");
@@ -506,4 +506,4 @@ class ResponseEmitterTest extends TestCase
             $this->assertStringContainsString("Custom Status {$statusCode}", $output);
         }
     }
-} 
+}

@@ -42,4 +42,4 @@ interface DatabaseConnection
      * Check if currently in a transaction
      */
     public function inTransaction(): bool;
-} 
+}

@@ -31,7 +31,7 @@ class ActionTest extends TestCase
     public function testActionErrorCreation(): void
     {
         $error = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'Not found');
-        
+
         $this->assertEquals(ActionError::RESOURCE_NOT_FOUND, $error->getType());
         $this->assertEquals('Not found', $error->getDescription());
     }
@@ -39,7 +39,7 @@ class ActionTest extends TestCase
     public function testActionErrorWithNullDescription(): void
     {
         $error = new ActionError(ActionError::SERVER_ERROR);
-        
+
         $this->assertEquals(ActionError::SERVER_ERROR, $error->getType());
         $this->assertNull($error->getDescription());
     }
@@ -48,7 +48,7 @@ class ActionTest extends TestCase
     {
         $error = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'Not found');
         $error->setType(ActionError::VALIDATION_ERROR);
-        
+
         $this->assertEquals(ActionError::VALIDATION_ERROR, $error->getType());
     }
 
@@ -56,7 +56,7 @@ class ActionTest extends TestCase
     {
         $error = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'Not found');
         $error->setDescription('Updated description');
-        
+
         $this->assertEquals('Updated description', $error->getDescription());
     }
 
@@ -64,7 +64,7 @@ class ActionTest extends TestCase
     {
         $error = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'Not found');
         $json = $error->jsonSerialize();
-        
+
         $this->assertIsArray($json);
         $this->assertArrayHasKey('type', $json);
         $this->assertArrayHasKey('description', $json);
@@ -76,7 +76,7 @@ class ActionTest extends TestCase
     {
         $data = ['test' => 'value'];
         $payload = new ActionPayload(200, $data);
-        
+
         $this->assertEquals(200, $payload->getStatusCode());
         $this->assertEquals($data, $payload->getData());
         $this->assertNull($payload->getError());
@@ -86,7 +86,7 @@ class ActionTest extends TestCase
     {
         $error = new ActionError(ActionError::SERVER_ERROR, 'Server error');
         $payload = new ActionPayload(500, null, $error);
-        
+
         $this->assertEquals(500, $payload->getStatusCode());
         $this->assertNull($payload->getData());
         $this->assertEquals($error, $payload->getError());
@@ -97,7 +97,7 @@ class ActionTest extends TestCase
         $data = ['partial' => 'data'];
         $error = new ActionError(ActionError::VALIDATION_ERROR, 'Partial error');
         $payload = new ActionPayload(207, $data, $error);
-        
+
         $this->assertEquals(207, $payload->getStatusCode());
         $this->assertEquals($data, $payload->getData());
         $this->assertEquals($error, $payload->getError());

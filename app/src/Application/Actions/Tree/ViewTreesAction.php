@@ -19,32 +19,33 @@ class ViewTreesAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         try {
             // Get all active trees from the repository
             $trees = $this->treeRepository->findActive();
-            
+
             // Generate HTML for the trees list
             $html = $this->generateHTML($trees);
-            
+
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
         } catch (\Exception $e) {
             // Log the error (in a real app, you'd use a proper logger)
             error_log("Error fetching trees: " . $e->getMessage());
-            
+
             $errorHtml = $this->generateErrorHTML($e->getMessage());
             $this->response->getBody()->write($errorHtml);
             return $this->response->withHeader('Content-Type', 'text/html');
         }
     }
-    
+
     private function generateHTML(array $trees): string
     {
         $css = $this->getCSS();
         $treesHtml = $this->generateTreesList($trees);
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -82,29 +83,29 @@ class ViewTreesAction extends Action
 </html>
 HTML;
     }
-    
+
     private function generateTreesList(array $trees): string
     {
         if (empty($trees)) {
             return '<div class="no-trees"><p>No active trees found in the database.</p></div>';
         }
-        
+
         $html = '<div class="trees-list">';
-        
+
         foreach ($trees as $tree) {
             $html .= $this->generateTreeCard($tree);
         }
-        
+
         $html .= '</div>';
         return $html;
     }
-    
+
     private function generateTreeCard($tree): string
     {
         $description = $tree->getDescription() ?: 'No description available';
         $createdAt = $tree->getCreatedAt()->format('M j, Y g:i A');
         $updatedAt = $tree->getUpdatedAt()->format('M j, Y g:i A');
-        
+
         return <<<HTML
 <div class="tree-card">
     <div class="tree-header">
@@ -127,11 +128,11 @@ HTML;
 </div>
 HTML;
     }
-    
+
     private function generateErrorHTML(string $errorMessage): string
     {
         $css = $this->getCSS();
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -158,17 +159,17 @@ HTML;
 </html>
 HTML;
     }
-    
+
     private function countTrees(array $trees): int
     {
         return count($trees);
     }
-    
+
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
-    
+
     private function getCSS(): string
     {
         return <<<CSS
@@ -469,4 +470,4 @@ body {
 }
 CSS;
     }
-} 
+}

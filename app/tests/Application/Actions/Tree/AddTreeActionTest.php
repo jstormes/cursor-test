@@ -30,7 +30,7 @@ class AddTreeActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new AddTreeAction(
             $this->logger,
             $this->treeRepository
@@ -70,7 +70,7 @@ class AddTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -115,7 +115,7 @@ class AddTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
             ->willReturn([
@@ -148,11 +148,11 @@ class AddTreeActionTest extends TestCase
     public function testPostRequestWithTooLongName(): void
     {
         $longName = str_repeat('A', 256);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
             ->willReturn([
@@ -185,11 +185,11 @@ class AddTreeActionTest extends TestCase
     public function testPostRequestWithTooLongDescription(): void
     {
         $longDescription = str_repeat('A', 1001);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
             ->willReturn([
@@ -222,11 +222,11 @@ class AddTreeActionTest extends TestCase
     public function testPostRequestWithDuplicateName(): void
     {
         $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
             ->willReturn([
@@ -263,11 +263,11 @@ class AddTreeActionTest extends TestCase
     public function testPostRequestWithCaseInsensitiveDuplicateName(): void
     {
         $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
             ->willReturn([
@@ -306,7 +306,7 @@ class AddTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willReturn([
@@ -399,7 +399,7 @@ class AddTreeActionTest extends TestCase
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
-            
+
         $this->request->expects($this->once())
             ->method('getParsedBody')
             ->willThrowException(new \Exception('Parse error'));

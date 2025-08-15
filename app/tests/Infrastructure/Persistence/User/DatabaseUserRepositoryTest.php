@@ -21,7 +21,7 @@ class DatabaseUserRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockConnection = $this->createMock(DatabaseConnection::class);
         $this->mockDataMapper = $this->createMock(UserDataMapper::class);
         $this->repository = new DatabaseUserRepository($this->mockConnection, $this->mockDataMapper);
@@ -95,4 +95,4 @@ class DatabaseUserRepositoryTest extends TestCase
 
         $this->repository->findUserOfId(999);
     }
-} 
+}

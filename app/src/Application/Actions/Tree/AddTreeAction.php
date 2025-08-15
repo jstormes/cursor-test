@@ -21,53 +21,53 @@ class AddTreeAction extends Action
         parent::__construct($logger);
     }
 
+    #[\Override]
     protected function action(): Response
     {
         $request = $this->request;
         $method = $request->getMethod();
-        
+
         if ($method === 'GET') {
             return $this->showForm();
         } elseif ($method === 'POST') {
             return $this->handleFormSubmission();
         }
-        
+
         return $this->response->withStatus(405);
     }
-    
+
     private function showForm(): Response
     {
         try {
             $html = $this->generateFormHTML();
             $this->response->getBody()->write($html);
             return $this->response->withHeader('Content-Type', 'text/html');
-            
         } catch (\Exception $e) {
             $this->logger->error('Error showing add tree form: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function handleFormSubmission(): Response
     {
         try {
             $parsedBody = $this->request->getParsedBody();
-            
+
             // Validate required fields
             $name = trim($parsedBody['name'] ?? '');
             if (empty($name)) {
                 return $this->showFormWithError('Tree name is required');
             }
-            
+
             if (strlen($name) > 255) {
                 return $this->showFormWithError('Tree name must be 255 characters or less');
             }
-            
+
             $description = trim($parsedBody['description'] ?? '');
             if (strlen($description) > 1000) {
                 return $this->showFormWithError('Description must be 1000 characters or less');
             }
-            
+
             // Check if tree name already exists
             $existingTrees = $this->treeRepository->findActive();
             foreach ($existingTrees as $existingTree) {
@@ -75,33 +75,32 @@ class AddTreeAction extends Action
                     return $this->showFormWithError('A tree with this name already exists');
                 }
             }
-            
+
             // Create the tree
             $tree = new Tree(
                 null,
                 $name,
                 $description ?: null
             );
-            
+
             // Save the tree
             $this->treeRepository->save($tree);
-            
+
             return $this->generateSuccessHTML($tree);
-            
         } catch (\Exception $e) {
             $this->logger->error('Error creating tree: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage());
         }
     }
-    
+
     private function generateFormHTML(string $error = '', array $formData = []): string
     {
         $name = htmlspecialchars($formData['name'] ?? '');
         $description = htmlspecialchars($formData['description'] ?? '');
         $errorHtml = $error ? "<div class='error-message'>{$this->escapeHtml($error)}</div>" : '';
-        
+
         $css = $this->getCSS();
-        
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -150,7 +149,7 @@ class AddTreeAction extends Action
 </html>
 HTML;
     }
-    
+
     private function showFormWithError(string $error): Response
     {
         $parsedBody = $this->request->getParsedBody();
@@ -158,13 +157,13 @@ HTML;
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateSuccessHTML(Tree $tree): Response
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
         $description = htmlspecialchars($tree->getDescription() ?: 'No description');
-        
+
         $html = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -200,11 +199,11 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function generateErrorHTML(string $errorMessage): Response
     {
         $html = <<<HTML
@@ -227,16 +226,16 @@ HTML;
 </body>
 </html>
 HTML;
-        
+
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
-    
+
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
-    
+
     private function getCSS(): string
     {
         return <<<CSS
@@ -397,4 +396,4 @@ body {
 }
 CSS;
     }
-} 
+}

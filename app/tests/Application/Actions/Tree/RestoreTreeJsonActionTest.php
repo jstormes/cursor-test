@@ -30,7 +30,7 @@ class RestoreTreeJsonActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
-        
+
         $this->action = new RestoreTreeJsonAction(
             $this->logger,
             $this->treeRepository
@@ -40,7 +40,7 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testSuccessfulRestore(): void
     {
         $deletedTree = new Tree(1, 'Deleted Tree', 'A deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -133,7 +133,7 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testAlreadyActiveTree(): void
     {
         $activeTree = new Tree(1, 'Active Tree', 'Already active tree', new DateTime(), new DateTime(), true);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -326,7 +326,7 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testTreeWithNullDescription(): void
     {
         $deletedTree = new Tree(1, 'No Description Tree', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -370,14 +370,14 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testJsonResponseStructure(): void
     {
         $deletedTree = new Tree(
-            42, 
-            'Structure Test Tree', 
-            'Testing JSON structure', 
-            new DateTime('2023-05-15 14:30:00'), 
-            new DateTime('2023-06-20 09:15:30'), 
+            42,
+            'Structure Test Tree',
+            'Testing JSON structure',
+            new DateTime('2023-05-15 14:30:00'),
+            new DateTime('2023-06-20 09:15:30'),
             false
         );
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -409,7 +409,7 @@ class RestoreTreeJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 // Verify top-level structure
                 $expectedKeys = ['success', 'message', 'tree', 'links'];
                 foreach ($expectedKeys as $key) {
@@ -417,7 +417,7 @@ class RestoreTreeJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 // Verify tree data structure
                 $tree = $data['tree'];
                 $expectedTreeKeys = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at'];
@@ -426,7 +426,7 @@ class RestoreTreeJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 // Verify links structure
                 $expectedLinkKeys = ['view_tree', 'back_to_trees', 'view_deleted_trees'];
                 foreach ($expectedLinkKeys as $key) {
@@ -434,7 +434,7 @@ class RestoreTreeJsonActionTest extends TestCase
                         return false;
                     }
                 }
-                
+
                 return $tree['id'] === 42 &&
                        $tree['name'] === 'Structure Test Tree' &&
                        $tree['description'] === 'Testing JSON structure' &&
@@ -474,7 +474,7 @@ class RestoreTreeJsonActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                
+
                 // Verify error structure
                 return array_key_exists('success', $data) &&
                        array_key_exists('error', $data) &&
@@ -492,7 +492,7 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testSuccessMessageContent(): void
     {
         $deletedTree = new Tree(99, 'Message Test Tree', 'Testing success message', new DateTime(), new DateTime(), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -536,7 +536,7 @@ class RestoreTreeJsonActionTest extends TestCase
     public function testTreeActiveStatusInResponse(): void
     {
         $deletedTree = new Tree(1, 'Status Test', 'Testing active status', new DateTime(), new DateTime(), false);
-        
+
         $this->request->expects($this->once())
             ->method('getMethod')
             ->willReturn('POST');

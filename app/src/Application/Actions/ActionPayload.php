@@ -33,7 +33,7 @@ class ActionPayload implements JsonSerializable
     }
 
     /**
-     * @return array|null|object
+     * @return array|object|null
      */
     public function getData()
     {
@@ -45,6 +45,7 @@ class ActionPayload implements JsonSerializable
         return $this->error;
     }
 
+    #[\Override]
     #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {

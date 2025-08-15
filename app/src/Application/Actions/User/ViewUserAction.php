@@ -11,6 +11,7 @@ class ViewUserAction extends UserAction
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     protected function action(): Response
     {
         $userId = (int) $this->resolveArg('id');

@@ -17,4 +17,4 @@ interface TreeNode
     public function getType(): string;
     public function getTypeData(): array;
     public function accept(TreeNodeVisitor $visitor): string;
-} 
+}

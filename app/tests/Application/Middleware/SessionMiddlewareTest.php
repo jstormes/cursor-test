@@ -27,10 +27,10 @@ class SessionMiddlewareTest extends TestCase
     public function testProcessStartsSession(): void
     {
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         $handler = $this->createMock(RequestHandlerInterface::class);
         $response = $this->responseFactory->createResponse(200);
-        
+
         $handler->expects($this->once())
             ->method('handle')
             ->willReturn($response);
@@ -44,10 +44,10 @@ class SessionMiddlewareTest extends TestCase
     public function testProcessWithExistingSession(): void
     {
         $request = (new ServerRequestFactory())->createServerRequest('GET', '/test');
-        
+
         $handler = $this->createMock(RequestHandlerInterface::class);
         $response = $this->responseFactory->createResponse(200);
-        
+
         $handler->expects($this->once())
             ->method('handle')
             ->willReturn($response);
@@ -61,13 +61,13 @@ class SessionMiddlewareTest extends TestCase
     public function testProcessWithDifferentRequestMethods(): void
     {
         $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
-        
+
         foreach ($methods as $method) {
             $request = (new ServerRequestFactory())->createServerRequest($method, '/test');
-            
+
             $handler = $this->createMock(RequestHandlerInterface::class);
             $response = $this->responseFactory->createResponse(200);
-            
+
             $handler->expects($this->once())
                 ->method('handle')
                 ->willReturn($response);
@@ -78,4 +78,4 @@ class SessionMiddlewareTest extends TestCase
             $this->assertEquals(200, $result->getStatusCode());
         }
     }
-} 
+}
