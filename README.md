@@ -190,25 +190,37 @@ docker-compose exec php-dev bash
 
 ## 🌐 API Endpoints
 
-The application provides RESTful endpoints for tree management:
+The application provides endpoints for tree management with both HTML and JSON responses:
 
-### Tree Operations
-- `GET /trees` - List all trees (HTML view)
-- `GET /trees/{id}` - View specific tree with rendered nodes
-- `POST /trees` - Create new tree
-- `PUT /trees/{id}` - Update tree
-- `DELETE /trees/{id}` - Soft delete tree
+### Tree Operations (HTML)
+- `GET /trees` - List all active trees
+- `GET /trees/deleted` - List all deleted trees
+- `GET /tree` - View first tree structure
+- `GET /tree/{id}` - Edit specific tree with rendered nodes
+- `GET /tree/{id}/view` - Read-only view of specific tree
+- `GET|POST /tree/add` - Create new tree (form)
+- `GET|POST /tree/{id}/delete` - Soft delete tree (form)
+- `GET|POST /tree/{id}/restore` - Restore deleted tree (form)
 
-### JSON API
-- `GET /api/trees` - JSON list of trees
-- `GET /api/trees/{id}` - JSON tree data
-- `POST /api/trees` - Create tree via JSON
-- `PUT /api/trees/{id}` - Update tree via JSON
+### Tree Operations (JSON API)
+- `GET /trees/json` - JSON list of all active trees
+- `GET /trees/deleted/json` - JSON list of deleted trees
+- `GET /tree/json` - JSON data for first tree
+- `GET /tree/{id}/json` - JSON data for specific tree
+- `POST /tree/add/json` - Create tree via JSON
+- `POST /tree/{id}/delete/json` - Soft delete tree via JSON
+- `POST /tree/{id}/restore/json` - Restore tree via JSON
 
 ### Node Management
-- Tree nodes are managed through the composite structure
+- `GET|POST /tree/{treeId}/add-node` - Add node to tree (form)
+- `POST /tree/{treeId}/add-node/json` - Add node via JSON
+- `GET|POST /tree/{treeId}/node/{nodeId}/delete` - Delete node (form)
+- Tree nodes use composite pattern with `SimpleNode`, `ButtonNode`, and nested `TreeNode` types
 - Visitor pattern handles HTML rendering automatically
-- Support for `SimpleNode`, `ButtonNode`, and nested `TreeNode` types
+
+### User Management
+- `GET /users` - List all users
+- `GET /users/{id}` - View specific user
 
 ## 📖 Learning Objectives
 

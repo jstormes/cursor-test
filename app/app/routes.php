@@ -7,6 +7,7 @@ use App\Application\Actions\User\ViewUserAction;
 use App\Application\Actions\Tree\ViewTreeAction;
 use App\Application\Actions\Tree\ViewTreeJsonAction;
 use App\Application\Actions\Tree\ViewTreesAction;
+use App\Application\Actions\Tree\ViewTreesJsonAction;
 use App\Application\Actions\Tree\ViewTreeByIdAction;
 use App\Application\Actions\Tree\ViewTreeByIdReadOnlyAction;
 use App\Application\Actions\Tree\ViewTreeByIdJsonAction;
@@ -32,10 +33,7 @@ return function (App $app) {
         return $response;
     });
 
-    $app->get('/', function (Request $request, Response $response) {
-        $response->getBody()->write('Hello world!');
-        return $response;
-    });
+    $app->get('/', ViewTreesAction::class);
 
     $app->group('/users', function (Group $group) {
         $group->get('', ListUsersAction::class);
@@ -43,6 +41,7 @@ return function (App $app) {
     });
 
     $app->get('/trees', ViewTreesAction::class);
+    $app->get('/trees/json', ViewTreesJsonAction::class);
     $app->get('/trees/deleted', ViewDeletedTreesAction::class);
     $app->get('/trees/deleted/json', ViewDeletedTreesJsonAction::class);
     $app->get('/tree', ViewTreeAction::class);

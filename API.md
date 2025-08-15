@@ -41,7 +41,47 @@ GET /trees
 ```
 Returns an HTML page displaying all active trees.
 
-**JSON API**
+**JSON API - List All Trees**
+```http
+GET /trees/json
+```
+Returns all active trees in JSON format.
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Active trees retrieved successfully.",
+  "stats": {
+    "total_active_trees": 4
+  },
+  "trees": [
+    {
+      "id": 1,
+      "name": "Company Structure",
+      "description": "Organizational chart for the company",
+      "is_active": true,
+      "created_at": "2025-08-15 15:51:05",
+      "updated_at": "2025-08-15 15:51:05"
+    },
+    {
+      "id": 2,
+      "name": "File System", 
+      "description": "File system tree structure",
+      "is_active": true,
+      "created_at": "2025-08-15 15:51:05",
+      "updated_at": "2025-08-15 15:51:05"
+    }
+  ],
+  "links": {
+    "view_deleted_trees": "/trees/deleted/json",
+    "view_trees_html": "/trees",
+    "add_new_tree": "/tree/add"
+  }
+}
+```
+
+**JSON API - First Tree Structure**
 ```http
 GET /tree/json
 ```
@@ -538,8 +578,14 @@ curl -X POST http://localhost:8088/tree/1/add-node/json \
   -d '{"name": "Contact", "node_type": "ButtonNode", "parent_id": 1, "button_text": "Get in Touch", "button_action": "/contact"}'
 ```
 
-### Example 2: Retrieve Tree Structure
+### Example 2: Retrieve Tree Data
 
+**Get list of all trees:**
+```bash
+curl http://localhost:8088/trees/json
+```
+
+**Get specific tree structure:**
 ```bash
 curl http://localhost:8088/tree/1/json
 ```
