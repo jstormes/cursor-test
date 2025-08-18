@@ -48,7 +48,7 @@ vendor/bin/phpcs
 vendor/bin/phpcbf
 
 # Static analysis (PHPStan)
-vendor/bin/phpstan analyse
+vendor/bin/phpstan analyse --memory-limit=512M
 
 # Advanced static analysis (Psalm)
 vendor/bin/psalm
@@ -79,7 +79,7 @@ docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpcs"
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpcbf"
 
 # Run static analysis from host  
-docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse"
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse --memory-limit=512M"
 
 # Run advanced static analysis from host
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/psalm"
@@ -171,17 +171,17 @@ This project maintains high code quality through multiple automated tools:
 - Checks for: cyclomatic complexity, method length, coupling, unused code
 
 ### Testing & Coverage
-- **PHPUnit**: Unit testing framework with 478+ tests
-- **Test Coverage**: 84%+ line coverage reporting
+- **PHPUnit**: Unit testing framework with 513+ tests
+- **Test Coverage**: 87%+ line coverage reporting
 - Configuration: `phpunit.xml`
 
 ### Quality Metrics (Current Status)
-- ✅ **Tests**: 478/478 passing (100%)
-- ✅ **Coverage**: 84.10% line coverage  
-- ✅ **PHPStan**: 0 errors (Level 4)
-- ✅ **Psalm**: 0 errors (Level 3)
-- ⚠️ **PHPCS**: 1 error, 88 warnings (mostly line length)
-- ⚠️ **PHPMD**: Some complex methods identified
+- ✅ **Tests**: 513/513 passing (100%), 4 skipped - **All methods restored**
+- ✅ **Coverage**: 87.04% line coverage (1807/2076 lines) - **Fully restored**
+- ✅ **PHPStan**: 0 errors (Level 4) - **All errors resolved**
+- 🔄 **Psalm**: 95 errors found (91.66% type inference) - **34 errors fixed overall**
+- ✅ **PHPCS**: 0 errors, 83 warnings (mostly line length) - 2 errors fixed
+- ⚠️ **PHPMD**: Complex methods and design issues identified
 
 ### Configuration Files
 - `phpcs.xml` - PHP_CodeSniffer rules
@@ -195,7 +195,7 @@ This project maintains high code quality through multiple automated tools:
 composer test                    # Run all tests
 vendor/bin/phpcbf                # Auto-fix coding standards
 vendor/bin/phpcs                 # Check remaining violations
-vendor/bin/phpstan analyse       # Static analysis
+vendor/bin/phpstan analyse --memory-limit=512M       # Static analysis
 vendor/bin/psalm                 # Advanced type checking
 vendor/bin/phpmd src text cleancode,codesize,design,naming,unusedcode
 ```

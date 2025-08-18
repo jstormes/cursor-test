@@ -75,6 +75,9 @@ abstract class Action
     protected function respond(ActionPayload $payload): Response
     {
         $json = json_encode($payload, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Failed to encode JSON response');
+        }
         $this->response->getBody()->write($json);
 
         return $this->response

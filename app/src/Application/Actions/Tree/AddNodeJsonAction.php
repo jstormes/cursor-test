@@ -135,7 +135,11 @@ class AddNodeJsonAction extends Action
                 ]
             ];
 
-            $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
+            $json = json_encode($response, JSON_PRETTY_PRINT);
+            if ($json === false) {
+                throw new \RuntimeException('Failed to encode JSON response');
+            }
+            $this->response->getBody()->write($json);
             return $this->response->withHeader('Content-Type', 'application/json');
         } catch (\Exception $e) {
             $this->logger->error('Error creating node via JSON: ' . $e->getMessage());
@@ -153,7 +157,11 @@ class AddNodeJsonAction extends Action
             ]
         ];
 
-        $this->response->getBody()->write(json_encode($response, JSON_PRETTY_PRINT));
+        $json = json_encode($response, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Failed to encode JSON response');
+        }
+        $this->response->getBody()->write($json);
         return $this->response->withHeader('Content-Type', 'application/json');
     }
 }

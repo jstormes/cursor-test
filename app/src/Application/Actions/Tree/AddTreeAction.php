@@ -153,7 +153,8 @@ HTML;
     private function showFormWithError(string $error): Response
     {
         $parsedBody = $this->request->getParsedBody();
-        $html = $this->generateFormHTML($error, $parsedBody);
+        $formData = is_array($parsedBody) ? $parsedBody : [];
+        $html = $this->generateFormHTML($error, $formData);
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }

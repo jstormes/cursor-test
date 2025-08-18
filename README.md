@@ -47,7 +47,7 @@ cursor-test/
 │   │   └── Infrastructure/     # Infrastructure layer (database, repositories)
 │   │       ├── Database/       # Database abstraction layer
 │   │       └── Persistence/    # Concrete repository implementations
-│   ├── tests/                  # PHPUnit test suite (478+ tests)
+│   ├── tests/                  # PHPUnit test suite (513+ tests)
 │   ├── var/                    # Application cache and logs
 │   ├── vendor/                 # Composer dependencies
 │   ├── composer.json           # PHP dependencies
@@ -128,8 +128,8 @@ interface TreeRepositoryInterface {
 ## ✅ Testing & Quality
 
 ### Test Coverage
-- **478+ Unit Tests** with PHPUnit
-- **84%+ Line Coverage** across all layers
+- **513+ Unit Tests** with PHPUnit
+- **87%+ Line Coverage** across all layers
 - **Domain, Application, Infrastructure** test separation
 - **Test-driven development** approach
 
@@ -140,10 +140,11 @@ interface TreeRepositoryInterface {
 - **PHPMD**: Code complexity and design quality analysis
 
 ### Quality Metrics
-- ✅ **Tests**: 478/478 passing (100%)
-- ✅ **Coverage**: 84.10% line coverage  
-- ✅ **PHPStan**: 0 errors (Level 4)
-- ✅ **Psalm**: 0 errors (Level 3)
+- ✅ **Tests**: 513/513 passing (100%), 4 skipped - **All methods restored**
+- ✅ **Coverage**: 87.04% line coverage (1807/2076 lines) - **Fully restored**
+- ✅ **PHPStan**: 0 errors (Level 4) - **All errors resolved**
+- 🔄 **Psalm**: 95 errors found (91.66% type inference) - **34 errors fixed overall**
+- ✅ **PHPCS**: 0 errors, 83 warnings (mostly line length) - 2 errors fixed
 
 ## 🚀 Development Commands
 
@@ -157,7 +158,7 @@ docker-compose up -d
 docker-compose exec php-dev bash -c "cd /app && composer test:coverage"
 
 # Code quality checks
-docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse"
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse --memory-limit=512M"
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/psalm"
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpcs"
 
@@ -262,7 +263,7 @@ docker-compose exec php-dev bash
 docker-compose exec php-dev bash -c "cd /app && composer test:coverage"
 
 # Run all quality checks
-docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse && vendor/bin/psalm && vendor/bin/phpcs"
+docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse --memory-limit=512M && vendor/bin/psalm && vendor/bin/phpcs"
 ```
 
 ## 🆘 Troubleshooting

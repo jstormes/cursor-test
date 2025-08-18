@@ -131,7 +131,7 @@ class DeleteNodeAction extends Action
         if (!empty($descendants)) {
             $descendantsList = '<h3>The following child nodes will also be deleted:</h3><ul class="descendants-list">';
             foreach ($descendants as $descendant) {
-                $descendantsList .= '<li>' . htmlspecialchars($descendant->getName()) . 
+                $descendantsList .= '<li>' . htmlspecialchars($descendant->getName()) .
                                     ' (' . $descendant->getType() . ')</li>';
             }
             $descendantsList .= '</ul>';

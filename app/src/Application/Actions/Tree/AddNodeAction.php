@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use DateTime;
 
-class AddNodeAction extends Action
+final class AddNodeAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
@@ -166,6 +166,9 @@ class AddNodeAction extends Action
         $errorHtml = $error ? "<div class='error-message'>{$this->escapeHtml($error)}</div>" : '';
 
         // Get available parent nodes
+        if ($treeId === null) {
+            throw new \RuntimeException('Tree ID cannot be null');
+        }
         $parentNodes = $this->treeNodeRepository->findByTreeId($treeId);
         $parentOptions = '<option value="">No Parent (Root Node)</option>';
         foreach ($parentNodes as $parentNode) {
@@ -275,7 +278,8 @@ HTML;
     private function showFormWithError(Tree $tree, string $error): Response
     {
         $parsedBody = $this->request->getParsedBody();
-        $html = $this->generateFormHTML($tree, $error, $parsedBody);
+        $formData = is_array($parsedBody) ? $parsedBody : [];
+        $html = $this->generateFormHTML($tree, $error, $formData);
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
     }
