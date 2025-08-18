@@ -144,7 +144,7 @@ interface TreeRepositoryInterface {
 - ✅ **Coverage**: 87.04% line coverage (1807/2076 lines) - **Fully restored**
 - ✅ **PHPStan**: 0 errors (Level 4) - **All errors resolved**
 - 🔄 **Psalm**: 95 errors found (91.66% type inference) - **34 errors fixed overall**
-- ✅ **PHPCS**: 0 errors, 83 warnings (mostly line length) - 2 errors fixed
+- ✅ **PHPCS**: 0 errors, 78 warnings (mostly line length) - 2 errors + 5 warnings fixed
 
 ## 🚀 Development Commands
 

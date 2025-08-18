@@ -35,7 +35,11 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         if ($this->allowEdit) {
             $nodeId = $node->getId();
             $treeId = $node->getTreeId();
-            return '<div class="tree-node"><a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '<a href="/tree/' . $treeId . '/add-node?parent_id=' . $nodeId . '" class="add-icon">+</a></div>';
+            return '<div class="tree-node">' .
+                '<a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a>' .
+                '<input type="checkbox"> ' . htmlspecialchars($node->getName()) .
+                '<a href="/tree/' . $treeId . '/add-node?parent_id=' . $nodeId . '" class="add-icon">+</a>' .
+                '</div>';
         } else {
             return '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName()) . '</div>';
         }
@@ -47,7 +51,9 @@ class HtmlTreeNodeRenderer implements TreeNodeRenderer, TreeNodeVisitor
         if ($this->allowEdit) {
             $nodeId = $node->getId();
             $treeId = $node->getTreeId();
-            $html = '<div class="tree-node"><a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a><input type="checkbox"> ' . htmlspecialchars($node->getName());
+            $html = '<div class="tree-node">' .
+                '<a href="/tree/' . $treeId . '/node/' . $nodeId . '/delete" class="remove-icon">×</a>' .
+                '<input type="checkbox"> ' . htmlspecialchars($node->getName());
         } else {
             $html = '<div class="tree-node"><input type="checkbox"> ' . htmlspecialchars($node->getName());
         }

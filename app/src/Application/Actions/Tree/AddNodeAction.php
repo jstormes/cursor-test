@@ -173,7 +173,8 @@ final class AddNodeAction extends Action
         $parentOptions = '<option value="">No Parent (Root Node)</option>';
         foreach ($parentNodes as $parentNode) {
             $selected = $parentId == $parentNode->getId() ? 'selected' : '';
-            $parentOptions .= "<option value=\"{$parentNode->getId()}\" {$selected}>{$this->escapeHtml($parentNode->getName())}</option>";
+            $parentOptions .= "<option value=\"{$parentNode->getId()}\" {$selected}>" .
+                $this->escapeHtml($parentNode->getName()) . "</option>";
         }
 
         $css = $this->getCSS();
@@ -345,7 +346,10 @@ HTML;
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
         .error { color: #dc3545; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; background: #007bff; 
+            color: white; text-decoration: none; border-radius: 5px; 
+        }
     </style>
 </head>
 <body>
@@ -372,7 +376,10 @@ HTML;
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
         .error { color: #dc3545; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; background: #007bff; 
+            color: white; text-decoration: none; border-radius: 5px; 
+        }
     </style>
 </head>
 <body>

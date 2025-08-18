@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "monolog/monolog": "^2.8",
         "php-di/php-di": "^6.4",
@@ -37,6 +37,7 @@
         "phpstan/extension-installer": "^1.2.0",
         "phpstan/phpstan": "^1.8",
         "phpunit/phpunit": "^9.5.26",
+        "roave/security-advisories": "dev-latest",
         "squizlabs/php_codesniffer": "^3.7",
         "vimeo/psalm": "^6.13"
     },
