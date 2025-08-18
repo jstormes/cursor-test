@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Application\Actions\Tree;
 
 use App\Application\Actions\Tree\AddTreeAction;
+use App\Application\Validation\TreeValidator;
+use App\Application\Validation\ValidationResult;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
 use Tests\TestCase;
@@ -22,6 +24,7 @@ class AddTreeActionTest extends TestCase
     private StreamInterface $stream;
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
+    private TreeValidator $validator;
 
     protected function setUp(): void
     {
@@ -30,10 +33,12 @@ class AddTreeActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
+        $this->validator = $this->createMock(TreeValidator::class);
 
         $this->action = new AddTreeAction(
             $this->logger,
-            $this->treeRepository
+            $this->treeRepository,
+            $this->validator
         );
     }
 
@@ -73,6 +78,23 @@ class AddTreeActionTest extends TestCase
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
+            ->willReturn([
+                'name' => 'Test Tree',
+                'description' => 'A test tree description'
+            ]);
+
+        // Mock validation success
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
+        $this->validator->expects($this->once())
+            ->method('sanitize')
             ->willReturn([
                 'name' => 'Test Tree',
                 'description' => 'A test tree description'
@@ -123,6 +145,19 @@ class AddTreeActionTest extends TestCase
                 'description' => 'A description'
             ]);
 
+        // Mock validation failure
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+        $validationResult->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['name' => ['Tree name is required']]);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
         $this->treeRepository->expects($this->never())
             ->method('save');
 
@@ -160,6 +195,19 @@ class AddTreeActionTest extends TestCase
                 'description' => 'A description'
             ]);
 
+        // Mock validation failure
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+        $validationResult->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['name' => ['Tree name must not exceed 255 characters']]);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
         $this->treeRepository->expects($this->never())
             ->method('save');
 
@@ -175,7 +223,7 @@ class AddTreeActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Tree name must be 255 characters or less');
+                return str_contains($html, 'Tree name must not exceed 255 characters');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, []);
@@ -197,6 +245,19 @@ class AddTreeActionTest extends TestCase
                 'description' => $longDescription
             ]);
 
+        // Mock validation failure
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+        $validationResult->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['description' => ['Description must not exceed 1000 characters']]);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
         $this->treeRepository->expects($this->never())
             ->method('save');
 
@@ -212,7 +273,7 @@ class AddTreeActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Description must be 1000 characters or less');
+                return str_contains($html, 'Description must not exceed 1000 characters');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, []);
@@ -229,6 +290,23 @@ class AddTreeActionTest extends TestCase
 
         $this->request->expects($this->exactly(2))
             ->method('getParsedBody')
+            ->willReturn([
+                'name' => 'Test Tree',
+                'description' => 'New description'
+            ]);
+
+        // Mock validation success
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
+        $this->validator->expects($this->once())
+            ->method('sanitize')
             ->willReturn([
                 'name' => 'Test Tree',
                 'description' => 'New description'
@@ -275,6 +353,23 @@ class AddTreeActionTest extends TestCase
                 'description' => 'New description'
             ]);
 
+        // Mock validation success
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
+        $this->validator->expects($this->once())
+            ->method('sanitize')
+            ->willReturn([
+                'name' => 'TEST TREE',
+                'description' => 'New description'
+            ]);
+
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$existingTree]);
@@ -312,6 +407,23 @@ class AddTreeActionTest extends TestCase
             ->willReturn([
                 'name' => 'Test Tree',
                 'description' => ''
+            ]);
+
+        // Mock validation success
+        $validationResult = $this->createMock(ValidationResult::class);
+        $validationResult->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->willReturn($validationResult);
+
+        $this->validator->expects($this->once())
+            ->method('sanitize')
+            ->willReturn([
+                'name' => 'Test Tree',
+                'description' => null
             ]);
 
         $this->treeRepository->expects($this->once())
@@ -421,7 +533,7 @@ class AddTreeActionTest extends TestCase
             ->method('write')
             ->with($this->callback(function ($html) {
                 return str_contains($html, 'Error Creating Tree') &&
-                       str_contains($html, 'Parse error');
+                       str_contains($html, 'An error occurred while creating the tree. Please try again.');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, []);

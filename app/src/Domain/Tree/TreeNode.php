@@ -12,9 +12,15 @@ interface TreeNode
     public function getParentId(): ?int;
     public function getSortOrder(): int;
     public function addChild(TreeNode $child): void;
+    /**
+     * @return TreeNode[]
+     */
     public function getChildren(): array;
     public function hasChildren(): bool;
     public function getType(): string;
+    /**
+     * @return array<string, mixed>
+     */
     public function getTypeData(): array;
     public function accept(TreeNodeVisitor $visitor): string;
 }

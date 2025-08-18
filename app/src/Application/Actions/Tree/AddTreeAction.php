@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Actions\Tree;
 
 use App\Application\Actions\Action;
+use App\Application\Validation\TreeValidator;
+use App\Application\Exceptions\ValidationException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -16,7 +18,8 @@ class AddTreeAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
-        private TreeRepository $treeRepository
+        private TreeRepository $treeRepository,
+        private TreeValidator $validator
     ) {
         parent::__construct($logger);
     }
@@ -52,26 +55,25 @@ class AddTreeAction extends Action
     {
         try {
             $parsedBody = $this->request->getParsedBody();
+            $data = is_array($parsedBody) ? $parsedBody : [];
 
-            // Validate required fields
-            $name = trim($parsedBody['name'] ?? '');
-            if (empty($name)) {
-                return $this->showFormWithError('Tree name is required');
+            // Validate input data
+            $validationResult = $this->validator->validate($data);
+            if (!$validationResult->isValid()) {
+                $errors = [];
+                foreach ($validationResult->getErrors() as $fieldErrors) {
+                    $errors = array_merge($errors, $fieldErrors);
+                }
+                return $this->showFormWithError(implode('. ', $errors));
             }
 
-            if (strlen($name) > 255) {
-                return $this->showFormWithError('Tree name must be 255 characters or less');
-            }
-
-            $description = trim($parsedBody['description'] ?? '');
-            if (strlen($description) > 1000) {
-                return $this->showFormWithError('Description must be 1000 characters or less');
-            }
+            // Sanitize input data
+            $sanitizedData = $this->validator->sanitize($data);
 
             // Check if tree name already exists
             $existingTrees = $this->treeRepository->findActive();
             foreach ($existingTrees as $existingTree) {
-                if (strtolower($existingTree->getName()) === strtolower($name)) {
+                if (strtolower($existingTree->getName()) === strtolower($sanitizedData['name'])) {
                     return $this->showFormWithError('A tree with this name already exists');
                 }
             }
@@ -79,17 +81,23 @@ class AddTreeAction extends Action
             // Create the tree
             $tree = new Tree(
                 null,
-                $name,
-                $description ?: null
+                $sanitizedData['name'],
+                $sanitizedData['description'] ?? null
             );
 
             // Save the tree
             $this->treeRepository->save($tree);
 
             return $this->generateSuccessHTML($tree);
+        } catch (ValidationException $e) {
+            $errors = [];
+            foreach ($e->getValidationErrors() as $fieldErrors) {
+                $errors = array_merge($errors, $fieldErrors);
+            }
+            return $this->showFormWithError(implode('. ', $errors));
         } catch (\Exception $e) {
             $this->logger->error('Error creating tree: ' . $e->getMessage());
-            return $this->generateErrorHTML($e->getMessage());
+            return $this->generateErrorHTML('An error occurred while creating the tree. Please try again.');
         }
     }
 

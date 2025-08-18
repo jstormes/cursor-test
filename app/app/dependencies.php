@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use App\Application\Settings\SettingsInterface;
 use App\Application\Services\TreeService;
+use App\Application\Validation\TreeValidator;
+use App\Application\Validation\TreeNodeValidator;
+use App\Application\Configuration\EnvironmentValidator;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\User\UserRepository;
@@ -100,6 +103,20 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(TreeNodeRepository::class),
                 $c->get(UnitOfWork::class)
             );
+        },
+
+        // Validators
+        TreeValidator::class => function (ContainerInterface $c) {
+            return new TreeValidator();
+        },
+
+        TreeNodeValidator::class => function (ContainerInterface $c) {
+            return new TreeNodeValidator();
+        },
+
+        // Configuration
+        EnvironmentValidator::class => function (ContainerInterface $c) {
+            return new EnvironmentValidator();
         },
     ]);
 };

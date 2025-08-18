@@ -14,9 +14,15 @@ echo "Testing Add Tree Functionality\n";
 echo "==============================\n\n";
 
 try {
-    // Create database connection
-    $pdo = new PDO('mysql:host=localhost;dbname=tree_db;charset=utf8mb4', 'root', 'password');
-    $connection = new PdoDatabaseConnection($pdo);
+    // Create database connection using environment variables
+    $config = [
+        'host' => $_ENV['MYSQL_HOST'] ?? 'localhost',
+        'port' => $_ENV['MYSQL_PORT'] ?? 3306,
+        'database' => $_ENV['MYSQL_DATABASE'] ?? 'tree_db',
+        'username' => $_ENV['MYSQL_USER'] ?? 'root',
+        'password' => $_ENV['MYSQL_PASSWORD'] ?? 'password',
+    ];
+    $connection = new PdoDatabaseConnection($config);
     
     // Create repositories
     $treeDataMapper = new TreeDataMapper();

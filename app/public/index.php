@@ -6,11 +6,24 @@ use App\Application\Handlers\HttpErrorHandler;
 use App\Application\Handlers\ShutdownHandler;
 use App\Application\ResponseEmitter\ResponseEmitter;
 use App\Application\Settings\SettingsInterface;
+use App\Application\Configuration\EnvironmentValidator;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+// Validate environment variables on startup
+try {
+    $envValidator = new EnvironmentValidator();
+    $envValidator->validateOrThrow();
+} catch (RuntimeException $e) {
+    // Log the error and fail gracefully
+    error_log('Environment validation failed: ' . $e->getMessage());
+    http_response_code(500);
+    echo 'Server configuration error. Please check the logs.';
+    exit(1);
+}
 
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();

@@ -1,0 +1,120 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Infrastructure\Persistence\Tree;
+
+use App\Domain\Tree\Tree;
+use App\Domain\Tree\TreeRepository;
+use App\Infrastructure\Cache\CacheInterface;
+
+class CachedTreeRepository implements TreeRepository
+{
+    private const CACHE_TTL = 3600; // 1 hour
+    private const ACTIVE_TREES_KEY = 'trees:active';
+    private const DELETED_TREES_KEY = 'trees:deleted';
+
+    public function __construct(
+        private TreeRepository $repository,
+        private CacheInterface $cache
+    ) {
+    }
+
+    #[\Override]
+    public function findById(int $id): ?Tree
+    {
+        $cacheKey = "tree:{$id}";
+
+        $cached = $this->cache->get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $tree = $this->repository->findById($id);
+        if ($tree !== null) {
+            $this->cache->set($cacheKey, $tree, self::CACHE_TTL);
+        }
+
+        return $tree;
+    }
+
+    #[\Override]
+    public function findActive(): array
+    {
+        $cached = $this->cache->get(self::ACTIVE_TREES_KEY);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $trees = $this->repository->findActive();
+        $this->cache->set(self::ACTIVE_TREES_KEY, $trees, self::CACHE_TTL);
+
+        return $trees;
+    }
+
+    #[\Override]
+    public function findDeleted(): array
+    {
+        $cached = $this->cache->get(self::DELETED_TREES_KEY);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $trees = $this->repository->findDeleted();
+        $this->cache->set(self::DELETED_TREES_KEY, $trees, self::CACHE_TTL);
+
+        return $trees;
+    }
+
+    #[\Override]
+    public function save(Tree $tree): void
+    {
+        $this->repository->save($tree);
+
+        // Invalidate relevant caches
+        $this->invalidateTreeCaches($tree);
+    }
+
+    #[\Override]
+    public function delete(int $id): void
+    {
+        $this->repository->delete($id);
+
+        // Invalidate caches
+        $this->cache->delete("tree:{$id}");
+        $this->cache->delete(self::ACTIVE_TREES_KEY);
+        $this->cache->delete(self::DELETED_TREES_KEY);
+    }
+
+    #[\Override]
+    public function softDelete(int $id): void
+    {
+        $this->repository->softDelete($id);
+
+        // Invalidate caches
+        $this->cache->delete("tree:{$id}");
+        $this->cache->delete(self::ACTIVE_TREES_KEY);
+        $this->cache->delete(self::DELETED_TREES_KEY);
+    }
+
+    #[\Override]
+    public function restore(int $id): void
+    {
+        $this->repository->restore($id);
+
+        // Invalidate caches
+        $this->cache->delete("tree:{$id}");
+        $this->cache->delete(self::ACTIVE_TREES_KEY);
+        $this->cache->delete(self::DELETED_TREES_KEY);
+    }
+
+    private function invalidateTreeCaches(Tree $tree): void
+    {
+        if ($tree->getId() !== null) {
+            $this->cache->delete("tree:{$tree->getId()}");
+        }
+
+        $this->cache->delete(self::ACTIVE_TREES_KEY);
+        $this->cache->delete(self::DELETED_TREES_KEY);
+    }
+}

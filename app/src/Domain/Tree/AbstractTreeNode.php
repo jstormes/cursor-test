@@ -11,6 +11,7 @@ abstract class AbstractTreeNode implements TreeNode
     protected int $treeId;
     protected ?int $parentId;
     protected int $sortOrder;
+    /** @var TreeNode[] */
     protected array $children = [];
 
     public function __construct(
@@ -82,5 +83,8 @@ abstract class AbstractTreeNode implements TreeNode
     abstract public function accept(TreeNodeVisitor $visitor): string;
 
     #[\Override]
+    /**
+     * @return array<string, mixed>
+     */
     abstract public function getTypeData(): array;
 }

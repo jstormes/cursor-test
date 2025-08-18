@@ -43,9 +43,18 @@ services:
     # This section sets the environment variables inside the Docker container.
     environment:
       - TZ=America/Chicago # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-      # Database connection string for the application.
-      # See the "mariadb:" section below for the database setup.
+      
+      # Application environment
+      - APP_ENV=development
+      
+      # Database connection environment variables
+      - MYSQL_HOST=mariadb
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      
+      # Legacy DSN for backward compatibility
       - MYSQL_DSN=mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password
 
     # The `ports` tells Docker to map port 80 from inside the container to
@@ -164,6 +173,18 @@ services:
 #    image: your-dockerid/yourimage  ## goes to your repository on Docker Hub
     environment:
       - TZ=America/Chicago
+      
+      # Application environment
+      - APP_ENV=production
+      
+      # Database connection environment variables
+      - MYSQL_HOST=mariadb
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      
+      # Legacy DSN for backward compatibility
       - MYSQL_DSN=mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password
     ports:
       - "9088:80"

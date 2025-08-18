@@ -17,13 +17,13 @@ use Psr\Log\NullLogger;
 echo "Testing JSON Soft Delete Actions...\n";
 
 try {
-    // Set up dependencies
+    // Set up dependencies using environment variables
     $connection = new PdoDatabaseConnection([
-        'host' => 'mariadb',
-        'port' => 3306,
-        'database' => 'app',
-        'username' => 'root',
-        'password' => 'password'
+        'host' => $_ENV['MYSQL_HOST'] ?? 'mariadb',
+        'port' => $_ENV['MYSQL_PORT'] ?? 3306,
+        'database' => $_ENV['MYSQL_DATABASE'] ?? 'app',
+        'username' => $_ENV['MYSQL_USER'] ?? 'root',
+        'password' => $_ENV['MYSQL_PASSWORD'] ?? 'password'
     ]);
     $dataMapper = new TreeDataMapper();
     $treeRepository = new DatabaseTreeRepository($connection, $dataMapper);
