@@ -100,7 +100,7 @@ class TreeNodeValidator implements ValidationInterface
             $sanitized['tree_id'] = (int)$data['tree_id'];
         }
 
-        if (isset($data['parent_id'])) {
+        if (array_key_exists('parent_id', $data)) {
             $sanitized['parent_id'] = $data['parent_id'] === null ? null : (int)$data['parent_id'];
         }
 

@@ -112,7 +112,7 @@ class CachedTreeRepository implements TreeRepository
     public function deleteByTreeId(int $treeId): void
     {
         $this->repository->deleteByTreeId($treeId);
-        
+
         // Invalidate caches
         $this->cache->delete("tree:{$treeId}");
         $this->cache->delete(self::ACTIVE_TREES_KEY);
@@ -123,7 +123,7 @@ class CachedTreeRepository implements TreeRepository
     public function findTreeStructure(int $treeId): ?Tree
     {
         $cacheKey = "tree_structure:{$treeId}";
-        
+
         $cached = $this->cache->get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -141,7 +141,7 @@ class CachedTreeRepository implements TreeRepository
     public function findByName(string $name): ?Tree
     {
         $cacheKey = "tree_name:" . md5($name);
-        
+
         $cached = $this->cache->get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -159,7 +159,7 @@ class CachedTreeRepository implements TreeRepository
     public function findAll(): array
     {
         $cacheKey = 'trees:all';
-        
+
         $cached = $this->cache->get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -177,12 +177,12 @@ class CachedTreeRepository implements TreeRepository
             $this->cache->delete("tree:{$tree->getId()}");
             $this->cache->delete("tree_structure:{$tree->getId()}");
         }
-        
+
         // Invalidate name cache if we know the name
         if ($tree->getName()) {
             $this->cache->delete("tree_name:" . md5($tree->getName()));
         }
-        
+
         $this->cache->delete(self::ACTIVE_TREES_KEY);
         $this->cache->delete(self::DELETED_TREES_KEY);
         $this->cache->delete('trees:all');

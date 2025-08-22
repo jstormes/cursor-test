@@ -44,7 +44,7 @@ class TreeValidator implements ValidationInterface
             $sanitized['name'] = trim(htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8'));
         }
 
-        if (isset($data['description'])) {
+        if (array_key_exists('description', $data)) {
             $sanitized['description'] = $data['description'] === null
                 ? null
                 : trim(htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8'));
