@@ -17,6 +17,4 @@ interface UnitOfWork
     public function registerDirty(object $entity): void;
 
     public function registerDeleted(object $entity): void;
-
-    public function inTransaction(): bool;
 }

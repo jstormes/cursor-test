@@ -14,11 +14,6 @@ interface HtmlRendererInterface
     public function renderTreeView(Tree $tree, array $rootNodes): string;
 
     /**
-     * Render a tree list page
-     */
-    public function renderTreeList(array $trees): string;
-
-    /**
      * Render a "no trees available" page
      */
     public function renderNoTrees(): string;
@@ -37,19 +32,4 @@ interface HtmlRendererInterface
      * Render an error page
      */
     public function renderError(string $message, ?string $title = null): string;
-
-    /**
-     * Render a form page
-     */
-    public function renderForm(string $title, string $formHtml, array $navigationLinks = []): string;
-
-    /**
-     * Render a success page
-     */
-    public function renderSuccess(string $message, array $navigationLinks = []): string;
-
-    /**
-     * Render deleted trees page
-     */
-    public function renderDeletedTrees(array $deletedTrees): string;
 }

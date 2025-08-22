@@ -13,19 +13,4 @@ class DatabaseException extends Exception
     {
         parent::__construct($message, $code, $previous);
     }
-
-    public static function transactionFailed(string $operation, ?Throwable $previous = null): self
-    {
-        return new self("Transaction failed during: {$operation}", 0, $previous);
-    }
-
-    public static function connectionFailed(?Throwable $previous = null): self
-    {
-        return new self('Database connection failed', 0, $previous);
-    }
-
-    public static function queryFailed(string $query, ?Throwable $previous = null): self
-    {
-        return new self("Query execution failed: {$query}", 0, $previous);
-    }
 }

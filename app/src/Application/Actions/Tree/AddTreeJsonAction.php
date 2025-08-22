@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use DateTime;
 
-class AddTreeJsonAction extends Action
+final class AddTreeJsonAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,

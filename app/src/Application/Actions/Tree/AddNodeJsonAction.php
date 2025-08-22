@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use DateTime;
 
-class AddNodeJsonAction extends Action
+final class AddNodeJsonAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,

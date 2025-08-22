@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use DateTime;
 
-class AddTreeAction extends Action
+final class AddTreeAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,

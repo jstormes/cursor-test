@@ -6,8 +6,4 @@ namespace App\Infrastructure\Database;
 
 interface DatabaseConnectionFactoryInterface
 {
-    /**
-     * Create a database connection from configuration
-     */
-    public function create(array $config): DatabaseConnection;
 }

@@ -14,7 +14,7 @@ class QueryOptimizer
         return $sql;
     }
 
-    private function addIndexHints(string $sql): string
+    private function addIndexHints(string $sql): string|null
     {
         // Add index hints for common tree operations
         $patterns = [

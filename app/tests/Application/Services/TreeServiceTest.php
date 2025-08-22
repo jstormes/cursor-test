@@ -57,10 +57,10 @@ class TreeServiceTest extends TestCase
     {
         $treeResult = new ValidationResult($treeValid);
         $nodeResult = new ValidationResult($nodeValid);
-        
+
         $this->mockTreeValidator->method('validate')->willReturn($treeResult);
         $this->mockTreeValidator->method('sanitize')->willReturn($treeData ?? ['name' => 'Test Tree', 'description' => 'A test tree']);
-        
+
         $this->mockNodeValidator->method('validate')->willReturn($nodeResult);
         $this->mockNodeValidator->method('sanitize')->willReturn($nodeData ?? ['type' => 'SimpleNode', 'name' => 'Test Node']);
     }
@@ -242,7 +242,9 @@ class TreeServiceTest extends TestCase
         $nodes = [];
 
         // Setup validation mocks
-        $this->setupValidationMocks(true, true, 
+        $this->setupValidationMocks(
+            true,
+            true,
             ['name' => 'Test Tree', 'description' => 'A test tree'],
             null
         );
@@ -275,7 +277,9 @@ class TreeServiceTest extends TestCase
         ];
 
         // Setup validation mocks to pass validation but fail on missing tree_id
-        $this->setupValidationMocks(true, true, 
+        $this->setupValidationMocks(
+            true,
+            true,
             ['name' => 'Test Tree', 'description' => 'A test tree'],
             ['type' => 'SimpleNode', 'name' => 'Root', 'parent_id' => null, 'sort_order' => 0]
         );
@@ -305,7 +309,9 @@ class TreeServiceTest extends TestCase
         ];
 
         // Setup validation mocks to pass validation but fail on missing tree_id
-        $this->setupValidationMocks(true, true, 
+        $this->setupValidationMocks(
+            true,
+            true,
             ['name' => 'Test Tree', 'description' => 'A test tree'],
             ['type' => 'SimpleNode', 'name' => 'Root', 'parent_id' => null, 'sort_order' => 0]
         );
@@ -335,7 +341,9 @@ class TreeServiceTest extends TestCase
         ];
 
         // Setup validation mocks to pass validation but fail on unknown node type
-        $this->setupValidationMocks(true, true, 
+        $this->setupValidationMocks(
+            true,
+            true,
             ['name' => 'Test Tree', 'description' => 'A test tree'],
             ['type' => 'UnknownNode', 'name' => 'Root', 'parent_id' => null, 'sort_order' => 0, 'tree_id' => 1]
         );
@@ -370,7 +378,9 @@ class TreeServiceTest extends TestCase
         ];
 
         // Setup validation mocks to pass validation but fail on node creation
-        $this->setupValidationMocks(true, true, 
+        $this->setupValidationMocks(
+            true,
+            true,
             ['name' => 'Test Tree', 'description' => 'A test tree'],
             ['type' => 'SimpleNode', 'name' => 'Root', 'parent_id' => null, 'sort_order' => 0, 'tree_id' => 1]
         );

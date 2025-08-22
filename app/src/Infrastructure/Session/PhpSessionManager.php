@@ -52,7 +52,11 @@ final class PhpSessionManager implements SessionManagerInterface
     #[\Override]
     public function getId(): ?string
     {
-        return $this->isStarted() ? session_id() : null;
+        if (!$this->isStarted()) {
+            return null;
+        }
+        $sessionId = session_id();
+        return $sessionId !== false ? $sessionId : null;
     }
 
     #[\Override]
@@ -61,6 +65,9 @@ final class PhpSessionManager implements SessionManagerInterface
         return session_status() === PHP_SESSION_ACTIVE;
     }
 
+    /**
+     * @psalm-return array<string, mixed>
+     */
     #[\Override]
     public function all(): array
     {

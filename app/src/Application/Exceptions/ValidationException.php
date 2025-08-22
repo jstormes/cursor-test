@@ -17,11 +17,6 @@ class ValidationException extends Exception
         parent::__construct($message);
     }
 
-    public function getValidationResult(): ValidationResult
-    {
-        return $this->validationResult;
-    }
-
     public function getValidationErrors(): array
     {
         return $this->validationResult->getErrors();

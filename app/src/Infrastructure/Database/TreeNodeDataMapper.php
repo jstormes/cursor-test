@@ -11,6 +11,7 @@ use DateTime;
 
 class TreeNodeDataMapper implements DataMapper
 {
+    #[\Override]
     public function mapToEntity(array $data): AbstractTreeNode
     {
         $node = match ($data['type_class']) {
@@ -35,6 +36,7 @@ class TreeNodeDataMapper implements DataMapper
         return $node;
     }
 
+    #[\Override]
     public function mapToArray(object $entity): array
     {
         if (!$entity instanceof AbstractTreeNode) {
@@ -54,6 +56,7 @@ class TreeNodeDataMapper implements DataMapper
         return $data;
     }
 
+    #[\Override]
     public function mapToEntities(array $data): array
     {
         return array_map([$this, 'mapToEntity'], $data);
