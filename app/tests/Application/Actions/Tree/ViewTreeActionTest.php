@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Infrastructure\Rendering\HtmlRendererInterface;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,6 +27,7 @@ class ViewTreeActionTest extends TestCase
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
     private TreeNodeRepository $treeNodeRepository;
+    private HtmlRendererInterface $htmlRenderer;
 
     protected function setUp(): void
     {
@@ -35,12 +37,35 @@ class ViewTreeActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
+        $this->htmlRenderer = $this->createMock(HtmlRendererInterface::class);
 
         $this->action = new ViewTreeAction(
             $this->logger,
             $this->treeRepository,
-            $this->treeNodeRepository
+            $this->treeNodeRepository,
+            $this->htmlRenderer
         );
+    }
+
+    private function mockRendererForTreeView(string $expectedHtml = '<html><body>Test HTML</body></html>'): void
+    {
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->willReturn($expectedHtml);
+    }
+
+    private function mockRendererForNoTrees(string $expectedHtml = '<html><body>No Trees</body></html>'): void
+    {
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderNoTrees')
+            ->willReturn($expectedHtml);
+    }
+
+    private function mockRendererForEmptyTree(string $expectedHtml = '<html><body>Empty Tree</body></html>'): void
+    {
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderEmptyTree')
+            ->willReturn($expectedHtml);
     }
 
     public function testActionReturnsHtmlResponse(): void
@@ -59,6 +84,12 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode, $childNode]);
 
+        // Mock HTML renderer
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn('<html><body>Test HTML</body></html>');
+
         $this->response->expects($this->once())
             ->method('getBody')
             ->willReturn($this->stream);
@@ -70,11 +101,7 @@ class ViewTreeActionTest extends TestCase
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, '<!DOCTYPE html>') &&
-                       str_contains($html, '<title>Tree Structure - Test Tree</title>') &&
-                       str_contains($html, 'Tree Structure: Test Tree');
-            }));
+            ->with('<html><body>Test HTML</body></html>');
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -95,16 +122,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode, $childNode]);
 
+        // Mock HTML renderer to return HTML with expected content
+        $expectedHtml = '<html><body><div>Root</div><div>Child</div><button>Click Me</button></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, 'Root') &&
-                       str_contains($html, 'Child') &&
-                       str_contains($html, 'Click Me');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -124,18 +154,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
+        // Mock HTML renderer to return HTML with CSS
+        $expectedHtml = '<html><head><style>.tree ul{float: left} .tree li{text-align: center}</style></head><body>Test</body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, '<style>') &&
-                       str_contains($html, '.tree ul') &&
-                       str_contains($html, '.tree li') &&
-                       str_contains($html, 'float: left') &&
-                       str_contains($html, 'text-align: center');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -155,15 +186,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
+        // Mock HTML renderer to return HTML with button
+        $expectedHtml = '<html><body><div><button>Click Me</button></div></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, 'Click Me') &&
-                       str_contains($html, '<button>');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -183,19 +218,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
+        // Mock HTML renderer to return proper HTML structure
+        $expectedHtml = '<!DOCTYPE html><html lang="en"><head></head><body><div class="header"></div><div class="navigation"></div></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, '<!DOCTYPE html>') &&
-                       str_contains($html, '<html lang="en">') &&
-                       str_contains($html, '<head>') &&
-                       str_contains($html, '<body>') &&
-                       str_contains($html, '<div class="header">') &&
-                       str_contains($html, '<div class="navigation">');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -218,14 +253,16 @@ class ViewTreeActionTest extends TestCase
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
+        // Mock HTML renderer to return HTML with checkboxes
+        $expectedHtml = '<html><body><div class="tree-node">Root<a class="remove-icon">×</a><a class="add-icon">+</a></div></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, 'Root') &&
-                       str_contains($html, '<div class="tree-node">') &&
-                       str_contains($html, 'class="remove-icon">×</a>') &&
-                       str_contains($html, 'class="add-icon">+</a>');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -245,19 +282,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
+        // Mock HTML renderer to return valid HTML
+        $expectedHtml = '<html><head></head><body>Valid HTML content</body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderTreeView')
+            ->with($tree, $this->isType('array'))
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, '<html') &&
-                       str_contains($html, '</html>') &&
-                       str_contains($html, '<head') &&
-                       str_contains($html, '</head>') &&
-                       str_contains($html, '<body') &&
-                       str_contains($html, '</body>');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -269,15 +306,18 @@ class ViewTreeActionTest extends TestCase
             ->method('findActive')
             ->willReturn([]);
 
+        // Mock HTML renderer for no trees scenario
+        $expectedHtml = '<html><body><h1>No Trees Available</h1><p>No active trees found in the database</p></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderNoTrees')
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, 'No Trees Available') &&
-                       str_contains($html, 'No active trees found in the database');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }
@@ -296,15 +336,19 @@ class ViewTreeActionTest extends TestCase
             ->with(1)
             ->willReturn([]);
 
+        // Mock HTML renderer for empty tree scenario
+        $expectedHtml = '<html><body><h1>Empty Tree: Test Tree</h1><p>This tree has no nodes yet</p></body></html>';
+        $this->htmlRenderer->expects($this->once())
+            ->method('renderEmptyTree')
+            ->with($tree)
+            ->willReturn($expectedHtml);
+
         $this->response->method('getBody')->willReturn($this->stream);
         $this->response->method('withHeader')->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
-            ->with($this->callback(function ($html) {
-                return str_contains($html, 'Empty Tree: Test Tree') &&
-                       str_contains($html, 'This tree has no nodes yet');
-            }));
+            ->with($expectedHtml);
 
         $this->action->__invoke($this->request, $this->response, []);
     }

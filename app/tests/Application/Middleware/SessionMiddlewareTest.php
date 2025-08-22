@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Application\Middleware;
 
 use App\Application\Middleware\SessionMiddleware;
+use App\Infrastructure\Session\SessionManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -16,12 +17,14 @@ class SessionMiddlewareTest extends TestCase
 {
     private SessionMiddleware $middleware;
     private ResponseFactory $responseFactory;
+    private SessionManagerInterface $sessionManager;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->responseFactory = new ResponseFactory();
-        $this->middleware = new SessionMiddleware();
+        $this->sessionManager = $this->createMock(SessionManagerInterface::class);
+        $this->middleware = new SessionMiddleware($this->sessionManager);
     }
 
     public function testProcessStartsSession(): void

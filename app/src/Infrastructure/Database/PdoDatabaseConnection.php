@@ -10,7 +10,7 @@ use PDOException;
 
 class PdoDatabaseConnection implements DatabaseConnection
 {
-    private PDO $pdo;
+    protected PDO $pdo;
 
     public function __construct(array $config)
     {

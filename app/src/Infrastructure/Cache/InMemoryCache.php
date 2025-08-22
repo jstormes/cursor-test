@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Cache;
 
+use App\Infrastructure\Time\ClockInterface;
+
 class InMemoryCache implements CacheInterface
 {
     private array $cache = [];
     private array $expiry = [];
+
+    public function __construct(private ClockInterface $clock)
+    {
+    }
 
     #[\Override]
     public function get(string $key): mixed
@@ -23,7 +29,7 @@ class InMemoryCache implements CacheInterface
     public function set(string $key, mixed $value, int $ttl = 3600): bool
     {
         $this->cache[$key] = $value;
-        $this->expiry[$key] = time() + $ttl;
+        $this->expiry[$key] = $this->clock->now() + $ttl;
 
         return true;
     }
@@ -50,7 +56,7 @@ class InMemoryCache implements CacheInterface
             return false;
         }
 
-        if (isset($this->expiry[$key]) && $this->expiry[$key] < time()) {
+        if (isset($this->expiry[$key]) && $this->expiry[$key] < $this->clock->now()) {
             $this->delete($key);
             return false;
         }
@@ -60,7 +66,7 @@ class InMemoryCache implements CacheInterface
 
     public function cleanup(): void
     {
-        $now = time();
+        $now = $this->clock->now();
         foreach ($this->expiry as $key => $expireTime) {
             if ($expireTime < $now) {
                 $this->delete($key);

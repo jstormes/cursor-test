@@ -10,9 +10,13 @@ use App\Application\Configuration\EnvironmentValidator;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\User\UserRepository;
+use App\Infrastructure\Cache\CacheInterface;
+use App\Infrastructure\Cache\InMemoryCache;
 use App\Infrastructure\Database\DatabaseConnection;
+use App\Infrastructure\Database\DatabaseConnectionFactoryInterface;
 use App\Infrastructure\Database\DatabaseUnitOfWork;
 use App\Infrastructure\Database\PdoDatabaseConnection;
+use App\Infrastructure\Database\PdoDatabaseConnectionFactory;
 use App\Infrastructure\Database\TreeDataMapper;
 use App\Infrastructure\Database\TreeNodeDataMapper;
 use App\Infrastructure\Database\UserDataMapper;
@@ -20,6 +24,12 @@ use App\Infrastructure\Database\UnitOfWork;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeRepository;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeNodeRepository;
 use App\Infrastructure\Persistence\User\DatabaseUserRepository;
+use App\Infrastructure\Rendering\HtmlRendererInterface;
+use App\Infrastructure\Rendering\TreeHtmlRenderer;
+use App\Infrastructure\Session\PhpSessionManager;
+use App\Infrastructure\Session\SessionManagerInterface;
+use App\Infrastructure\Time\ClockInterface;
+use App\Infrastructure\Time\SystemClock;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -44,11 +54,37 @@ return function (ContainerBuilder $containerBuilder) {
             return $logger;
         },
 
+        // Clock interface
+        ClockInterface::class => function (ContainerInterface $c) {
+            return new SystemClock();
+        },
+
+        // Session manager
+        SessionManagerInterface::class => function (ContainerInterface $c) {
+            return new PhpSessionManager();
+        },
+
+        // HTML renderer
+        HtmlRendererInterface::class => function (ContainerInterface $c) {
+            return new TreeHtmlRenderer();
+        },
+
+        // Cache interface
+        CacheInterface::class => function (ContainerInterface $c) {
+            return new InMemoryCache($c->get(ClockInterface::class));
+        },
+
+        // Database connection factory
+        DatabaseConnectionFactoryInterface::class => function (ContainerInterface $c) {
+            return new PdoDatabaseConnectionFactory();
+        },
+
         // Database connection
         DatabaseConnection::class => function (ContainerInterface $c) {
             $settings = $c->get(SettingsInterface::class);
             $dbSettings = $settings->get('database');
-            return new PdoDatabaseConnection($dbSettings);
+            $factory = $c->get(DatabaseConnectionFactoryInterface::class);
+            return $factory->create($dbSettings);
         },
 
         // Unit of Work
