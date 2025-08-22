@@ -11,7 +11,6 @@ use App\Application\Configuration\EnvironmentValidator;
 use App\Domain\Tree\TreeNodeFactory;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
-use App\Domain\User\UserRepository;
 use App\Infrastructure\Factory\DefaultTreeNodeFactory;
 use App\Infrastructure\Cache\CacheInterface;
 use App\Infrastructure\Cache\InMemoryCache;
@@ -22,11 +21,9 @@ use App\Infrastructure\Database\PdoDatabaseConnection;
 use App\Infrastructure\Database\PdoDatabaseConnectionFactory;
 use App\Infrastructure\Database\TreeDataMapper;
 use App\Infrastructure\Database\TreeNodeDataMapper;
-use App\Infrastructure\Database\UserDataMapper;
 use App\Infrastructure\Database\UnitOfWork;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeRepository;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeNodeRepository;
-use App\Infrastructure\Persistence\User\DatabaseUserRepository;
 use App\Infrastructure\Rendering\CssProviderInterface;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
 use App\Infrastructure\Rendering\StaticCssProvider;
@@ -95,15 +92,11 @@ return function (ContainerBuilder $containerBuilder) {
             return new DatabaseUnitOfWork(
                 $c->get(DatabaseConnection::class),
                 $c->get(TreeDataMapper::class),
-                $c->get(TreeNodeDataMapper::class),
-                $c->get(UserDataMapper::class)
+                $c->get(TreeNodeDataMapper::class)
             );
         },
 
         // Data Mappers
-        UserDataMapper::class => function (ContainerInterface $c) {
-            return new UserDataMapper();
-        },
 
         TreeDataMapper::class => function (ContainerInterface $c) {
             return new TreeDataMapper();
@@ -114,13 +107,6 @@ return function (ContainerBuilder $containerBuilder) {
         },
 
         // Repositories
-        UserRepository::class => function (ContainerInterface $c) {
-            return new DatabaseUserRepository(
-                $c->get(DatabaseConnection::class),
-                $c->get(UserDataMapper::class)
-            );
-        },
-
         TreeRepository::class => function (ContainerInterface $c) {
             return new DatabaseTreeRepository(
                 $c->get(DatabaseConnection::class),

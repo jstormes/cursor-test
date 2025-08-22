@@ -46,7 +46,6 @@ cursor-test/
 │   ├── src/                    # Source code (Clean Architecture)
 │   │   ├── Domain/             # Domain layer (entities, value objects)
 │   │   │   ├── Tree/           # Tree domain with composite pattern
-│   │   │   └── User/           # User domain entities
 │   │   ├── Application/        # Application layer (use cases, actions)
 │   │   │   ├── Actions/        # Slim framework action classes
 │   │   │   ├── Services/       # Business logic coordination
@@ -54,7 +53,7 @@ cursor-test/
 │   │   └── Infrastructure/     # Infrastructure layer (database, repositories)
 │   │       ├── Database/       # Database abstraction layer
 │   │       └── Persistence/    # Concrete repository implementations
-│   ├── tests/                  # PHPUnit test suite (801+ tests)
+│   ├── tests/                  # PHPUnit test suite (777+ tests)
 │   ├── var/                    # Application cache and logs
 │   ├── vendor/                 # Composer dependencies
 │   ├── composer.json           # PHP dependencies
@@ -94,7 +93,7 @@ cursor-test/
 - **Host**: localhost, **Port**: 5000
 - **Username**: root, **Password**: password
 - **Database**: app
-- **Tables**: trees, tree_nodes, users with relationships
+- **Tables**: trees, tree_nodes with hierarchical relationships
 
 ## 🎯 Design Patterns in Action
 
@@ -136,9 +135,9 @@ interface TreeRepositoryInterface {
 ## ✅ Testing & Quality
 
 ### Test Coverage
-- **801 Unit Tests** with PHPUnit (100% passing)
-- **Comprehensive Coverage** across all architectural layers with focus on actual functionality
-- **2,902 Total Assertions** testing all business logic and patterns
+- **777 Unit Tests** with PHPUnit (100% passing)
+- **Comprehensive Coverage** across all architectural layers focused on tree functionality
+- **2,843 Total Assertions** testing all business logic and patterns
 - **Domain, Application, Infrastructure** test separation with comprehensive mocking
 
 ### Code Quality Tools
@@ -148,7 +147,7 @@ interface TreeRepositoryInterface {
 - **PHPMD**: Code complexity and design quality analysis
 
 ### Quality Metrics
-- ✅ **Tests**: 801/801 passing (100%), 2,902 assertions - **Clean, stateless application**
+- ✅ **Tests**: 777/777 passing (100%), 2,843 assertions - **Clean, focused application**
 - ✅ **Architecture**: Stateless design with no session dependencies - **Perfect for scaling**
 - ✅ **Performance**: No session overhead, optimized for APIs and microservices
 - ✅ **Security**: Input validation, XSS protection, environment validation implemented
@@ -232,9 +231,6 @@ The application provides endpoints for tree management with both HTML and JSON r
 - Tree nodes use composite pattern with `SimpleNode`, `ButtonNode`, and nested `TreeNode` types
 - Visitor pattern handles HTML rendering automatically
 
-### User Management
-- `GET /users` - List all users
-- `GET /users/{id}` - View specific user
 
 ## 📖 Learning Objectives
 
@@ -371,7 +367,7 @@ docker-compose exec php-dev bash -c "cd /app && rm -rf vendor && composer instal
 - **🎯 Simplified Architecture**: Cleaner codebase with 26 fewer tests testing unused functionality  
 - **⚡ Performance Boost**: No session overhead, faster request processing, better memory usage
 - **🔧 API-First**: All endpoints work seamlessly without session dependencies
-- **🧪 Test Focus**: 801 tests covering actual functionality, 2,902 assertions for business logic
+- **🧪 Test Focus**: 777 tests covering tree functionality, 2,843 assertions for business logic
 - **📊 Quality Achievement**: A+ Grade (95/100) - Production-ready stateless application
 
 ## 📝 Project Purpose

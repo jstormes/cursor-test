@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Application\Actions\User\ListUsersAction;
-use App\Application\Actions\User\ViewUserAction;
 use App\Application\Actions\Tree\ViewTreeAction;
 use App\Application\Actions\Tree\ViewTreeJsonAction;
 use App\Application\Actions\Tree\ViewTreesAction;
@@ -34,11 +32,6 @@ return function (App $app) {
     });
 
     $app->get('/', ViewTreesAction::class);
-
-    $app->group('/users', function (Group $group) {
-        $group->get('', ListUsersAction::class);
-        $group->get('/{id}', ViewUserAction::class);
-    });
 
     $app->get('/trees', ViewTreesAction::class);
     $app->get('/trees/json', ViewTreesJsonAction::class);

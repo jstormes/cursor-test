@@ -113,14 +113,10 @@ This is a **stateless PHP web application** built with the **Slim Framework** fo
   - `HtmlTreeNodeRenderer.php`: Visitor pattern for HTML rendering
   - Repository interfaces for data access abstraction
 
-- **User Domain**: User management entities
-  - `User.php`: User entity with standard CRUD operations
-  - `UserRepository.php`: Repository interface for user data access
 
 ### Application Layer (`src/Application/`)
 - **Actions**: Slim Framework action classes for HTTP endpoints
   - Tree actions: CRUD operations with both HTML and JSON responses
-  - User actions: User management endpoints
 - **Services**: Business logic coordination
   - `TreeService.php`: Orchestrates tree operations with transaction management
 - **Middleware**: Cross-cutting concerns like performance monitoring
@@ -215,7 +211,7 @@ vendor/bin/phpmd src text cleancode,codesize,design,naming,unusedcode
 ## Quality Analysis Breakdown
 
 ### 📊 **Test Coverage Details**
-- **Domain Layer**: 100% coverage (Tree, User, ButtonNode, SimpleNode entities)
+- **Domain Layer**: 100% coverage (Tree, ButtonNode, SimpleNode entities)
 - **Application Services**: 100% coverage (TreeService business logic)
 - **Action Classes**: 70-100% coverage across HTTP endpoints
 - **Infrastructure**: 70-90% coverage (repositories, data mappers)

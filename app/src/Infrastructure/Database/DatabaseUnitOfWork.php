@@ -6,7 +6,6 @@ namespace App\Infrastructure\Database;
 
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\AbstractTreeNode;
-use App\Domain\User\User;
 
 class DatabaseUnitOfWork implements UnitOfWork
 {
@@ -17,13 +16,11 @@ class DatabaseUnitOfWork implements UnitOfWork
     public function __construct(
         private DatabaseConnection $connection,
         private ?TreeDataMapper $treeMapper = null,
-        private ?TreeNodeDataMapper $nodeMapper = null,
-        private ?UserDataMapper $userMapper = null
+        private ?TreeNodeDataMapper $nodeMapper = null
     ) {
         // Initialize mappers if not provided
         $this->treeMapper ??= new TreeDataMapper();
         $this->nodeMapper ??= new TreeNodeDataMapper();
-        $this->userMapper ??= new UserDataMapper();
     }
 
     #[\Override]
@@ -95,7 +92,6 @@ class DatabaseUnitOfWork implements UnitOfWork
         match (true) {
             $entity instanceof Tree => $this->insertTree($entity),
             $entity instanceof AbstractTreeNode => $this->insertTreeNode($entity),
-            $entity instanceof User => $this->insertUser($entity),
             default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
         };
     }
@@ -105,7 +101,6 @@ class DatabaseUnitOfWork implements UnitOfWork
         match (true) {
             $entity instanceof Tree => $this->updateTree($entity),
             $entity instanceof AbstractTreeNode => $this->updateTreeNode($entity),
-            $entity instanceof User => $this->updateUser($entity),
             default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
         };
     }
@@ -115,7 +110,6 @@ class DatabaseUnitOfWork implements UnitOfWork
         match (true) {
             $entity instanceof Tree => $this->deleteTree($entity),
             $entity instanceof AbstractTreeNode => $this->deleteTreeNode($entity),
-            $entity instanceof User => $this->deleteUser($entity),
             default => throw new \InvalidArgumentException('Unsupported entity type: ' . get_class($entity))
         };
     }
@@ -199,40 +193,6 @@ class DatabaseUnitOfWork implements UnitOfWork
         $this->connection->execute($sql, [$node->getId()]);
     }
 
-    private function insertUser(User $user): void
-    {
-        $data = $this->userMapper->mapToArray($user);
-        $sql = 'INSERT INTO users (username, first_name, last_name) VALUES (?, ?, ?)';
-        $this->connection->execute($sql, [
-            $data['username'],
-            $data['first_name'],
-            $data['last_name']
-        ]);
-
-        // Set the ID using the setter method
-        $user->setId((int) $this->connection->lastInsertId());
-    }
-
-    private function updateUser(User $user): void
-    {
-        $data = $this->userMapper->mapToArray($user);
-        $sql = 'UPDATE users SET username = ?, first_name = ?, last_name = ? WHERE id = ?';
-        $this->connection->execute($sql, [
-            $data['username'],
-            $data['first_name'],
-            $data['last_name'],
-            $data['id']
-        ]);
-    }
-
-    private function deleteUser(User $user): void
-    {
-        if ($user->getId() === null) {
-            throw new \InvalidArgumentException('Cannot delete user without ID');
-        }
-        $sql = 'DELETE FROM users WHERE id = ?';
-        $this->connection->execute($sql, [$user->getId()]);
-    }
 
     private function clear(): void
     {
