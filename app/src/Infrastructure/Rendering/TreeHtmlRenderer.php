@@ -134,12 +134,13 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     public function renderError(string $message, ?string $title = null): string
     {
         $title = $title ?: 'Error';
+        $safeTitle = htmlspecialchars($title);
         $safeMessage = htmlspecialchars($message);
 
         return $this->renderPage(
-            $title,
+            $safeTitle,
             <<<HTML
-            <h1>{$title}</h1>
+            <h1>{$safeTitle}</h1>
             <p class="error">{$safeMessage}</p>
             <a href="/trees" class="btn">Back to Trees List</a>
             HTML,

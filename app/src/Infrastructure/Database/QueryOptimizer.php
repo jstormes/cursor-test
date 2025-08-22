@@ -20,6 +20,7 @@ class QueryOptimizer
         $patterns = [
             '/FROM\s+trees\s+/i' => 'FROM trees USE INDEX (idx_trees_active, idx_trees_created_at) ',
             '/FROM\s+tree_nodes\s+/i' => 'FROM tree_nodes USE INDEX (idx_tree_nodes_tree_id, idx_tree_nodes_parent_id) ',
+            '/(?<!LEFT\s)JOIN\s+tree_nodes\s+/i' => 'JOIN tree_nodes USE INDEX (idx_tree_nodes_tree_id, idx_tree_nodes_parent_id) ',
         ];
 
         foreach ($patterns as $pattern => $replacement) {
@@ -31,10 +32,11 @@ class QueryOptimizer
 
     private function optimizeJoins(string $sql): string
     {
-        // Optimize common join patterns
-        $sql = str_replace(
-            'LEFT JOIN tree_nodes',
-            'LEFT JOIN tree_nodes FORCE INDEX (idx_tree_nodes_tree_id)',
+        // Optimize common join patterns by adding FORCE INDEX hints
+        // This specifically targets LEFT JOIN patterns that might not be caught by the general pattern matching
+        $sql = preg_replace(
+            '/LEFT JOIN tree_nodes(\s+\w+)?\s+ON/i',
+            'LEFT JOIN tree_nodes$1 FORCE INDEX (idx_tree_nodes_tree_id) ON',
             $sql
         );
 

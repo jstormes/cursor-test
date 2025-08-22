@@ -28,7 +28,7 @@ class EnvironmentValidator
         foreach ($this->requiredEnvVars as $envVar) {
             $value = $_ENV[$envVar] ?? getenv($envVar);
 
-            if (empty($value)) {
+            if ($value === false || $value === null || trim($value) === '') {
                 $errors[] = "Required environment variable '{$envVar}' is not set";
                 continue;
             }
@@ -36,7 +36,7 @@ class EnvironmentValidator
             // Apply specific validation rules
             if (isset($this->validationRules[$envVar])) {
                 $rule = $this->validationRules[$envVar];
-                if (!$this->validateValue($value, $rule)) {
+                if (!$this->validateValue(trim($value), $rule)) {
                     $errors[] = "Environment variable '{$envVar}' has invalid format for rule '{$rule}'";
                 }
             }
