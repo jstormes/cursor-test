@@ -34,6 +34,11 @@ abstract class AbstractTreeNode implements TreeNode
         return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
     #[\Override]
     public function getName(): string
     {

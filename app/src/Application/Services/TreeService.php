@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace App\Application\Services;
 
+use App\Application\Exceptions\ValidationException;
+use App\Application\Validation\TreeNodeValidator;
+use App\Application\Validation\TreeValidator;
 use App\Domain\Tree\AbstractTreeNode;
+use App\Domain\Tree\InvalidTreeOperationException;
 use App\Domain\Tree\Tree;
+use App\Domain\Tree\TreeNodeFactory;
+use App\Domain\Tree\TreeNotFoundException;
+use App\Domain\Tree\TreeNodeNotFoundException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Database\UnitOfWork;
@@ -15,7 +22,10 @@ class TreeService
     public function __construct(
         private TreeRepository $treeRepository,
         private TreeNodeRepository $nodeRepository,
-        private UnitOfWork $unitOfWork
+        private UnitOfWork $unitOfWork,
+        private TreeNodeFactory $nodeFactory,
+        private TreeValidator $treeValidator,
+        private TreeNodeValidator $nodeValidator
     ) {
     }
 
@@ -24,21 +34,38 @@ class TreeService
      */
     public function createTreeWithNodes(string $name, ?string $description, array $nodes): Tree
     {
+        // Validate tree data
+        $treeData = ['name' => $name, 'description' => $description];
+        $treeValidation = $this->treeValidator->validate($treeData);
+        if (!$treeValidation->isValid()) {
+            throw new ValidationException($treeValidation, 'Tree validation failed');
+        }
+
+        // Sanitize tree data
+        $sanitizedTreeData = $this->treeValidator->sanitize($treeData);
+
         $this->unitOfWork->beginTransaction();
 
         try {
-            // Create the tree
-            $tree = new Tree(null, $name, $description);
-            $this->treeRepository->save($tree);
+            // Create the tree and register it as new
+            $tree = new Tree(null, $sanitizedTreeData['name'], $sanitizedTreeData['description'] ?? null);
+            $this->unitOfWork->registerNew($tree);
 
-            // Add nodes to the tree
+            // Add nodes to the tree and register them as new
             foreach ($nodes as $nodeData) {
-                $treeId = $nodeData['tree_id'] ?? $tree->getId();
-                if ($treeId === null) {
-                    throw new \InvalidArgumentException('Tree ID is required for node creation');
+                // Validate and sanitize node data
+                $nodeValidation = $this->nodeValidator->validate($nodeData);
+                if (!$nodeValidation->isValid()) {
+                    throw new ValidationException($nodeValidation, 'Node validation failed');
                 }
-                $node = $this->createNodeFromData($nodeData, $treeId);
-                $this->nodeRepository->save($node);
+                $sanitizedNodeData = $this->nodeValidator->sanitize($nodeData);
+
+                $treeId = $sanitizedNodeData['tree_id'] ?? $tree->getId();
+                if ($treeId === null) {
+                    throw InvalidTreeOperationException::treeIdRequired();
+                }
+                $node = $this->nodeFactory->createFromData($sanitizedNodeData, $treeId);
+                $this->unitOfWork->registerNew($node);
             }
 
             $this->unitOfWork->commit();
@@ -59,12 +86,12 @@ class TreeService
         try {
             $node = $this->nodeRepository->findById($nodeId);
             if (!$node) {
-                throw new \InvalidArgumentException("Node with ID {$nodeId} not found");
+                throw new TreeNodeNotFoundException($nodeId);
             }
 
-            // Update the node's parent
-            $node = $this->createNodeWithNewParent($node, $newParentId);
-            $this->nodeRepository->save($node);
+            // Update the node's parent and register it as dirty
+            $node = $this->nodeFactory->createWithNewParent($node, $newParentId);
+            $this->unitOfWork->registerDirty($node);
 
             $this->unitOfWork->commit();
         } catch (\Exception $e) {
@@ -81,11 +108,17 @@ class TreeService
         $this->unitOfWork->beginTransaction();
 
         try {
-            // Delete all nodes first
-            $this->nodeRepository->deleteByTreeId($treeId);
+            // Find and register all nodes for deletion
+            $nodes = $this->nodeRepository->findByTreeId($treeId);
+            foreach ($nodes as $node) {
+                $this->unitOfWork->registerDeleted($node);
+            }
 
-            // Delete the tree
-            $this->treeRepository->delete($treeId);
+            // Find and register the tree for deletion
+            $tree = $this->treeRepository->findById($treeId);
+            if ($tree) {
+                $this->unitOfWork->registerDeleted($tree);
+            }
 
             $this->unitOfWork->commit();
         } catch (\Exception $e) {
@@ -101,65 +134,9 @@ class TreeService
     {
         $tree = $this->treeRepository->findById($treeId);
         if (!$tree) {
-            throw new \InvalidArgumentException("Tree with ID {$treeId} not found");
+            throw new TreeNotFoundException($treeId);
         }
 
         return $this->nodeRepository->findTreeStructure($treeId);
-    }
-
-    /**
-     * Create a node from data array
-     */
-    private function createNodeFromData(array $nodeData, int $treeId): AbstractTreeNode
-    {
-        $type = $nodeData['type'] ?? 'SimpleNode';
-        $name = $nodeData['name'];
-        $parentId = $nodeData['parent_id'] ?? null;
-        $sortOrder = $nodeData['sort_order'] ?? 0;
-        $typeData = $nodeData['type_data'] ?? [];
-
-        return match ($type) {
-            'SimpleNode' => new \App\Domain\Tree\SimpleNode(
-                null,
-                $name,
-                $treeId,
-                $parentId,
-                $sortOrder
-            ),
-            'ButtonNode' => new \App\Domain\Tree\ButtonNode(
-                null,
-                $name,
-                $treeId,
-                $parentId,
-                $sortOrder,
-                $typeData
-            ),
-            default => throw new \InvalidArgumentException("Unknown node type: {$type}")
-        };
-    }
-
-    /**
-     * Create a new node instance with updated parent
-     */
-    private function createNodeWithNewParent(AbstractTreeNode $node, int $newParentId): AbstractTreeNode
-    {
-        return match ($node->getType()) {
-            'SimpleNode' => new \App\Domain\Tree\SimpleNode(
-                $node->getId(),
-                $node->getName(),
-                $node->getTreeId(),
-                $newParentId,
-                $node->getSortOrder()
-            ),
-            'ButtonNode' => new \App\Domain\Tree\ButtonNode(
-                $node->getId(),
-                $node->getName(),
-                $node->getTreeId(),
-                $newParentId,
-                $node->getSortOrder(),
-                $node->getTypeData()
-            ),
-            default => throw new \InvalidArgumentException("Unknown node type: {$node->getType()}")
-        };
     }
 }

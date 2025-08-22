@@ -132,11 +132,8 @@ class DatabaseUnitOfWork implements UnitOfWork
             $data['is_active']
         ]);
 
-        // Set the ID using reflection
-        $reflection = new \ReflectionClass($tree);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($tree, (int) $this->connection->lastInsertId());
+        // Set the ID using the setter method
+        $tree->setId((int) $this->connection->lastInsertId());
     }
 
     private function updateTree(Tree $tree): void
@@ -174,11 +171,8 @@ class DatabaseUnitOfWork implements UnitOfWork
             $data['type_data']
         ]);
 
-        // Set the ID using reflection
-        $reflection = new \ReflectionClass($node);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($node, (int) $this->connection->lastInsertId());
+        // Set the ID using the setter method
+        $node->setId((int) $this->connection->lastInsertId());
     }
 
     private function updateTreeNode(AbstractTreeNode $node): void
@@ -215,11 +209,8 @@ class DatabaseUnitOfWork implements UnitOfWork
             $data['last_name']
         ]);
 
-        // Set the ID using reflection
-        $reflection = new \ReflectionClass($user);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($user, (int) $this->connection->lastInsertId());
+        // Set the ID using the setter method
+        $user->setId((int) $this->connection->lastInsertId());
     }
 
     private function updateUser(User $user): void

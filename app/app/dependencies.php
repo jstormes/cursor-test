@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Application\Middleware\PerformanceMiddleware;
 use App\Application\Settings\SettingsInterface;
 use App\Application\Services\TreeService;
 use App\Application\Validation\TreeValidator;
 use App\Application\Validation\TreeNodeValidator;
 use App\Application\Configuration\EnvironmentValidator;
+use App\Domain\Tree\TreeNodeFactory;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\User\UserRepository;
+use App\Infrastructure\Factory\DefaultTreeNodeFactory;
 use App\Infrastructure\Cache\CacheInterface;
 use App\Infrastructure\Cache\InMemoryCache;
 use App\Infrastructure\Database\DatabaseConnection;
@@ -24,7 +27,9 @@ use App\Infrastructure\Database\UnitOfWork;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeRepository;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeNodeRepository;
 use App\Infrastructure\Persistence\User\DatabaseUserRepository;
+use App\Infrastructure\Rendering\CssProviderInterface;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
+use App\Infrastructure\Rendering\StaticCssProvider;
 use App\Infrastructure\Rendering\TreeHtmlRenderer;
 use App\Infrastructure\Session\PhpSessionManager;
 use App\Infrastructure\Session\SessionManagerInterface;
@@ -64,9 +69,14 @@ return function (ContainerBuilder $containerBuilder) {
             return new PhpSessionManager();
         },
 
+        // CSS Provider
+        CssProviderInterface::class => function (ContainerInterface $c) {
+            return new StaticCssProvider();
+        },
+
         // HTML renderer
         HtmlRendererInterface::class => function (ContainerInterface $c) {
-            return new TreeHtmlRenderer();
+            return new TreeHtmlRenderer($c->get(CssProviderInterface::class));
         },
 
         // Cache interface
@@ -132,12 +142,20 @@ return function (ContainerBuilder $containerBuilder) {
             );
         },
 
+        // Factory
+        TreeNodeFactory::class => function (ContainerInterface $c) {
+            return new DefaultTreeNodeFactory();
+        },
+
         // Services
         TreeService::class => function (ContainerInterface $c) {
             return new TreeService(
                 $c->get(TreeRepository::class),
                 $c->get(TreeNodeRepository::class),
-                $c->get(UnitOfWork::class)
+                $c->get(UnitOfWork::class),
+                $c->get(TreeNodeFactory::class),
+                $c->get(TreeValidator::class),
+                $c->get(TreeNodeValidator::class)
             );
         },
 
@@ -148,6 +166,11 @@ return function (ContainerBuilder $containerBuilder) {
 
         TreeNodeValidator::class => function (ContainerInterface $c) {
             return new TreeNodeValidator();
+        },
+
+        // Middleware
+        PerformanceMiddleware::class => function (ContainerInterface $c) {
+            return new PerformanceMiddleware($c->get(LoggerInterface::class));
         },
 
         // Configuration

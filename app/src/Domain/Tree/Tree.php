@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Tree;
 
+use App\Infrastructure\Time\ClockInterface;
 use DateTime;
 use JsonSerializable;
 
@@ -15,6 +16,7 @@ class Tree implements JsonSerializable
     private DateTime $createdAt;
     private DateTime $updatedAt;
     private bool $isActive;
+    private ClockInterface $clock;
 
     public function __construct(
         ?int $id,
@@ -22,19 +24,26 @@ class Tree implements JsonSerializable
         ?string $description = null,
         ?DateTime $createdAt = null,
         ?DateTime $updatedAt = null,
-        bool $isActive = true
+        bool $isActive = true,
+        ?ClockInterface $clock = null
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
-        $this->createdAt = $createdAt ?? new DateTime();
-        $this->updatedAt = $updatedAt ?? new DateTime();
+        $this->clock = $clock ?? new \App\Infrastructure\Time\SystemClock();
+        $this->createdAt = $createdAt ?? $this->clock->nowDateTime();
+        $this->updatedAt = $updatedAt ?? $this->clock->nowDateTime();
         $this->isActive = $isActive;
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getName(): string
@@ -65,19 +74,19 @@ class Tree implements JsonSerializable
     public function setName(string $name): void
     {
         $this->name = $name;
-        $this->updatedAt = new DateTime();
+        $this->updatedAt = $this->clock->nowDateTime();
     }
 
     public function setDescription(?string $description): void
     {
         $this->description = $description;
-        $this->updatedAt = new DateTime();
+        $this->updatedAt = $this->clock->nowDateTime();
     }
 
     public function setActive(bool $isActive): void
     {
         $this->isActive = $isActive;
-        $this->updatedAt = new DateTime();
+        $this->updatedAt = $this->clock->nowDateTime();
     }
 
     #[\Override]
