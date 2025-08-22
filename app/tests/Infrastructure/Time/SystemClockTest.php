@@ -46,7 +46,7 @@ class SystemClockTest extends TestCase
     {
         $time1 = $this->clock->now();
         $time2 = $this->clock->now();
-        
+
         // Allow for small time difference due to execution time
         $this->assertLessThanOrEqual(1, abs($time2 - $time1));
     }

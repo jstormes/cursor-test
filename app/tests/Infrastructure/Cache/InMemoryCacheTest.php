@@ -69,7 +69,7 @@ class InMemoryCacheTest extends TestCase
         $this->cache->set('key1', 'value1');
         $this->cache->set('key2', 'value2');
         $this->assertTrue($this->cache->clear());
-        
+
         $this->assertNull($this->cache->get('key1'));
         $this->assertNull($this->cache->get('key2'));
     }

@@ -24,7 +24,7 @@ class PdoDatabaseConnectionTest extends TestCase
         ];
 
         // Create a testable connection using SQLite
-        $this->connection = new class($config) extends PdoDatabaseConnection {
+        $this->connection = new class ($config) extends PdoDatabaseConnection {
             public function __construct(array $config)
             {
                 // Override to use SQLite instead of MySQL for testing
@@ -49,7 +49,7 @@ class PdoDatabaseConnectionTest extends TestCase
     public function testQueryReturnsStatement(): void
     {
         $statement = $this->connection->query('SELECT * FROM test_table');
-        
+
         $this->assertInstanceOf(PDOStatement::class, $statement);
         $this->assertIsArray($statement->fetchAll());
     }
@@ -60,7 +60,7 @@ class PdoDatabaseConnectionTest extends TestCase
             'INSERT INTO test_table (name, value) VALUES (?, ?)',
             ['test', 123]
         );
-        
+
         $this->assertEquals(1, $rowCount);
     }
 
@@ -70,9 +70,9 @@ class PdoDatabaseConnectionTest extends TestCase
             'INSERT INTO test_table (name, value) VALUES (?, ?)',
             ['test', 123]
         );
-        
+
         $lastId = $this->connection->lastInsertId();
-        
+
         $this->assertIsString($lastId);
         $this->assertEquals('1', $lastId);
     }
@@ -81,18 +81,18 @@ class PdoDatabaseConnectionTest extends TestCase
     {
         // Test basic transaction operations
         $this->assertFalse($this->connection->inTransaction());
-        
+
         $this->connection->beginTransaction();
         $this->assertTrue($this->connection->inTransaction());
-        
+
         $this->connection->execute(
             'INSERT INTO test_table (name, value) VALUES (?, ?)',
             ['transaction_test', 456]
         );
-        
+
         $this->connection->commit();
         $this->assertFalse($this->connection->inTransaction());
-        
+
         // Verify data was committed
         $statement = $this->connection->query(
             'SELECT COUNT(*) as count FROM test_table WHERE name = ?',

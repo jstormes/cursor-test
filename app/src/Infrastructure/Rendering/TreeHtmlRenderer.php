@@ -14,7 +14,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeDescription = htmlspecialchars($tree->getDescription() ?: 'No description available');
-        
+
         // Generate tree HTML
         $renderer = new HtmlTreeNodeRenderer(true);
         $treeHtml = '<div class="tree"><ul>';
@@ -98,7 +98,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     public function renderEmptyTree(Tree $tree): string
     {
         $treeName = htmlspecialchars($tree->getName());
-        
+
         return $this->renderPage(
             "Empty Tree - {$treeName}",
             <<<HTML
@@ -114,7 +114,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     public function renderNoRootNodes(Tree $tree): string
     {
         $treeName = htmlspecialchars($tree->getName());
-        
+
         return $this->renderPage(
             "No Root Nodes - {$treeName}",
             <<<HTML
@@ -131,7 +131,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     {
         $title = $title ?: 'Error';
         $safeMessage = htmlspecialchars($message);
-        
+
         return $this->renderPage(
             $title,
             <<<HTML
@@ -174,7 +174,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     {
         $safeMessage = htmlspecialchars($message);
         $navigationHtml = '';
-        
+
         if (!empty($navigationLinks)) {
             foreach ($navigationLinks as $text => $url) {
                 $navigationHtml .= '<a href="' . htmlspecialchars($url) . '" class="btn">' . htmlspecialchars($text) . '</a>';
@@ -231,7 +231,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     private function renderPage(string $title, string $content, ?string $customCSS = null): string
     {
         $css = $customCSS ?: $this->getMainCSS();
-        
+
         return <<<HTML
         <!DOCTYPE html>
         <html lang="en">
