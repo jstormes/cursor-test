@@ -22,7 +22,7 @@ class TreeHtmlRendererTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->mockCssProvider = $this->createMock(CssProviderInterface::class);
         $this->renderer = new TreeHtmlRenderer($this->mockCssProvider);
     }

@@ -182,7 +182,7 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
         try {
             $connection1 = $this->factory->create($config1);
             $connection2 = $this->factory->create($config2);
-            
+
             // Should create different instances
             $this->assertNotSame($connection1, $connection2);
             $this->assertInstanceOf(PdoDatabaseConnection::class, $connection1);
@@ -211,7 +211,7 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
         try {
             $connection1 = $this->factory->create($config);
             $connection2 = $this->factory->create($config);
-            
+
             // Should create different instances each time
             $this->assertNotSame($connection1, $connection2);
             $this->assertInstanceOf(PdoDatabaseConnection::class, $connection1);
@@ -293,7 +293,7 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
         try {
             $connection = $this->factory->create($config);
             $this->assertInstanceOf(PdoDatabaseConnection::class, $connection);
-            
+
             // If connection succeeds, we know the config was passed correctly
         } catch (\PDOException $e) {
             // If connection fails with PDOException, it means the config was
@@ -337,7 +337,7 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
         try {
             $connection = $this->factory->create($config);
             $this->assertInstanceOf(DatabaseConnection::class, $connection);
-            
+
             // Verify the connection has expected methods
             $this->assertTrue(method_exists($connection, 'query'));
             $this->assertTrue(method_exists($connection, 'execute'));
@@ -351,15 +351,15 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
     {
         $reflection = new \ReflectionClass(PdoDatabaseConnectionFactory::class);
         $method = $reflection->getMethod('create');
-        
+
         $this->assertTrue($method->isPublic());
         $this->assertEquals('create', $method->getName());
-        
+
         $parameters = $method->getParameters();
         $this->assertCount(1, $parameters);
         $this->assertEquals('config', $parameters[0]->getName());
         $this->assertEquals('array', $parameters[0]->getType()?->getName());
-        
+
         $returnType = $method->getReturnType();
         $this->assertEquals('App\\Infrastructure\\Database\\DatabaseConnection', $returnType?->getName());
     }

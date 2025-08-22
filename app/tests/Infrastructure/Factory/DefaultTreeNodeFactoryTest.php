@@ -105,7 +105,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
         $this->assertEquals($treeId, $node->getTreeId());
         $this->assertEquals(2, $node->getParentId());
         $this->assertEquals(1, $node->getSortOrder());
-        
+
         $typeData = $node->getTypeData();
         $this->assertEquals('Click Me', $typeData['button_text']);
         $this->assertEquals('https://example.com', $typeData['button_action']);
@@ -124,7 +124,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
         $this->assertInstanceOf(ButtonNode::class, $node);
         $this->assertEquals('Button Without Data', $node->getName());
         $this->assertEquals($treeId, $node->getTreeId());
-        
+
         // ButtonNode uses default values when no type_data is provided
         $expectedTypeData = [
             'button_text' => 'Test Btn',
@@ -158,7 +158,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
         // The actual error is "Undefined array key"
         $this->expectWarning();
         $this->expectWarningMessage('Undefined array key "name"');
-        
+
         $this->factory->createFromData($nodeData, $treeId);
     }
 
@@ -207,7 +207,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
         $this->assertEquals($originalNode->getTreeId(), $newNode->getTreeId());
         $this->assertEquals($newParentId, $newNode->getParentId());
         $this->assertEquals($originalNode->getSortOrder(), $newNode->getSortOrder());
-        
+
         // Verify original node is unchanged
         $this->assertEquals(5, $originalNode->getParentId());
     }
@@ -227,7 +227,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
         $this->assertEquals($newParentId, $newNode->getParentId());
         $this->assertEquals($originalNode->getSortOrder(), $newNode->getSortOrder());
         $this->assertEquals($typeData, $newNode->getTypeData());
-        
+
         // Verify original node is unchanged
         $this->assertEquals(10, $originalNode->getParentId());
     }
@@ -269,7 +269,7 @@ class DefaultTreeNodeFactoryTest extends TestCase
             'button_text' => 'Complex Button Text',
             'button_action' => 'https://complex-url.com/path?param=value'
         ];
-        
+
         $originalNode = new ButtonNode(30, 'Complex Button', 3, 15, 7, $complexTypeData);
         $newParentId = 45;
 

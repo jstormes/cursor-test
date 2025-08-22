@@ -87,7 +87,7 @@ class QueryOptimizerTest extends TestCase
         $originalSql = 'SELECT * FROM trees t ' .
                       'LEFT JOIN tree_nodes tn1 ON t.id = tn1.tree_id ' .
                       'LEFT JOIN tree_nodes tn2 ON tn1.id = tn2.parent_id';
-        
+
         $optimizedSql = $this->optimizer->optimizeTreeQuery($originalSql);
 
         // Both LEFT JOINs should be optimized
@@ -288,13 +288,19 @@ class QueryOptimizerTest extends TestCase
         foreach ($testCases as $sqlFragment => $shouldMatch) {
             $fullSql = "SELECT * {$sqlFragment}id = 1";
             $optimized = $this->optimizer->optimizeTreeQuery($fullSql);
-            
+
             if ($shouldMatch) {
-                $this->assertStringContainsString('USE INDEX', $optimized, 
-                    "SQL fragment '{$sqlFragment}' should be optimized");
+                $this->assertStringContainsString(
+                    'USE INDEX',
+                    $optimized,
+                    "SQL fragment '{$sqlFragment}' should be optimized"
+                );
             } else {
-                $this->assertStringNotContainsString('USE INDEX', $optimized,
-                    "SQL fragment '{$sqlFragment}' should not be optimized");
+                $this->assertStringNotContainsString(
+                    'USE INDEX',
+                    $optimized,
+                    "SQL fragment '{$sqlFragment}' should not be optimized"
+                );
             }
         }
     }
@@ -316,7 +322,7 @@ class QueryOptimizerTest extends TestCase
         $this->assertStringContainsString('WHERE t.is_active = 1', $optimizedSql);
         $this->assertStringContainsString('ORDER BY tn.created_at DESC', $optimizedSql);
         $this->assertStringContainsString('LIMIT 10', $optimizedSql);
-        
+
         // Verify optimizations were applied
         $this->assertStringContainsString('trees USE INDEX', $optimizedSql);
         $this->assertStringContainsString('FORCE INDEX', $optimizedSql);

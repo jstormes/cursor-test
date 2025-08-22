@@ -15,9 +15,9 @@ class EnvironmentValidatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->validator = new EnvironmentValidator();
-        
+
         // Store original environment variables from both sources
         $this->originalEnv = [
             'MYSQL_HOST' => $_ENV['MYSQL_HOST'] ?? getenv('MYSQL_HOST') ?: null,
@@ -42,7 +42,7 @@ class EnvironmentValidatorTest extends TestCase
                 putenv("$key=$value"); // Also set for getenv()
             }
         }
-        
+
         parent::tearDown();
     }
 
@@ -302,7 +302,7 @@ class EnvironmentValidatorTest extends TestCase
     {
         // Test various development environment names
         $devEnvironments = ['dev', 'development', 'local', 'test'];
-        
+
         foreach ($devEnvironments as $env) {
             $this->setEnvVars([
                 'MYSQL_HOST' => 'localhost',
@@ -314,7 +314,7 @@ class EnvironmentValidatorTest extends TestCase
             ]);
 
             $errors = $this->validator->validate();
-            
+
             // Should not contain root user warning
             $rootUserError = array_filter($errors, fn($error) => str_contains($error, 'Using root database user in production'));
             $this->assertEmpty($rootUserError, "Environment '$env' should be considered development");
@@ -325,7 +325,7 @@ class EnvironmentValidatorTest extends TestCase
     {
         // Test production environment names
         $prodEnvironments = ['prod', 'production', 'staging', 'live'];
-        
+
         foreach ($prodEnvironments as $env) {
             $this->setEnvVars([
                 'MYSQL_HOST' => 'localhost',
@@ -337,7 +337,7 @@ class EnvironmentValidatorTest extends TestCase
             ]);
 
             $errors = $this->validator->validate();
-            
+
             // Should contain root user warning
             $rootUserError = array_filter($errors, fn($error) => str_contains($error, 'Using root database user in production'));
             $this->assertNotEmpty($rootUserError, "Environment '$env' should be considered production");
@@ -462,7 +462,7 @@ class EnvironmentValidatorTest extends TestCase
     public function testValidateWithValidPortNumbers(): void
     {
         $validPorts = ['1', '80', '3306', '5432', '65535'];
-        
+
         foreach ($validPorts as $port) {
             $this->setEnvVars([
                 'MYSQL_HOST' => 'localhost',
@@ -481,7 +481,7 @@ class EnvironmentValidatorTest extends TestCase
     public function testValidateWithCaseInsensitiveEnvironmentNames(): void
     {
         $envs = ['DEV', 'Development', 'LOCAL', 'TeSt'];
-        
+
         foreach ($envs as $env) {
             $this->setEnvVars([
                 'MYSQL_HOST' => 'localhost',
@@ -493,7 +493,7 @@ class EnvironmentValidatorTest extends TestCase
             ]);
 
             $errors = $this->validator->validate();
-            
+
             $rootUserError = array_filter($errors, fn($error) => str_contains($error, 'Using root database user in production'));
             $this->assertEmpty($rootUserError, "Environment '$env' should be considered development (case insensitive)");
         }

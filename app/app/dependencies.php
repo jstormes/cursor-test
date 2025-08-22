@@ -31,8 +31,6 @@ use App\Infrastructure\Rendering\CssProviderInterface;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
 use App\Infrastructure\Rendering\StaticCssProvider;
 use App\Infrastructure\Rendering\TreeHtmlRenderer;
-use App\Infrastructure\Session\PhpSessionManager;
-use App\Infrastructure\Session\SessionManagerInterface;
 use App\Infrastructure\Time\ClockInterface;
 use App\Infrastructure\Time\SystemClock;
 use DI\ContainerBuilder;
@@ -62,11 +60,6 @@ return function (ContainerBuilder $containerBuilder) {
         // Clock interface
         ClockInterface::class => function (ContainerInterface $c) {
             return new SystemClock();
-        },
-
-        // Session manager
-        SessionManagerInterface::class => function (ContainerInterface $c) {
-            return new PhpSessionManager();
         },
 
         // CSS Provider

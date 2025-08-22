@@ -26,7 +26,7 @@ class StaticCssProviderTest extends TestCase
     public function testGetMainCssReturnsString(): void
     {
         $css = $this->cssProvider->getMainCSS();
-        
+
         $this->assertIsString($css);
         $this->assertNotEmpty($css);
     }
@@ -123,7 +123,7 @@ class StaticCssProviderTest extends TestCase
     public function testGetSimplePageCssReturnsString(): void
     {
         $css = $this->cssProvider->getSimplePageCSS();
-        
+
         $this->assertIsString($css);
         $this->assertNotEmpty($css);
     }
@@ -137,7 +137,7 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('text-align: center', $css);
         $this->assertStringContainsString('padding:', $css);
         $this->assertStringContainsString('background:', $css);
-        
+
         $this->assertStringContainsString('.message {', $css);
         $this->assertStringContainsString('.btn {', $css);
         $this->assertStringContainsString('.btn:hover {', $css);
@@ -157,7 +157,7 @@ class StaticCssProviderTest extends TestCase
     public function testGetErrorPageCssReturnsString(): void
     {
         $css = $this->cssProvider->getErrorPageCSS();
-        
+
         $this->assertIsString($css);
         $this->assertNotEmpty($css);
     }
@@ -170,7 +170,7 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('.error {', $css);
         $this->assertStringContainsString('.btn {', $css);
         $this->assertStringContainsString('.btn:hover {', $css);
-        
+
         // Test error-specific color
         $this->assertStringContainsString('#dc3545', $css);
     }
@@ -178,7 +178,7 @@ class StaticCssProviderTest extends TestCase
     public function testGetSuccessPageCssReturnsString(): void
     {
         $css = $this->cssProvider->getSuccessPageCSS();
-        
+
         $this->assertIsString($css);
         $this->assertNotEmpty($css);
     }
@@ -191,7 +191,7 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('.success {', $css);
         $this->assertStringContainsString('.btn {', $css);
         $this->assertStringContainsString('.btn:hover {', $css);
-        
+
         // Test success-specific color
         $this->assertStringContainsString('#28a745', $css);
     }
@@ -201,22 +201,22 @@ class StaticCssProviderTest extends TestCase
         // Test that multiple calls return the same reference (static caching)
         $css1 = $this->cssProvider->getMainCSS();
         $css2 = $this->cssProvider->getMainCSS();
-        
+
         $this->assertSame($css1, $css2, 'Main CSS should be cached statically');
 
         $simpleCss1 = $this->cssProvider->getSimplePageCSS();
         $simpleCss2 = $this->cssProvider->getSimplePageCSS();
-        
+
         $this->assertSame($simpleCss1, $simpleCss2, 'Simple page CSS should be cached statically');
 
         $errorCss1 = $this->cssProvider->getErrorPageCSS();
         $errorCss2 = $this->cssProvider->getErrorPageCSS();
-        
+
         $this->assertSame($errorCss1, $errorCss2, 'Error page CSS should be cached statically');
 
         $successCss1 = $this->cssProvider->getSuccessPageCSS();
         $successCss2 = $this->cssProvider->getSuccessPageCSS();
-        
+
         $this->assertSame($successCss1, $successCss2, 'Success page CSS should be cached statically');
     }
 
@@ -307,7 +307,7 @@ class StaticCssProviderTest extends TestCase
             $this->assertStringContainsString('}', $css, "$type CSS should contain closing braces");
             $this->assertStringContainsString(':', $css, "$type CSS should contain property-value separators");
             $this->assertStringContainsString(';', $css, "$type CSS should contain statement terminators");
-            
+
             // Test that braces are balanced
             $openBraces = substr_count($css, '{');
             $closeBraces = substr_count($css, '}');
@@ -355,12 +355,12 @@ class StaticCssProviderTest extends TestCase
             $this->assertStringNotContainsString('<script', $css);
             $this->assertStringNotContainsString('javascript:', $css);
             $this->assertStringNotContainsString('</script>', $css);
-            
+
             // Should not contain HTML tags
             $this->assertStringNotContainsString('<div', $css);
             $this->assertStringNotContainsString('<html', $css);
             $this->assertStringNotContainsString('<body', $css);
-            
+
             // Should not be empty
             $this->assertNotEmpty(trim($css));
         }
