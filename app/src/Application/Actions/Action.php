@@ -84,4 +84,102 @@ abstract class Action
                     ->withHeader('Content-Type', 'application/json')
                     ->withStatus($payload->getStatusCode());
     }
+
+    protected function escapeHtml(string $text): string
+    {
+        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    }
+
+    protected function generateTreeNotFoundHTML(int $treeId): Response
+    {
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Not Found</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error { color: #dc3545; margin: 20px 0; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; background: #007bff; 
+            color: white; text-decoration: none; border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Tree Not Found</h1>
+    <p class="error">Tree with ID {$treeId} was not found in the database.</p>
+    <a href="/trees" class="btn">Back to Trees List</a>
+</body>
+</html>
+HTML;
+
+        $this->response->getBody()->write($html);
+        return $this->response->withHeader('Content-Type', 'text/html');
+    }
+
+    protected function generateErrorHTML(string $errorMessage, string $title = 'Error', string $backUrl = '/trees'): Response
+    {
+        $safeMessage = $this->escapeHtml($errorMessage);
+        $safeTitle = $this->escapeHtml($title);
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$safeTitle}</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error { color: #dc3545; margin: 20px 0; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; background: #007bff; 
+            color: white; text-decoration: none; border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>{$safeTitle}</h1>
+    <p class="error">{$safeMessage}</p>
+    <a href="{$backUrl}" class="btn">Back to Trees List</a>
+</body>
+</html>
+HTML;
+
+        $this->response->getBody()->write($html);
+        return $this->response->withHeader('Content-Type', 'text/html');
+    }
+
+    protected function generateNodeNotFoundHTML(int $treeId, int $nodeId): Response
+    {
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node Not Found</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error { color: #dc3545; margin: 20px 0; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; background: #007bff; 
+            color: white; text-decoration: none; border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Node Not Found</h1>
+    <p class="error">Node with ID {$nodeId} was not found in tree {$treeId}.</p>
+    <a href="/trees" class="btn">Back to Trees List</a>
+</body>
+</html>
+HTML;
+
+        $this->response->getBody()->write($html);
+        return $this->response->withHeader('Content-Type', 'text/html');
+    }
 }

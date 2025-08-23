@@ -73,7 +73,7 @@ class ViewTreeByIdAction extends Action
             return $this->response->withHeader('Content-Type', 'text/html');
         } catch (\Exception $e) {
             $this->logger->error('Error loading tree by ID: ' . $e->getMessage());
-            return $this->generateErrorHTML($e->getMessage());
+            return $this->generateErrorHTML($e->getMessage(), 'Error Loading Tree');
         }
     }
 
@@ -109,7 +109,7 @@ class ViewTreeByIdAction extends Action
         $mainCSS = $this->cssProvider->getMainCSS();
         $treeCSS = $this->cssProvider->getTreeCSS('edit');
         $css = $mainCSS . "\n\n" . $treeCSS;
-        
+
         $treeName = htmlspecialchars($tree->getName());
         $treeDescription = htmlspecialchars($tree->getDescription() ?: 'No description available');
 
@@ -146,32 +146,6 @@ class ViewTreeByIdAction extends Action
 HTML;
     }
 
-    private function generateTreeNotFoundHTML(int $treeId): Response
-    {
-        $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Not Found</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .message { color: #666; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
-    </style>
-</head>
-<body>
-    <h1>Tree Not Found</h1>
-    <p class="message">Tree with ID {$treeId} was not found in the database.</p>
-    <a href="/trees" class="btn">Back to Trees List</a>
-</body>
-</html>
-HTML;
-
-        $this->response->getBody()->write($html);
-        return $this->response->withHeader('Content-Type', 'text/html');
-    }
 
     private function generateNoNodesHTML(\App\Domain\Tree\Tree $tree): Response
     {
@@ -247,37 +221,5 @@ HTML;
 
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
-    }
-
-    private function generateErrorHTML(string $errorMessage): Response
-    {
-        $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Loading Tree</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .error { color: #dc3545; margin: 20px 0; }
-        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <h1>Error Loading Tree</h1>
-    <p class="error">{$this->escapeHtml($errorMessage)}</p>
-    <a href="/trees" class="btn">Back to Trees List</a>
-</body>
-</html>
-HTML;
-
-        $this->response->getBody()->write($html);
-        return $this->response->withHeader('Content-Type', 'text/html');
-    }
-
-    private function escapeHtml(string $text): string
-    {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
 }

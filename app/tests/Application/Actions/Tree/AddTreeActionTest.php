@@ -498,7 +498,7 @@ class AddTreeActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Error Creating Tree') &&
+                return str_contains($html, 'Error Adding Tree') &&
                        str_contains($html, 'Stream error');
             }));
 
@@ -532,7 +532,7 @@ class AddTreeActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Error Creating Tree') &&
+                return str_contains($html, 'Error Adding Tree') &&
                        str_contains($html, 'An error occurred while creating the tree. Please try again.');
             }));
 

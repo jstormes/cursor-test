@@ -35,9 +35,7 @@ class ViewTreesAction extends Action
             // Log the error (in a real app, you'd use a proper logger)
             error_log("Error fetching trees: " . $e->getMessage());
 
-            $errorHtml = $this->generateErrorHTML($e->getMessage());
-            $this->response->getBody()->write($errorHtml);
-            return $this->response->withHeader('Content-Type', 'text/html');
+            return $this->generateErrorHTML($e->getMessage(), 'Error Loading Trees');
         }
     }
 
@@ -129,46 +127,12 @@ HTML;
 HTML;
     }
 
-    private function generateErrorHTML(string $errorMessage): string
-    {
-        $css = $this->getCSS();
-
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - Trees List</title>
-    <style>
-        {$css}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Error Loading Trees</h1>
-        <div class="error-message">
-            <p>Sorry, there was an error loading the trees list:</p>
-            <p class="error-details">{$this->escapeHtml($errorMessage)}</p>
-        </div>
-        <div class="actions">
-            <a href="/" class="btn btn-primary">Go Home</a>
-        </div>
-    </div>
-</body>
-</html>
-HTML;
-    }
 
     private function countTrees(array $trees): int
     {
         return count($trees);
     }
 
-    private function escapeHtml(string $text): string
-    {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    }
 
     private function getCSS(): string
     {

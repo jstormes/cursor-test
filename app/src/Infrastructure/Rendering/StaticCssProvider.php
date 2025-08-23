@@ -10,7 +10,7 @@ final class StaticCssProvider implements CssProviderInterface
     private static ?string $simplePageCSS = null;
     private static ?string $errorPageCSS = null;
     private static ?string $successPageCSS = null;
-    
+
     private StandardTreeCssProvider $standardTreeCss;
     private EditTreeCssProvider $editTreeCss;
 

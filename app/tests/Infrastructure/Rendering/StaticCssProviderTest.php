@@ -85,7 +85,7 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('#667eea', $css);
         $this->assertStringContainsString('#764ba2', $css);
         $this->assertStringContainsString('#6c757d', $css);
-        
+
         // Test that tree-specific colors are in tree CSS, not main CSS
         $treeCss = $this->cssProvider->getTreeCSS('standard');
         $this->assertStringContainsString('#1e3a8a', $treeCss);
@@ -113,11 +113,11 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('::before', $standardTreeCss);
         $this->assertStringContainsString('::after', $standardTreeCss);
         $this->assertStringContainsString(':only-child', $standardTreeCss);
-        
+
         // Edit tree should have additional interactive elements
         $this->assertStringContainsString('.add-icon', $editTreeCss);
         $this->assertStringContainsString('.remove-icon', $editTreeCss);
-        
+
         // Both should have basic tree structure
         $this->assertStringContainsString('.tree ul', $standardTreeCss);
         $this->assertStringContainsString('.tree ul', $editTreeCss);

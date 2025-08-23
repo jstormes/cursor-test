@@ -508,7 +508,7 @@ class AddNodeActionTest extends TestCase
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($html) {
-                return str_contains($html, 'Error Adding Node') &&
+                return str_contains($html, 'Error Loading Form') &&
                        str_contains($html, 'Database error');
             }));
 

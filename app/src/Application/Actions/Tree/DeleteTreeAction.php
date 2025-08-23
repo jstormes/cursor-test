@@ -35,7 +35,7 @@ class DeleteTreeAction extends Action
             return $this->response->withStatus(405);
         } catch (\Exception $e) {
             $this->logger->error('Error in delete tree action: ' . $e->getMessage());
-            return $this->generateErrorHTML($e->getMessage());
+            return $this->generateErrorHTML($e->getMessage(), 'Error Deleting Tree');
         }
     }
 
@@ -232,63 +232,6 @@ HTML;
         return $this->response->withHeader('Content-Type', 'text/html');
     }
 
-    private function generateTreeNotFoundHTML(int $treeId): Response
-    {
-        $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Not Found</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            color: #333;
-        }
-        .error { 
-            color: #dc3545; 
-            margin: 20px 0; 
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 12px 24px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            margin: 0 10px;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Tree Not Found</h1>
-        <p class="error">Tree with ID {$treeId} was not found in the database.</p>
-        <a href="/trees" class="btn">← Back to Trees List</a>
-    </div>
-</body>
-</html>
-HTML;
-
-        $this->response->getBody()->write($html);
-        return $this->response->withHeader('Content-Type', 'text/html');
-    }
 
     private function generateAlreadyDeletedHTML(\App\Domain\Tree\Tree $tree): Response
     {
@@ -376,68 +319,6 @@ HTML;
         return $this->response->withHeader('Content-Type', 'text/html');
     }
 
-    private function generateErrorHTML(string $errorMessage): Response
-    {
-        $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Deleting Tree</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            color: #333;
-        }
-        .error { 
-            color: #dc3545; 
-            margin: 20px 0; 
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 12px 24px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            margin: 0 10px;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Error Deleting Tree</h1>
-        <p class="error">{$this->escapeHtml($errorMessage)}</p>
-        <a href="/trees" class="btn">← Back to Trees List</a>
-    </div>
-</body>
-</html>
-HTML;
-
-        $this->response->getBody()->write($html);
-        return $this->response->withHeader('Content-Type', 'text/html');
-    }
-
-    private function escapeHtml(string $text): string
-    {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    }
 
     private function getCSS(): string
     {

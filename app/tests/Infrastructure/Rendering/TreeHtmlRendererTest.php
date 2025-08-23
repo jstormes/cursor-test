@@ -418,7 +418,7 @@ class TreeHtmlRendererTest extends TestCase
         $this->mockCssProvider->expects($this->atLeastOnce())
             ->method('getMainCSS')
             ->willReturn('/* Main CSS */');
-            
+
         $this->mockCssProvider->expects($this->atLeastOnce())
             ->method('getTreeCSS')
             ->with('standard')

@@ -273,8 +273,7 @@ class ViewDeletedTreesActionTest extends TestCase
             ->with($this->callback(function ($html) {
                 return str_contains($html, 'Error Loading Deleted Trees') &&
                        str_contains($html, 'Database connection failed') &&
-                       str_contains($html, '← Back to Trees List') &&
-                       str_contains($html, 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                       str_contains($html, 'Back to Trees List');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, []);

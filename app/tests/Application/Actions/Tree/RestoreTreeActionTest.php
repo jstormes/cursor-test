@@ -106,7 +106,7 @@ class RestoreTreeActionTest extends TestCase
                 return str_contains($html, '<title>Tree Not Found</title>') &&
                        str_contains($html, 'Tree Not Found') &&
                        str_contains($html, 'Tree with ID 999 was not found in the database') &&
-                       str_contains($html, '← Back to Deleted Trees');
+                       str_contains($html, 'Back to Trees List');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, ['id' => '999']);
@@ -331,7 +331,7 @@ class RestoreTreeActionTest extends TestCase
                 return str_contains($html, '<title>Error Restoring Tree</title>') &&
                        str_contains($html, 'Error Restoring Tree') &&
                        str_contains($html, 'Database connection failed') &&
-                       str_contains($html, '← Back to Deleted Trees');
+                       str_contains($html, 'Back to Trees List');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, ['id' => '1']);

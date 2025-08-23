@@ -13,7 +13,7 @@ class DatabaseExceptionTest extends TestCase
     public function testConstructorWithDefaultMessage(): void
     {
         $exception = new DatabaseException();
-        
+
         $this->assertInstanceOf(DatabaseException::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertEquals('Database operation failed', $exception->getMessage());
@@ -25,7 +25,7 @@ class DatabaseExceptionTest extends TestCase
     {
         $customMessage = 'Connection to database failed';
         $exception = new DatabaseException($customMessage);
-        
+
         $this->assertEquals($customMessage, $exception->getMessage());
         $this->assertEquals(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -36,7 +36,7 @@ class DatabaseExceptionTest extends TestCase
         $customMessage = 'Query execution failed';
         $customCode = 500;
         $exception = new DatabaseException($customMessage, $customCode);
-        
+
         $this->assertEquals($customMessage, $exception->getMessage());
         $this->assertEquals($customCode, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -46,7 +46,7 @@ class DatabaseExceptionTest extends TestCase
     {
         $previousException = new Exception('Original error');
         $exception = new DatabaseException('Database error', 0, $previousException);
-        
+
         $this->assertEquals('Database error', $exception->getMessage());
         $this->assertEquals(0, $exception->getCode());
         $this->assertSame($previousException, $exception->getPrevious());
@@ -57,9 +57,9 @@ class DatabaseExceptionTest extends TestCase
         $customMessage = 'Transaction rollback failed';
         $customCode = 1001;
         $previousException = new Exception('Deadlock detected');
-        
+
         $exception = new DatabaseException($customMessage, $customCode, $previousException);
-        
+
         $this->assertEquals($customMessage, $exception->getMessage());
         $this->assertEquals($customCode, $exception->getCode());
         $this->assertSame($previousException, $exception->getPrevious());
@@ -68,7 +68,7 @@ class DatabaseExceptionTest extends TestCase
     public function testExceptionInheritance(): void
     {
         $exception = new DatabaseException('Test error');
-        
+
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertInstanceOf(\Throwable::class, $exception);
     }
@@ -78,21 +78,21 @@ class DatabaseExceptionTest extends TestCase
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage('Database connection lost');
         $this->expectExceptionCode(2002);
-        
+
         throw new DatabaseException('Database connection lost', 2002);
     }
 
     public function testExceptionCanBeCaughtAsGenericException(): void
     {
         $this->expectException(Exception::class);
-        
+
         throw new DatabaseException('Generic database error');
     }
 
     public function testExceptionStackTrace(): void
     {
         $exception = new DatabaseException('Stack trace test');
-        
+
         $this->assertIsString($exception->getTraceAsString());
         $this->assertIsArray($exception->getTrace());
         $this->assertNotEmpty($exception->getTrace());
@@ -102,7 +102,7 @@ class DatabaseExceptionTest extends TestCase
     {
         $exception = new DatabaseException('String representation test', 999);
         $string = (string) $exception;
-        
+
         $this->assertStringContainsString('DatabaseException', $string);
         $this->assertStringContainsString('String representation test', $string);
         $this->assertStringContainsString('999', (string) $exception->getCode());

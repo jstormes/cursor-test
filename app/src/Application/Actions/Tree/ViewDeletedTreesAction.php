@@ -30,7 +30,7 @@ class ViewDeletedTreesAction extends Action
             return $this->response->withHeader('Content-Type', 'text/html');
         } catch (\Exception $e) {
             $this->logger->error('Error loading deleted trees: ' . $e->getMessage());
-            return $this->generateErrorHTML($e->getMessage());
+            return $this->generateErrorHTML($e->getMessage(), 'Error Loading Deleted Trees');
         }
     }
 
@@ -125,68 +125,6 @@ HTML;
         return count($trees);
     }
 
-    private function generateErrorHTML(string $errorMessage): Response
-    {
-        $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Loading Deleted Trees</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            color: #333;
-        }
-        .error { 
-            color: #dc3545; 
-            margin: 20px 0; 
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 12px 24px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            margin: 0 10px;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Error Loading Deleted Trees</h1>
-        <p class="error">{$this->escapeHtml($errorMessage)}</p>
-        <a href="/trees" class="btn">← Back to Trees List</a>
-    </div>
-</body>
-</html>
-HTML;
-
-        $this->response->getBody()->write($html);
-        return $this->response->withHeader('Content-Type', 'text/html');
-    }
-
-    private function escapeHtml(string $text): string
-    {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    }
 
     private function getCSS(): string
     {

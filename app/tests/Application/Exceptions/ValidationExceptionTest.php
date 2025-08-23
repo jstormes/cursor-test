@@ -15,9 +15,9 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $validationResult->addError('field1', 'Field 1 is required');
-        
+
         $exception = new ValidationException($validationResult);
-        
+
         $this->assertInstanceOf(ValidationException::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertEquals('Validation failed', $exception->getMessage());
@@ -28,10 +28,10 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $validationResult->addError('email', 'Invalid email format');
-        
+
         $customMessage = 'User input validation failed';
         $exception = new ValidationException($validationResult, $customMessage);
-        
+
         $this->assertEquals($customMessage, $exception->getMessage());
         $this->assertEquals(['email' => ['Invalid email format']], $exception->getValidationErrors());
     }
@@ -43,9 +43,9 @@ class ValidationExceptionTest extends TestCase
         $validationResult->addError('username', 'Username must be at least 3 characters');
         $validationResult->addError('password', 'Password is required');
         $validationResult->addError('email', 'Email is invalid');
-        
+
         $exception = new ValidationException($validationResult, 'Multiple validation errors');
-        
+
         $expectedErrors = [
             'username' => [
                 'Username is required',
@@ -54,16 +54,16 @@ class ValidationExceptionTest extends TestCase
             'password' => ['Password is required'],
             'email' => ['Email is invalid']
         ];
-        
+
         $this->assertEquals($expectedErrors, $exception->getValidationErrors());
     }
 
     public function testGetValidationErrorsWithNoErrors(): void
     {
         $validationResult = new ValidationResult();
-        
+
         $exception = new ValidationException($validationResult);
-        
+
         $this->assertEquals([], $exception->getValidationErrors());
         $this->assertTrue($validationResult->isValid());
     }
@@ -72,7 +72,7 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $exception = new ValidationException($validationResult);
-        
+
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertInstanceOf(\Throwable::class, $exception);
     }
@@ -81,19 +81,19 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $validationResult->addError('test', 'Test error');
-        
+
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Form validation failed');
-        
+
         throw new ValidationException($validationResult, 'Form validation failed');
     }
 
     public function testExceptionCanBeCaughtAsGenericException(): void
     {
         $validationResult = new ValidationResult();
-        
+
         $this->expectException(Exception::class);
-        
+
         throw new ValidationException($validationResult);
     }
 
@@ -102,9 +102,9 @@ class ValidationExceptionTest extends TestCase
         $validationResult = new ValidationResult();
         $validationResult->addError('field1', 'Error 1');
         $validationResult->addError('field2', 'Error 2');
-        
+
         $exception = new ValidationException($validationResult);
-        
+
         // Ensure the validation errors are preserved correctly
         $errors = $exception->getValidationErrors();
         $this->assertCount(2, $errors);
@@ -117,7 +117,7 @@ class ValidationExceptionTest extends TestCase
     public function testExceptionWithComplexValidationScenario(): void
     {
         $validationResult = new ValidationResult();
-        
+
         // Simulate a complex form validation scenario
         $validationResult->addError('name', 'Name is required');
         $validationResult->addError('name', 'Name must not contain special characters');
@@ -126,11 +126,11 @@ class ValidationExceptionTest extends TestCase
         $validationResult->addError('email', 'Email is required');
         $validationResult->addError('email', 'Email format is invalid');
         $validationResult->addError('email', 'Email domain is not allowed');
-        
+
         $exception = new ValidationException($validationResult, 'User registration validation failed');
-        
+
         $this->assertEquals('User registration validation failed', $exception->getMessage());
-        
+
         $errors = $exception->getValidationErrors();
         $this->assertCount(3, $errors); // 3 fields with errors
         $this->assertCount(2, $errors['name']);
@@ -142,7 +142,7 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $exception = new ValidationException($validationResult);
-        
+
         $this->assertIsString($exception->getTraceAsString());
         $this->assertIsArray($exception->getTrace());
         $this->assertNotEmpty($exception->getTrace());
@@ -152,7 +152,7 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $exception = new ValidationException($validationResult);
-        
+
         // ValidationException doesn't set a custom code, so it should be 0
         $this->assertEquals(0, $exception->getCode());
     }
@@ -161,7 +161,7 @@ class ValidationExceptionTest extends TestCase
     {
         $validationResult = new ValidationResult();
         $exception = new ValidationException($validationResult, '');
-        
+
         $this->assertEquals('', $exception->getMessage());
     }
 }

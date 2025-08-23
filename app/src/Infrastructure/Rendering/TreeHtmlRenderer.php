@@ -237,7 +237,7 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
     {
         $mainCSS = $this->cssProvider->getMainCSS();
         $treeCSS = $this->cssProvider->getTreeCSS('standard');
-        
+
         $css = $customCSS ?: ($mainCSS . "\n\n" . $treeCSS);
 
         return <<<HTML
