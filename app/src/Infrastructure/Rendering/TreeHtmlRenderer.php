@@ -235,7 +235,10 @@ final class TreeHtmlRenderer implements HtmlRendererInterface
 
     private function renderPage(string $title, string $content, ?string $customCSS = null): string
     {
-        $css = $customCSS ?: $this->cssProvider->getMainCSS();
+        $mainCSS = $this->cssProvider->getMainCSS();
+        $treeCSS = $this->cssProvider->getTreeCSS('standard');
+        
+        $css = $customCSS ?: ($mainCSS . "\n\n" . $treeCSS);
 
         return <<<HTML
         <!DOCTYPE html>

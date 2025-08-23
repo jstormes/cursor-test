@@ -13,4 +13,6 @@ interface CssProviderInterface
     public function getErrorPageCSS(): string;
 
     public function getSuccessPageCSS(): string;
+
+    public function getTreeCSS(string $treeViewType = 'standard'): string;
 }

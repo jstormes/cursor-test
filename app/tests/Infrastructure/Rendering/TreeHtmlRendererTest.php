@@ -414,10 +414,15 @@ class TreeHtmlRendererTest extends TestCase
     {
         $tree = new Tree(1, 'CSS Test', null, new DateTime());
 
-        // Test that the main CSS is requested
-        $this->mockCssProvider->expects($this->once())
+        // Test that the main CSS and tree CSS are requested
+        $this->mockCssProvider->expects($this->atLeastOnce())
             ->method('getMainCSS')
             ->willReturn('/* Main CSS */');
+            
+        $this->mockCssProvider->expects($this->atLeastOnce())
+            ->method('getTreeCSS')
+            ->with('standard')
+            ->willReturn('/* Tree CSS */');
 
         $this->renderer->renderTreeView($tree, []);
 

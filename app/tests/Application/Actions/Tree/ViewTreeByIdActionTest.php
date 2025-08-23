@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Infrastructure\Rendering\CssProviderInterface;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,6 +27,7 @@ class ViewTreeByIdActionTest extends TestCase
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
     private TreeNodeRepository $treeNodeRepository;
+    private CssProviderInterface $cssProvider;
 
     protected function setUp(): void
     {
@@ -35,11 +37,26 @@ class ViewTreeByIdActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
+        $this->cssProvider = $this->createMock(CssProviderInterface::class);
+
+        // Mock CSS provider methods with realistic CSS content
+        $this->cssProvider->method('getMainCSS')->willReturn('
+            body { font-family: Arial, sans-serif; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            .btn { padding: 10px; }
+            @media (max-width: 768px) { .header { font-size: 1em; } }
+        ');
+        $this->cssProvider->method('getTreeCSS')->willReturn('
+            .tree ul { padding-top: 20px; }
+            .tree li { position: relative; }
+            .tree li div { border: 1px solid #ccc; }
+        ');
 
         $this->action = new ViewTreeByIdAction(
             $this->logger,
             $this->treeRepository,
-            $this->treeNodeRepository
+            $this->treeNodeRepository,
+            $this->cssProvider
         );
     }
 
@@ -394,7 +411,7 @@ class ViewTreeByIdActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
-        $this->response->expects($this->once())
+        $this->response->expects($this->atLeastOnce())
             ->method('getBody')
             ->willReturn($this->stream);
 
@@ -403,7 +420,7 @@ class ViewTreeByIdActionTest extends TestCase
             ->with('Content-Type', 'text/html')
             ->willReturnSelf();
 
-        $this->stream->expects($this->once())
+        $this->stream->expects($this->atLeastOnce())
             ->method('write')
             ->with($this->callback(function ($html) {
                 return str_contains($html, '.header {') &&

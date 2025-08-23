@@ -10,12 +10,26 @@ final class StaticCssProvider implements CssProviderInterface
     private static ?string $simplePageCSS = null;
     private static ?string $errorPageCSS = null;
     private static ?string $successPageCSS = null;
+    
+    private StandardTreeCssProvider $standardTreeCss;
+    private EditTreeCssProvider $editTreeCss;
+
+    public function __construct()
+    {
+        $this->standardTreeCss = new StandardTreeCssProvider();
+        $this->editTreeCss = new EditTreeCssProvider();
+    }
 
     #[\Override]
     public function getMainCSS(): string
     {
         return self::$mainCSS ??= <<<CSS
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: #f8f9fa; 
+        }
         
         .header {
             text-align: center;
@@ -27,11 +41,29 @@ final class StaticCssProvider implements CssProviderInterface
             margin: 20px;
         }
         
-        .header h1 { margin: 0 0 10px 0; font-size: 2em; }
-        .description { margin: 0 0 15px 0; font-size: 1.1em; opacity: 0.9; }
-        .tree-info { display: flex; justify-content: center; gap: 20px; font-size: 0.9em; opacity: 0.8; }
+        .header h1 { 
+            margin: 0 0 10px 0; 
+            font-size: 2em; 
+        }
         
-        .navigation { text-align: center; margin: 20px; }
+        .description { 
+            margin: 0 0 15px 0; 
+            font-size: 1.1em; 
+            opacity: 0.9; 
+        }
+        
+        .tree-info { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            font-size: 0.9em; 
+            opacity: 0.8; 
+        }
+        
+        .navigation { 
+            text-align: center; 
+            margin: 20px; 
+        }
         
         .btn {
             display: inline-block;
@@ -45,38 +77,103 @@ final class StaticCssProvider implements CssProviderInterface
             cursor: pointer;
         }
         
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); }
-        
-        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s; }
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 1px solid #ccc; width: 50%; height: 20px; }
-        .tree li::after { right: auto; left: 50%; border-left: 1px solid #ccc; }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 1px solid #ccc; border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 1px solid #ccc; width: 0; height: 20px; }
-        .tree li div {
-            border: 1px solid #1e3a8a;
-            padding: 15px 10px;
-            color: #1e3a8a;
-            background-color: #ffffff;
-            font-family: arial, verdana, tahoma;
-            font-size: 11px;
-            display: inline-block;
-            position: relative;
-            border-radius: 5px;
-            transition: all 0.5s;
+        .btn-primary { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
         }
         
-        .tree-list { margin: 20px; }
-        .tree-item { background: white; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .tree-item h3 { margin: 0 0 10px 0; }
-        .tree-item a { color: #667eea; text-decoration: none; }
-        .tree-item a:hover { text-decoration: underline; }
+        .btn-secondary { 
+            background: #6c757d; 
+            color: white; 
+        }
+        
+        .btn:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .tree-list { 
+            margin: 20px; 
+        }
+        
+        .tree-item { 
+            background: white; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        
+        .tree-item h3 { 
+            margin: 0 0 10px 0; 
+        }
+        
+        .tree-item a { 
+            color: #667eea; 
+            text-decoration: none; 
+        }
+        
+        .tree-item a:hover { 
+            text-decoration: underline; 
+        }
+
+        /* Form styling */
+        .form-container {
+            margin: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .tree-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .navigation {
+                margin: 10px;
+            }
+            
+            .btn {
+                margin: 5px;
+                padding: 8px 16px;
+            }
+        }
         CSS;
     }
 
@@ -111,5 +208,15 @@ final class StaticCssProvider implements CssProviderInterface
         .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 0 10px; }
         .btn:hover { background: #0056b3; }
         CSS;
+    }
+
+    #[\Override]
+    public function getTreeCSS(string $treeViewType = 'standard'): string
+    {
+        return match ($treeViewType) {
+            'edit' => $this->editTreeCss->getTreeCSS(),
+            'standard' => $this->standardTreeCss->getTreeCSS(),
+            default => $this->standardTreeCss->getTreeCSS(),
+        };
     }
 }

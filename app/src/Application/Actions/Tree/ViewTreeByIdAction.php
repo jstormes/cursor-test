@@ -8,6 +8,7 @@ use App\Application\Actions\Action;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\HtmlTreeNodeRenderer;
+use App\Infrastructure\Rendering\CssProviderInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -17,7 +18,8 @@ class ViewTreeByIdAction extends Action
     public function __construct(
         LoggerInterface $logger,
         private TreeRepository $treeRepository,
-        private TreeNodeRepository $treeNodeRepository
+        private TreeNodeRepository $treeNodeRepository,
+        private CssProviderInterface $cssProvider
     ) {
         parent::__construct($logger);
     }
@@ -104,7 +106,10 @@ class ViewTreeByIdAction extends Action
 
     private function generateHTML(string $treeHtml, \App\Domain\Tree\Tree $tree): string
     {
-        $css = $this->getCSS();
+        $mainCSS = $this->cssProvider->getMainCSS();
+        $treeCSS = $this->cssProvider->getTreeCSS('edit');
+        $css = $mainCSS . "\n\n" . $treeCSS;
+        
         $treeName = htmlspecialchars($tree->getName());
         $treeDescription = htmlspecialchars($tree->getDescription() ?: 'No description available');
 
@@ -172,7 +177,9 @@ HTML;
     {
         $treeName = htmlspecialchars($tree->getName());
         $treeId = $tree->getId();
-        $css = $this->getCSS();
+        $mainCSS = $this->cssProvider->getMainCSS();
+        $treeCSS = $this->cssProvider->getTreeCSS('edit');
+        $css = $mainCSS . "\n\n" . $treeCSS;
 
         $treeHtml = '<div class="tree"><ul>';
         $treeHtml .= '<li><div class="tree-node-no-box"><a href="/tree/' . $treeId . '/add-node" class="add-icon">+</a></div></li>';
@@ -272,285 +279,5 @@ HTML;
     private function escapeHtml(string $text): string
     {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    }
-
-    private function getCSS(): string
-    {
-        return <<<CSS
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 10px;
-    margin: 20px;
-}
-
-.header h1 {
-    margin: 0 0 10px 0;
-    font-size: 2em;
-}
-
-.description {
-    margin: 0 0 15px 0;
-    font-size: 1.1em;
-    opacity: 0.9;
-}
-
-.tree-info {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 0.9em;
-    opacity: 0.8;
-}
-
-.navigation {
-    text-align: center;
-    margin: 20px;
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    margin: 0 10px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.tree {
-    overflow-x: auto;
-    overflow-y: visible;
-}
-
-.tree ul {
-    padding-top: 20px; position: relative;
-    display: flex;
-    flex-wrap: nowrap;
-    
-    transition: all 0.5s;
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-}
-
-.tree li {
-    flex-shrink: 0;
-    text-align: center;
-    list-style-type: none;
-    position: relative;
-    padding: 20px 5px 0 5px;
-    
-    transition: all 0.5s;
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-}
-
-.tree li::before, .tree li::after{
-    content: '';
-    position: absolute; top: 0; right: 50%;
-    border-top: 1px solid #ccc;
-    width: 50%; height: 20px;
-}
-.tree li::after{
-    right: auto; left: 50%;
-    border-left: 1px solid #ccc;
-}
-
-.tree li:only-child::after, .tree li:only-child::before {
-    display: none;
-}
-
-.tree li:only-child{ padding-top: 0;}
-
-.tree li:first-child::before, .tree li:last-child::after{
-    border: 0 none;
-}
-.tree li:last-child::before{
-    border-right: 1px solid #ccc;
-    border-radius: 0 5px 0 0;
-    -webkit-border-radius: 0 5px 0 0;
-    -moz-border-radius: 0 5px 0 0;
-}
-.tree li:first-child::after{
-    border-radius: 5px 0 0 0;
-    -webkit-border-radius: 5px 0 0 0;
-    -moz-border-radius: 5px 0 0 0;
-}
-.tree ul ul::before{
-    content: '';
-    position: absolute; top: 0; left: 50%;
-    border-left: 1px solid #ccc;
-    width: 0; height: 20px;
-}
-.tree li div{
-    border: 1px solid #1e3a8a;
-    padding: 15px 10px 15px 10px;
-    text-decoration: none;
-    color: #1e3a8a;
-    background-color: #ffffff;
-    font-family: arial, verdana, tahoma;
-    font-size: 11px;
-    display: inline-block;
-    position: relative;
-    
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    
-    transition: all 0.5s;
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-}
-
-.tree li div .add-icon {
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #1e3a8a;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    pointer-events: auto;
-    z-index: 10;
-    transition: all 0.3s;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    text-decoration: none;
-}
-
-.tree li div .add-icon:hover {
-    background-color: #0f172a;
-    transform: translateX(-50%) scale(1.1);
-}
-
-.tree li div .remove-icon {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    background-color: #dc3545;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    pointer-events: auto;
-    z-index: 10;
-    transition: all 0.3s;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    text-decoration: none;
-}
-
-.tree li div .remove-icon:hover {
-    background-color: #a71e2a;
-    transform: translateX(-50%) scale(1.1);
-}
-.tree li div:hover, .tree li div:hover+ul li div {
-    background: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a;
-}
-
-.tree li div:hover .add-icon {
-    background-color: #ffffff;
-    color: #1e3a8a;
-}
-
-.tree li div:hover .remove-icon {
-    background-color: #ffffff;
-    color: #dc3545;
-}
-
-.tree li div input[type="checkbox"] {
-    margin: 0 4px 0 0;
-    transform: scale(1.1);
-    accent-color: #1e3a8a;
-    vertical-align: middle;
-}
-
-.tree li div button {
-    margin-top: 8px;
-    padding: 4px 8px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.tree li div button:hover {
-    background-color: #5a6268;
-}
-
-.tree li div.tree-node-no-box {
-    border: none;
-    background: transparent;
-    padding: 0;
-    position: relative;
-    display: inline-block;
-}
-
-.tree li div.tree-node-no-box:hover+ul li div {
-    background: #ffffff !important;
-    color: #1e3a8a !important;
-    border: 1px solid #1e3a8a !important;
-}
-
-.tree li div:hover+ul li::after, 
-.tree li div:hover+ul li::before, 
-.tree li div:hover+ul::before, 
-.tree li div:hover+ul ul::before{
-    border-color:  #94a0b4;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f8f9fa;
-}
-
-@media (max-width: 768px) {
-    .tree-info {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .header h1 {
-        font-size: 1.5em;
-    }
-}
-CSS;
     }
 }

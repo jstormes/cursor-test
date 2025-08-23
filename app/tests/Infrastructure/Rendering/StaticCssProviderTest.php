@@ -45,12 +45,7 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('.btn-primary {', $css);
         $this->assertStringContainsString('.btn-secondary {', $css);
 
-        // Test tree-specific selectors
-        $this->assertStringContainsString('.tree ul {', $css);
-        $this->assertStringContainsString('.tree li {', $css);
-        $this->assertStringContainsString('.tree li div {', $css);
-
-        // Test tree list selectors
+        // Test list-specific selectors (not tree visualization)
         $this->assertStringContainsString('.tree-list {', $css);
         $this->assertStringContainsString('.tree-item {', $css);
         $this->assertStringContainsString('.tree-item h3 {', $css);
@@ -86,11 +81,14 @@ class StaticCssProviderTest extends TestCase
     {
         $css = $this->cssProvider->getMainCSS();
 
-        // Test specific gradient colors used in the design
+        // Test specific gradient colors used in the design (main CSS only)
         $this->assertStringContainsString('#667eea', $css);
         $this->assertStringContainsString('#764ba2', $css);
-        $this->assertStringContainsString('#1e3a8a', $css);
         $this->assertStringContainsString('#6c757d', $css);
+        
+        // Test that tree-specific colors are in tree CSS, not main CSS
+        $treeCss = $this->cssProvider->getTreeCSS('standard');
+        $this->assertStringContainsString('#1e3a8a', $treeCss);
     }
 
     public function testGetMainCssContainsHoverEffects(): void
@@ -101,23 +99,28 @@ class StaticCssProviderTest extends TestCase
         $this->assertStringContainsString('translateY', $css);
     }
 
-    public function testGetMainCssContainsTreeStructure(): void
+    public function testGetTreeCssMethod(): void
     {
-        $css = $this->cssProvider->getMainCSS();
+        $standardTreeCss = $this->cssProvider->getTreeCSS('standard');
+        $editTreeCss = $this->cssProvider->getTreeCSS('edit');
 
-        // Test tree line drawing CSS
-        $this->assertStringContainsString('::before', $css);
-        $this->assertStringContainsString('::after', $css);
-        $this->assertStringContainsString(':only-child', $css);
-        $this->assertStringContainsString(':first-child', $css);
-        $this->assertStringContainsString(':last-child', $css);
+        $this->assertIsString($standardTreeCss);
+        $this->assertIsString($editTreeCss);
+        $this->assertNotEmpty($standardTreeCss);
+        $this->assertNotEmpty($editTreeCss);
 
-        // Test tree positioning
-        $this->assertStringContainsString('position: relative', $css);
-        $this->assertStringContainsString('position: absolute', $css);
-        $this->assertStringContainsString('border-top:', $css);
-        $this->assertStringContainsString('border-left:', $css);
-        $this->assertStringContainsString('border-right:', $css);
+        // Test tree line drawing CSS exists in tree CSS
+        $this->assertStringContainsString('::before', $standardTreeCss);
+        $this->assertStringContainsString('::after', $standardTreeCss);
+        $this->assertStringContainsString(':only-child', $standardTreeCss);
+        
+        // Edit tree should have additional interactive elements
+        $this->assertStringContainsString('.add-icon', $editTreeCss);
+        $this->assertStringContainsString('.remove-icon', $editTreeCss);
+        
+        // Both should have basic tree structure
+        $this->assertStringContainsString('.tree ul', $standardTreeCss);
+        $this->assertStringContainsString('.tree ul', $editTreeCss);
     }
 
     public function testGetSimplePageCssReturnsString(): void
@@ -236,11 +239,12 @@ class StaticCssProviderTest extends TestCase
         $this->assertNotEquals($errorCss, $successCss);
     }
 
-    public function testMainCssContainsCompleteTreeStyling(): void
+    public function testTreeCssContainsCompleteTreeStyling(): void
     {
-        $css = $this->cssProvider->getMainCSS();
+        $standardCss = $this->cssProvider->getTreeCSS('standard');
+        $editCss = $this->cssProvider->getTreeCSS('edit');
 
-        // Test that all necessary tree components are styled
+        // Test that all necessary tree components are styled in both versions
         $expectedTreeSelectors = [
             '.tree ul',
             '.tree li',
@@ -258,7 +262,14 @@ class StaticCssProviderTest extends TestCase
         ];
 
         foreach ($expectedTreeSelectors as $selector) {
-            $this->assertStringContainsString($selector, $css, "CSS should contain selector: $selector");
+            $this->assertStringContainsString($selector, $standardCss, "Standard tree CSS should contain selector: $selector");
+            $this->assertStringContainsString($selector, $editCss, "Edit tree CSS should contain selector: $selector");
+        }
+
+        // Edit-specific selectors
+        $editSpecificSelectors = ['.add-icon', '.remove-icon', '.tree-node-no-box'];
+        foreach ($editSpecificSelectors as $selector) {
+            $this->assertStringContainsString($selector, $editCss, "Edit tree CSS should contain selector: $selector");
         }
     }
 
