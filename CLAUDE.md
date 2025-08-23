@@ -324,6 +324,12 @@ From `.cursor/rules/` configuration:
 - Use phpMyAdmin at http://localhost:7088 for GUI management
 - Connection string for containers: `mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4`
 
+**NEVER consolidate CSS across Action classes**:
+- Each Action class has unique CSS in its `getCSS()` method for specific form layouts and styling
+- CSS consolidation would break the visual design and user experience of individual forms
+- While some CSS may appear similar, each Action class requires customized styling for its specific functionality
+- Keep CSS methods separate to maintain proper separation of concerns and design flexibility
+
 ## Code Location and Structure
 - All PHP code must be in the `app/` directory (mapped to `/app` inside containers)
 - Web root is `app/public/` (served from `/app/public` in containers)  
