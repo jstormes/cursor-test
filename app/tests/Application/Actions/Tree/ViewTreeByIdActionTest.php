@@ -12,6 +12,7 @@ use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Rendering\CssProviderInterface;
 use App\Infrastructure\Services\TreeStructureBuilder;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -77,7 +78,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testViewTreeWithNodes(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
 
@@ -149,7 +150,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testTreeWithNoNodes(): void
     {
-        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findById')
@@ -185,7 +186,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testTreeWithNoRootNodes(): void
     {
-        $tree = new Tree(1, 'Broken Tree', 'A tree with no root nodes', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Broken Tree', 'A tree with no root nodes', new DateTime(), new DateTime(), true, new MockClock());
 
         // All nodes have parents (no root nodes)
         $childNode1 = new SimpleNode(1, 'Child1', 1, 999, 0); // Parent doesn't exist
@@ -224,7 +225,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testTreeWithComplexHierarchy(): void
     {
-        $tree = new Tree(1, 'Complex Tree', 'A tree with multiple levels', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Complex Tree', 'A tree with multiple levels', new DateTime(), new DateTime(), true, new MockClock());
 
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $child1 = new SimpleNode(2, 'Child1', 1, 1, 0);
@@ -265,7 +266,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testTreeWithButtonNodes(): void
     {
-        $tree = new Tree(1, 'Button Tree', 'A tree with button nodes', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Button Tree', 'A tree with button nodes', new DateTime(), new DateTime(), true, new MockClock());
 
         $rootNode = new ButtonNode(1, 'Root Button', 1, null, 0, ['button_text' => 'Click Me']);
         $simpleChild = new SimpleNode(2, 'Simple Child', 1, 1, 0);
@@ -335,7 +336,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testHtmlStructureAndContent(): void
     {
-        $tree = new Tree(1, 'HTML Test Tree', 'Testing HTML output', new DateTime('2023-01-01 12:00:00'), new DateTime(), true);
+        $tree = new Tree(1, 'HTML Test Tree', 'Testing HTML output', new DateTime('2023-01-01 12:00:00'), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
 
         $this->treeRepository->expects($this->once())
@@ -378,7 +379,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $tree = new Tree(1, 'No Description Tree', null, new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'No Description Tree', null, new DateTime(), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
 
         $this->treeRepository->expects($this->once())
@@ -413,7 +414,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testCssIsIncludedInResponse(): void
     {
-        $tree = new Tree(1, 'CSS Test Tree', 'Testing CSS', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'CSS Test Tree', 'Testing CSS', new DateTime(), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
 
         $this->treeRepository->expects($this->once())
@@ -452,7 +453,7 @@ class ViewTreeByIdActionTest extends TestCase
 
     public function testBuildTreeFromNodesMethod(): void
     {
-        $tree = new Tree(1, 'Hierarchy Test', 'Testing tree building', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Hierarchy Test', 'Testing tree building', new DateTime(), new DateTime(), true, new MockClock());
 
         // Create a more complex tree structure
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);

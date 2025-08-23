@@ -11,6 +11,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Services\TreeStructureBuilder;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -61,7 +62,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testActionReturnsJsonResponse(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -87,7 +88,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testJsonStructureIsValid(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -119,7 +120,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testTreeDataStructure(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -150,7 +151,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testButtonNodeData(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -182,7 +183,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testChildrenStructure(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -216,7 +217,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testNodeCounting(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -268,7 +269,7 @@ class ViewTreeJsonActionTest extends TestCase
     public function testNoNodesFound(): void
     {
         // Mock tree data
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);
@@ -301,7 +302,7 @@ class ViewTreeJsonActionTest extends TestCase
         // Mock tree data
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Test Tree', 'A test tree', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', $createdAt, $updatedAt, true, new MockClock());
         $this->treeRepository->expects($this->once())
             ->method('findActive')
             ->willReturn([$tree]);

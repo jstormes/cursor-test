@@ -9,6 +9,7 @@ use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -44,7 +45,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testGetRequestShowsConfirmationForm(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $node = new SimpleNode(5, 'Node to Delete', 1, null, 0);
 
         $this->request->expects($this->once())
@@ -123,7 +124,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testGetRequestWithNodeNotFound(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -161,7 +162,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testGetRequestWithNodeFromDifferentTree(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $node = new SimpleNode(5, 'Node from Different Tree', 2, null, 0); // Tree ID 2, not 1
 
         $this->request->expects($this->once())
@@ -200,7 +201,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testPostRequestDeletesNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $node = new SimpleNode(5, 'Node to Delete', 1, null, 0);
 
         $this->request->expects($this->once())
@@ -248,7 +249,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testPostRequestDeletesNodeWithChildren(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $parentNode = new SimpleNode(5, 'Parent Node', 1, null, 0);
         $childNode1 = new SimpleNode(6, 'Child 1', 1, 5, 0);
         $childNode2 = new SimpleNode(7, 'Child 2', 1, 5, 1);
@@ -345,7 +346,7 @@ class DeleteNodeActionTest extends TestCase
 
     public function testPostRequestWithNodeNotFound(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

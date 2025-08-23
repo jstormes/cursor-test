@@ -6,6 +6,7 @@ namespace App\Infrastructure\Database;
 
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\AbstractTreeNode;
+use App\Infrastructure\Time\ClockInterface;
 
 class DatabaseUnitOfWork implements UnitOfWork
 {
@@ -15,11 +16,12 @@ class DatabaseUnitOfWork implements UnitOfWork
 
     public function __construct(
         private DatabaseConnection $connection,
+        private ClockInterface $clock,
         private ?TreeDataMapper $treeMapper = null,
         private ?TreeNodeDataMapper $nodeMapper = null
     ) {
         // Initialize mappers if not provided
-        $this->treeMapper ??= new TreeDataMapper();
+        $this->treeMapper ??= new TreeDataMapper($this->clock);
         $this->nodeMapper ??= new TreeNodeDataMapper();
     }
 

@@ -7,6 +7,8 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\AddTreeJsonAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Infrastructure\Time\ClockInterface;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +24,7 @@ class AddTreeJsonActionTest extends TestCase
     private StreamInterface $stream;
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
+    private ClockInterface $clock;
 
     protected function setUp(): void
     {
@@ -30,10 +33,12 @@ class AddTreeJsonActionTest extends TestCase
         $this->stream = $this->createMock(StreamInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
+        $this->clock = $this->createMock(ClockInterface::class);
 
         $this->action = new AddTreeJsonAction(
             $this->logger,
-            $this->treeRepository
+            $this->treeRepository,
+            $this->clock
         );
     }
 
@@ -260,7 +265,7 @@ class AddTreeJsonActionTest extends TestCase
 
     public function testDuplicateTreeName(): void
     {
-        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
+        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -299,7 +304,7 @@ class AddTreeJsonActionTest extends TestCase
 
     public function testCaseInsensitiveDuplicateCheck(): void
     {
-        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
+        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')

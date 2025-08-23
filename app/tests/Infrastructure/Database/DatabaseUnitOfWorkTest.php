@@ -7,6 +7,7 @@ namespace App\Tests\Infrastructure\Database;
 use App\Domain\Tree\Tree;
 use App\Infrastructure\Database\DatabaseConnection;
 use App\Infrastructure\Database\DatabaseUnitOfWork;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 
 class DatabaseUnitOfWorkTest extends TestCase
@@ -19,12 +20,12 @@ class DatabaseUnitOfWorkTest extends TestCase
         parent::setUp();
 
         $this->mockConnection = $this->createMock(DatabaseConnection::class);
-        $this->unitOfWork = new DatabaseUnitOfWork($this->mockConnection);
+        $this->unitOfWork = new DatabaseUnitOfWork($this->mockConnection, new MockClock());
     }
 
     public function testRegisterNew(): void
     {
-        $entity = new Tree(null, 'Test Tree', 'A test tree');
+        $entity = new Tree(null, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->unitOfWork->registerNew($entity);
 
@@ -34,7 +35,7 @@ class DatabaseUnitOfWorkTest extends TestCase
 
     public function testRegisterDirty(): void
     {
-        $entity = new Tree(1, 'Test Tree', 'A test tree');
+        $entity = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->unitOfWork->registerDirty($entity);
 
@@ -44,7 +45,7 @@ class DatabaseUnitOfWorkTest extends TestCase
 
     public function testRegisterDeleted(): void
     {
-        $entity = new Tree(1, 'Test Tree', 'A test tree');
+        $entity = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->unitOfWork->registerDeleted($entity);
 

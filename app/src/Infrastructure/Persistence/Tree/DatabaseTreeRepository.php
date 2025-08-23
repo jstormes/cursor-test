@@ -79,11 +79,8 @@ class DatabaseTreeRepository extends BaseRepository implements TreeRepository
             
             $newId = $this->insert(self::TABLE, $insertData);
 
-            // Set the ID using reflection since there's no setId method
-            $reflection = new \ReflectionClass($tree);
-            $idProperty = $reflection->getProperty('id');
-            $idProperty->setAccessible(true);
-            $idProperty->setValue($tree, $newId);
+            // Set the ID using the setId method
+            $tree->setId($newId);
         } else {
             // Update - exclude ID from data
             $updateData = [

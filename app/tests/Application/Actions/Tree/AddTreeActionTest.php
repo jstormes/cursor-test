@@ -10,6 +10,8 @@ use App\Application\Validation\ValidationResult;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
 use App\Infrastructure\Rendering\CssProviderInterface;
+use App\Infrastructure\Time\ClockInterface;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,6 +29,7 @@ class AddTreeActionTest extends TestCase
     private TreeRepository $treeRepository;
     private TreeValidator $validator;
     private CssProviderInterface $cssProvider;
+    private ClockInterface $clock;
 
     protected function setUp(): void
     {
@@ -37,12 +40,14 @@ class AddTreeActionTest extends TestCase
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->validator = $this->createMock(TreeValidator::class);
         $this->cssProvider = $this->createMock(CssProviderInterface::class);
+        $this->clock = $this->createMock(ClockInterface::class);
 
         $this->action = new AddTreeAction(
             $this->logger,
             $this->treeRepository,
             $this->validator,
-            $this->cssProvider
+            $this->cssProvider,
+            $this->clock
         );
     }
 
@@ -286,7 +291,7 @@ class AddTreeActionTest extends TestCase
 
     public function testPostRequestWithDuplicateName(): void
     {
-        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
+        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -344,7 +349,7 @@ class AddTreeActionTest extends TestCase
 
     public function testPostRequestWithCaseInsensitiveDuplicateName(): void
     {
-        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true);
+        $existingTree = new Tree(1, 'Test Tree', 'Existing', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

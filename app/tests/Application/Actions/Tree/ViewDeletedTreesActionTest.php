@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\ViewDeletedTreesAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,8 +40,8 @@ class ViewDeletedTreesActionTest extends TestCase
 
     public function testViewDeletedTreesWithTrees(): void
     {
-        $deletedTree1 = new Tree(1, 'Deleted Tree 1', 'First deleted tree', new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
-        $deletedTree2 = new Tree(2, 'Deleted Tree 2', 'Second deleted tree', new DateTime('2023-02-01'), new DateTime('2023-02-02'), false);
+        $deletedTree1 = new Tree(1, 'Deleted Tree 1', 'First deleted tree', new DateTime('2023-01-01'), new DateTime('2023-01-02'), false, new MockClock());
+        $deletedTree2 = new Tree(2, 'Deleted Tree 2', 'Second deleted tree', new DateTime('2023-02-01'), new DateTime('2023-02-02'), false, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findDeleted')
@@ -111,7 +112,8 @@ class ViewDeletedTreesActionTest extends TestCase
             'Test tree description',
             new DateTime('2023-05-15 14:30:00'),
             new DateTime('2023-06-20 09:15:30'),
-            false
+            false,
+            new MockClock()
         );
 
         $this->treeRepository->expects($this->once())
@@ -146,7 +148,7 @@ class ViewDeletedTreesActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $deletedTree = new Tree(1, 'Tree No Description', null, new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'Tree No Description', null, new DateTime(), new DateTime(), false, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findDeleted')
@@ -174,7 +176,7 @@ class ViewDeletedTreesActionTest extends TestCase
 
     public function testHtmlStructureAndCSS(): void
     {
-        $deletedTree = new Tree(1, 'Structure Test', 'Testing HTML structure', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'Structure Test', 'Testing HTML structure', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findDeleted')
@@ -216,7 +218,7 @@ class ViewDeletedTreesActionTest extends TestCase
     {
         $trees = [];
         for ($i = 1; $i <= 5; $i++) {
-            $trees[] = new Tree($i, "Tree $i", "Description $i", new DateTime(), new DateTime(), false);
+            $trees[] = new Tree($i, "Tree $i", "Description $i", new DateTime(), new DateTime(), false, new MockClock());
         }
 
         $this->treeRepository->expects($this->once())
@@ -311,7 +313,7 @@ class ViewDeletedTreesActionTest extends TestCase
 
     public function testTreeActionButtons(): void
     {
-        $deletedTree = new Tree(99, 'Action Test Tree', 'Testing action buttons', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(99, 'Action Test Tree', 'Testing action buttons', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findDeleted')
@@ -344,7 +346,7 @@ class ViewDeletedTreesActionTest extends TestCase
 
     public function testPageTitleAndMetadata(): void
     {
-        $deletedTree = new Tree(1, 'Title Test', 'Testing page metadata', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'Title Test', 'Testing page metadata', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findDeleted')

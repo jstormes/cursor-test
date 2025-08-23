@@ -6,6 +6,7 @@ namespace App\Tests\Infrastructure\Database;
 
 use App\Domain\Tree\Tree;
 use App\Infrastructure\Database\TreeDataMapper;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use DateTime;
 
@@ -16,7 +17,7 @@ class TreeDataMapperTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mapper = new TreeDataMapper();
+        $this->mapper = new TreeDataMapper(new MockClock());
     }
 
     public function testMapToEntity(): void
@@ -63,7 +64,7 @@ class TreeDataMapperTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Test Tree', 'A test tree', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', $createdAt, $updatedAt, true, new MockClock());
 
         $data = $this->mapper->mapToArray($tree);
 

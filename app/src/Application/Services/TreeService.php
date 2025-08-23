@@ -16,6 +16,7 @@ use App\Domain\Tree\TreeNodeNotFoundException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Database\UnitOfWork;
+use App\Infrastructure\Time\ClockInterface;
 
 class TreeService
 {
@@ -25,7 +26,8 @@ class TreeService
         private UnitOfWork $unitOfWork,
         private TreeNodeFactory $nodeFactory,
         private TreeValidator $treeValidator,
-        private TreeNodeValidator $nodeValidator
+        private TreeNodeValidator $nodeValidator,
+        private ClockInterface $clock
     ) {
     }
 
@@ -48,7 +50,7 @@ class TreeService
 
         try {
             // Create the tree and register it as new
-            $tree = new Tree(null, $sanitizedTreeData['name'], $sanitizedTreeData['description'] ?? null);
+            $tree = new Tree(null, $sanitizedTreeData['name'], $sanitizedTreeData['description'] ?? null, null, null, true, $this->clock);
             $this->unitOfWork->registerNew($tree);
 
             // Add nodes to the tree and register them as new

@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\RestoreTreeJsonAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,7 +40,7 @@ class RestoreTreeJsonActionTest extends TestCase
 
     public function testSuccessfulRestore(): void
     {
-        $deletedTree = new Tree(1, 'Deleted Tree', 'A deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false);
+        $deletedTree = new Tree(1, 'Deleted Tree', 'A deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -132,7 +133,7 @@ class RestoreTreeJsonActionTest extends TestCase
 
     public function testAlreadyActiveTree(): void
     {
-        $activeTree = new Tree(1, 'Active Tree', 'Already active tree', new DateTime(), new DateTime(), true);
+        $activeTree = new Tree(1, 'Active Tree', 'Already active tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -325,7 +326,7 @@ class RestoreTreeJsonActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $deletedTree = new Tree(1, 'No Description Tree', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
+        $deletedTree = new Tree(1, 'No Description Tree', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -375,7 +376,8 @@ class RestoreTreeJsonActionTest extends TestCase
             'Testing JSON structure',
             new DateTime('2023-05-15 14:30:00'),
             new DateTime('2023-06-20 09:15:30'),
-            false
+            false,
+            new MockClock()
         );
 
         $this->request->expects($this->once())
@@ -491,7 +493,7 @@ class RestoreTreeJsonActionTest extends TestCase
 
     public function testSuccessMessageContent(): void
     {
-        $deletedTree = new Tree(99, 'Message Test Tree', 'Testing success message', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(99, 'Message Test Tree', 'Testing success message', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -535,7 +537,7 @@ class RestoreTreeJsonActionTest extends TestCase
 
     public function testTreeActiveStatusInResponse(): void
     {
-        $deletedTree = new Tree(1, 'Status Test', 'Testing active status', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'Status Test', 'Testing active status', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

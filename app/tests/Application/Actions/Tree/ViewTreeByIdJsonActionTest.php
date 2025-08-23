@@ -11,6 +11,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Services\TreeStructureBuilder;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -60,7 +61,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testSuccessfulTreeRetrieval(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime('2023-01-01'), new DateTime('2023-01-02'), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime('2023-01-01'), new DateTime('2023-01-02'), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
 
@@ -122,7 +123,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testTreeWithNoNodes(): void
     {
-        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findById')
@@ -152,7 +153,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testTreeWithNoRootNodes(): void
     {
-        $tree = new Tree(1, 'Broken Tree', 'A broken tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Broken Tree', 'A broken tree', new DateTime(), new DateTime(), true, new MockClock());
 
         // All nodes have parents (no root nodes)
         $childNode1 = new SimpleNode(1, 'Child1', 1, 999, 0); // Parent doesn't exist
@@ -187,7 +188,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testTreeWithButtonNodes(): void
     {
-        $tree = new Tree(1, 'Button Tree', 'A tree with buttons', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Button Tree', 'A tree with buttons', new DateTime(), new DateTime(), true, new MockClock());
         $buttonNode = new ButtonNode(1, 'Root Button', 1, null, 0, ['button_text' => 'Click Me', 'button_action' => 'alert("clicked")']);
 
         $this->treeRepository->expects($this->once())
@@ -219,7 +220,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testComplexTreeStructure(): void
     {
-        $tree = new Tree(1, 'Complex Tree', 'Multi-level tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Complex Tree', 'Multi-level tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $child1 = new SimpleNode(2, 'Child1', 1, 1, 0);
@@ -261,7 +262,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testNodeDataStructure(): void
     {
-        $tree = new Tree(1, 'Data Test Tree', 'Testing node data', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Data Test Tree', 'Testing node data', new DateTime(), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root Node', 1, null, 5);
 
         $this->treeRepository->expects($this->once())
@@ -311,7 +312,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testMultipleRootNodes(): void
     {
-        $tree = new Tree(1, 'Multi-Root Tree', 'Tree with multiple root nodes', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Multi-Root Tree', 'Tree with multiple root nodes', new DateTime(), new DateTime(), true, new MockClock());
 
         $rootNode1 = new SimpleNode(1, 'Root1', 1, null, 0);
         $rootNode2 = new SimpleNode(2, 'Root2', 1, null, 1);
@@ -374,7 +375,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
     public function testTreeMetricsCalculation(): void
     {
-        $tree = new Tree(1, 'Metrics Tree', 'For testing metrics', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Metrics Tree', 'For testing metrics', new DateTime(), new DateTime(), true, new MockClock());
 
         // Create a 3-level tree: Root -> Child1 -> GrandChild, Root -> Child2
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
@@ -412,7 +413,7 @@ class ViewTreeByIdJsonActionTest extends TestCase
     {
         $createdAt = new DateTime('2023-05-15 14:30:00');
         $updatedAt = new DateTime('2023-06-20 09:15:30');
-        $tree = new Tree(1, 'Date Tree', 'Testing dates', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Date Tree', 'Testing dates', $createdAt, $updatedAt, true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
 
         $this->treeRepository->expects($this->once())

@@ -101,7 +101,7 @@ return function (ContainerBuilder $containerBuilder) {
         // Data Mappers
 
         TreeDataMapper::class => function (ContainerInterface $c) {
-            return new TreeDataMapper();
+            return new TreeDataMapper($c->get(ClockInterface::class));
         },
 
         TreeNodeDataMapper::class => function (ContainerInterface $c) {

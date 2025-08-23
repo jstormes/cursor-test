@@ -10,6 +10,7 @@ use App\Application\Exceptions\ValidationException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
 use App\Infrastructure\Rendering\CssProviderInterface;
+use App\Infrastructure\Time\ClockInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -21,7 +22,8 @@ final class AddTreeAction extends Action
         LoggerInterface $logger,
         private TreeRepository $treeRepository,
         private TreeValidator $validator,
-        private CssProviderInterface $cssProvider
+        private CssProviderInterface $cssProvider,
+        private ClockInterface $clock
     ) {
         parent::__construct($logger);
     }
@@ -84,7 +86,11 @@ final class AddTreeAction extends Action
             $tree = new Tree(
                 null,
                 $sanitizedData['name'],
-                $sanitizedData['description'] ?? null
+                $sanitizedData['description'] ?? null,
+                null,
+                null,
+                true,
+                $this->clock
             );
 
             // Save the tree

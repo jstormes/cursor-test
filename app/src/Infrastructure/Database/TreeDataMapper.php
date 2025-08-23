@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Infrastructure\Database;
 
 use App\Domain\Tree\Tree;
+use App\Infrastructure\Time\ClockInterface;
 use DateTime;
 
 class TreeDataMapper implements DataMapper
 {
+    public function __construct(private ClockInterface $clock)
+    {
+    }
     #[\Override]
     public function mapToEntity(array $data): Tree
     {
@@ -18,7 +22,8 @@ class TreeDataMapper implements DataMapper
             $data['description'] ?? null,
             new DateTime($data['created_at']),
             new DateTime($data['updated_at']),
-            (bool) $data['is_active']
+            (bool) $data['is_active'],
+            $this->clock
         );
     }
 

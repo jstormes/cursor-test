@@ -30,7 +30,10 @@ class Tree implements JsonSerializable
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
-        $this->clock = $clock ?? new \App\Infrastructure\Time\SystemClock();
+        if ($clock === null) {
+            throw new \InvalidArgumentException('ClockInterface is required');
+        }
+        $this->clock = $clock;
         $this->createdAt = $createdAt ?? $this->clock->nowDateTime();
         $this->updatedAt = $updatedAt ?? $this->clock->nowDateTime();
         $this->isActive = $isActive;

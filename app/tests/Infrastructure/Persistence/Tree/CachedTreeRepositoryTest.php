@@ -8,6 +8,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\TreeRepository;
 use App\Infrastructure\Cache\CacheInterface;
 use App\Infrastructure\Persistence\Tree\CachedTreeRepository;
+use App\Tests\Utilities\MockClock;
 use PHPUnit\Framework\TestCase;
 
 class CachedTreeRepositoryTest extends TestCase
@@ -26,7 +27,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findById tests
     public function testFindByIdReturnsCachedValueWhenAvailable(): void
     {
-        $tree = new Tree(1, 'Test Tree');
+        $tree = new Tree(1, 'Test Tree', null, null, null, true, new MockClock());
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -43,7 +44,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindByIdFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $tree = new Tree(1, 'Test Tree');
+        $tree = new Tree(1, 'Test Tree', null, null, null, true, new MockClock());
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -88,7 +89,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findActive tests
     public function testFindActiveReturnsCachedValueWhenAvailable(): void
     {
-        $trees = [new Tree(1, 'Tree 1'), new Tree(2, 'Tree 2')];
+        $trees = [new Tree(1, 'Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -105,7 +106,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindActiveFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $trees = [new Tree(1, 'Tree 1'), new Tree(2, 'Tree 2')];
+        $trees = [new Tree(1, 'Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -129,7 +130,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findDeleted tests
     public function testFindDeletedReturnsCachedValueWhenAvailable(): void
     {
-        $trees = [new Tree(1, 'Deleted Tree 1'), new Tree(2, 'Deleted Tree 2')];
+        $trees = [new Tree(1, 'Deleted Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Deleted Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -146,7 +147,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindDeletedFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $trees = [new Tree(1, 'Deleted Tree 1'), new Tree(2, 'Deleted Tree 2')];
+        $trees = [new Tree(1, 'Deleted Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Deleted Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -170,7 +171,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findTreeStructure tests
     public function testFindTreeStructureReturnsCachedValueWhenAvailable(): void
     {
-        $tree = new Tree(1, 'Tree with structure');
+        $tree = new Tree(1, 'Tree with structure', null, null, null, true, new MockClock());
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -187,7 +188,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindTreeStructureFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $tree = new Tree(1, 'Tree with structure');
+        $tree = new Tree(1, 'Tree with structure', null, null, null, true, new MockClock());
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -232,7 +233,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findByName tests
     public function testFindByNameReturnsCachedValueWhenAvailable(): void
     {
-        $tree = new Tree(1, 'Test Tree');
+        $tree = new Tree(1, 'Test Tree', null, null, null, true, new MockClock());
         $expectedCacheKey = 'tree_name:' . md5('Test Tree');
 
         $this->mockCache->expects($this->once())
@@ -250,7 +251,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindByNameFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $tree = new Tree(1, 'Test Tree');
+        $tree = new Tree(1, 'Test Tree', null, null, null, true, new MockClock());
         $expectedCacheKey = 'tree_name:' . md5('Test Tree');
 
         $this->mockCache->expects($this->once())
@@ -298,7 +299,7 @@ class CachedTreeRepositoryTest extends TestCase
     // findAll tests
     public function testFindAllReturnsCachedValueWhenAvailable(): void
     {
-        $trees = [new Tree(1, 'Tree 1'), new Tree(2, 'Tree 2')];
+        $trees = [new Tree(1, 'Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -315,7 +316,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testFindAllFetchesFromRepositoryAndCachesWhenNotCached(): void
     {
-        $trees = [new Tree(1, 'Tree 1'), new Tree(2, 'Tree 2')];
+        $trees = [new Tree(1, 'Tree 1', null, null, null, true, new MockClock()), new Tree(2, 'Tree 2', null, null, null, true, new MockClock())];
 
         $this->mockCache->expects($this->once())
             ->method('get')
@@ -339,7 +340,7 @@ class CachedTreeRepositoryTest extends TestCase
     // save tests
     public function testSaveCallsRepositoryAndInvalidatesRelevantCaches(): void
     {
-        $tree = new Tree(1, 'Test Tree');
+        $tree = new Tree(1, 'Test Tree', null, null, null, true, new MockClock());
 
         $this->mockRepository->expects($this->once())
             ->method('save')
@@ -362,7 +363,7 @@ class CachedTreeRepositoryTest extends TestCase
 
     public function testSaveWithNewTreeOnlyInvalidatesListCaches(): void
     {
-        $tree = new Tree(null, 'New Tree');
+        $tree = new Tree(null, 'New Tree', null, null, null, true, new MockClock());
 
         $this->mockRepository->expects($this->once())
             ->method('save')
@@ -456,7 +457,7 @@ class CachedTreeRepositoryTest extends TestCase
     // Cache invalidation edge cases
     public function testSaveWithTreeWithoutNameDoesNotInvalidateNameCache(): void
     {
-        $tree = new Tree(1, '');
+        $tree = new Tree(1, '', null, null, null, true, new MockClock());
 
         $this->mockRepository->expects($this->once())
             ->method('save')

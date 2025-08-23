@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\DeleteTreeJsonAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,7 +40,7 @@ class DeleteTreeJsonActionTest extends TestCase
 
     public function testSuccessfulTreeDeletion(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -129,7 +130,7 @@ class DeleteTreeJsonActionTest extends TestCase
 
     public function testTreeAlreadyDeleted(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -252,7 +253,7 @@ class DeleteTreeJsonActionTest extends TestCase
 
     public function testDeleteMethodCallsRepositoryOnce(): void
     {
-        $tree = new Tree(5, 'Another Tree', 'Another description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(5, 'Another Tree', 'Another description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -298,7 +299,7 @@ class DeleteTreeJsonActionTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-02 15:30:00');
-        $tree = new Tree(10, 'Data Test Tree', 'Test description', $createdAt, $updatedAt, true);
+        $tree = new Tree(10, 'Data Test Tree', 'Test description', $createdAt, $updatedAt, true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -345,7 +346,7 @@ class DeleteTreeJsonActionTest extends TestCase
 
     public function testResponseContainsCorrectLinks(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\ViewDeletedTreesJsonAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,8 +40,8 @@ class ViewDeletedTreesJsonActionTest extends TestCase
 
     public function testGetDeletedTreesWithData(): void
     {
-        $deletedTree1 = new Tree(1, 'Deleted Tree 1', 'First deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false);
-        $deletedTree2 = new Tree(2, 'Deleted Tree 2', 'Second deleted tree', new DateTime('2023-02-01 09:15:00'), new DateTime('2023-02-02 14:45:00'), false);
+        $deletedTree1 = new Tree(1, 'Deleted Tree 1', 'First deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false, new MockClock());
+        $deletedTree2 = new Tree(2, 'Deleted Tree 2', 'Second deleted tree', new DateTime('2023-02-01 09:15:00'), new DateTime('2023-02-02 14:45:00'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -280,7 +281,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $deletedTree = new Tree(1, 'Tree No Description', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
+        $deletedTree = new Tree(1, 'Tree No Description', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -321,7 +322,7 @@ class ViewDeletedTreesJsonActionTest extends TestCase
     {
         $trees = [];
         for ($i = 1; $i <= 5; $i++) {
-            $trees[] = new Tree($i, "Tree $i", "Description $i", new DateTime('2023-01-01'), new DateTime('2023-01-02'), false);
+            $trees[] = new Tree($i, "Tree $i", "Description $i", new DateTime('2023-01-01'), new DateTime('2023-01-02'), false, new MockClock());
         }
 
         $this->request->expects($this->once())
@@ -370,7 +371,8 @@ class ViewDeletedTreesJsonActionTest extends TestCase
             'Testing JSON format',
             new DateTime('2023-05-15 14:30:00'),
             new DateTime('2023-06-20 09:15:30'),
-            false
+            false,
+            new MockClock()
         );
 
         $this->request->expects($this->once())

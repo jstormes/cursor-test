@@ -7,6 +7,7 @@ namespace App\Application\Actions\Tree;
 use App\Application\Actions\Action;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Infrastructure\Time\ClockInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -16,7 +17,8 @@ final class AddTreeJsonAction extends Action
 {
     public function __construct(
         LoggerInterface $logger,
-        private TreeRepository $treeRepository
+        private TreeRepository $treeRepository,
+        private ClockInterface $clock
     ) {
         parent::__construct($logger);
     }
@@ -58,7 +60,11 @@ final class AddTreeJsonAction extends Action
             $tree = new Tree(
                 null,
                 $name,
-                $description ?: null
+                $description ?: null,
+                null,
+                null,
+                true,
+                $this->clock
             );
 
             // Save the tree

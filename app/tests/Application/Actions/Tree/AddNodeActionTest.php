@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,7 +46,7 @@ class AddNodeActionTest extends TestCase
 
     public function testGetRequestShowsForm(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -115,7 +116,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestCreatesSimpleNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -166,7 +167,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestCreatesButtonNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -218,7 +219,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestWithEmptyName(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -265,7 +266,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestWithTooLongName(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $longName = str_repeat('A', 256);
 
         $this->request->expects($this->once())
@@ -313,7 +314,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestButtonNodeWithoutButtonText(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -361,7 +362,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestWithInvalidParentNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -414,7 +415,7 @@ class AddNodeActionTest extends TestCase
 
     public function testPostRequestWithValidParentNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $parentNode = new SimpleNode(5, 'Parent', 1, null, 0);
 
         $this->request->expects($this->once())

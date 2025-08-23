@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\ViewTreesJsonAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,8 +40,8 @@ class ViewTreesJsonActionTest extends TestCase
 
     public function testGetActiveTreesWithData(): void
     {
-        $activeTree1 = new Tree(1, 'Active Tree 1', 'First active tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), true);
-        $activeTree2 = new Tree(2, 'Active Tree 2', 'Second active tree', new DateTime('2023-02-01 09:15:00'), new DateTime('2023-02-02 14:45:00'), true);
+        $activeTree1 = new Tree(1, 'Active Tree 1', 'First active tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), true, new MockClock());
+        $activeTree2 = new Tree(2, 'Active Tree 2', 'Second active tree', new DateTime('2023-02-01 09:15:00'), new DateTime('2023-02-02 14:45:00'), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -282,7 +283,7 @@ class ViewTreesJsonActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $activeTree = new Tree(1, 'Tree No Description', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), true);
+        $activeTree = new Tree(1, 'Tree No Description', null, new DateTime('2023-01-01'), new DateTime('2023-01-02'), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -323,7 +324,7 @@ class ViewTreesJsonActionTest extends TestCase
     {
         $trees = [];
         for ($i = 1; $i <= 5; $i++) {
-            $trees[] = new Tree($i, "Active Tree $i", "Description $i", new DateTime('2023-01-01'), new DateTime('2023-01-02'), true);
+            $trees[] = new Tree($i, "Active Tree $i", "Description $i", new DateTime('2023-01-01'), new DateTime('2023-01-02'), true, new MockClock());
         }
 
         $this->request->expects($this->once())
@@ -372,7 +373,8 @@ class ViewTreesJsonActionTest extends TestCase
             'Testing JSON format',
             new DateTime('2023-05-15 14:30:00'),
             new DateTime('2023-06-20 09:15:30'),
-            true
+            true,
+            new MockClock()
         );
 
         $this->request->expects($this->once())
@@ -511,7 +513,7 @@ class ViewTreesJsonActionTest extends TestCase
 
     public function testSuccessResponseStructure(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Test Description', new DateTime('2023-01-01'), new DateTime('2023-01-02'), true);
+        $tree = new Tree(1, 'Test Tree', 'Test Description', new DateTime('2023-01-01'), new DateTime('2023-01-02'), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

@@ -11,6 +11,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Services\TreeStructureBuilder;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -60,7 +61,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testViewTreeWithNodesReadOnly(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $rootNode = new SimpleNode(1, 'Root', 1, null, 0);
         $childNode = new SimpleNode(2, 'Child', 1, 1, 0);
 
@@ -104,7 +105,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testViewTreeWithButtonNodeReadOnly(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'A test tree', new DateTime(), new DateTime(), true, new MockClock());
         $buttonNode = new ButtonNode(1, 'Button Node', 1, null, 0);
         $buttonNode->setButtonText('Click Me');
         $buttonNode->setButtonAction('alert("Hello")');
@@ -176,7 +177,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testTreeWithNoNodes(): void
     {
-        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Empty Tree', 'An empty tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->treeRepository->expects($this->once())
             ->method('findById')
@@ -213,7 +214,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testTreeWithNoRootNodes(): void
     {
-        $tree = new Tree(1, 'Invalid Tree', 'Tree with invalid structure', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Invalid Tree', 'Tree with invalid structure', new DateTime(), new DateTime(), true, new MockClock());
         $orphanNode = new SimpleNode(1, 'Orphan', 1, 999, 0); // Parent ID 999 doesn't exist
 
         $this->treeRepository->expects($this->once())
@@ -248,7 +249,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testComplexTreeStructure(): void
     {
-        $tree = new Tree(1, 'Complex Tree', 'A complex tree structure', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Complex Tree', 'A complex tree structure', new DateTime(), new DateTime(), true, new MockClock());
         $root1 = new SimpleNode(1, 'Root 1', 1, null, 0);
         $root2 = new SimpleNode(2, 'Root 2', 1, null, 1);
         $child1 = new SimpleNode(3, 'Child 1', 1, 1, 0);
@@ -325,7 +326,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testTreeWithSpecialCharacters(): void
     {
-        $tree = new Tree(1, 'Tree <script>alert("XSS")</script>', 'Description with & special chars', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Tree <script>alert("XSS")</script>', 'Description with & special chars', new DateTime(), new DateTime(), true, new MockClock());
         $node = new SimpleNode(1, 'Node with "quotes" & <tags>', 1, null, 0);
 
         $this->treeRepository->expects($this->once())
@@ -363,7 +364,7 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
 
     public function testTreeWithInactiveStatus(): void
     {
-        $tree = new Tree(1, 'Inactive Tree', 'This tree is inactive', new DateTime(), new DateTime(), false);
+        $tree = new Tree(1, 'Inactive Tree', 'This tree is inactive', new DateTime(), new DateTime(), false, new MockClock());
         $node = new SimpleNode(1, 'Node in inactive tree', 1, null, 0);
 
         $this->treeRepository->expects($this->once())

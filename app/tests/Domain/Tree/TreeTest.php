@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Domain\Tree;
 
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 
@@ -19,7 +20,7 @@ class TreeTest extends TestCase
         $updatedAt = new DateTime('2023-01-01 11:00:00');
         $isActive = true;
 
-        $tree = new Tree($id, $name, $description, $createdAt, $updatedAt, $isActive);
+        $tree = new Tree($id, $name, $description, $createdAt, $updatedAt, $isActive, new MockClock());
 
         $this->assertEquals($id, $tree->getId());
         $this->assertEquals($name, $tree->getName());
@@ -33,7 +34,7 @@ class TreeTest extends TestCase
     {
         $name = 'Minimal Tree';
 
-        $tree = new Tree(null, $name);
+        $tree = new Tree(null, $name, null, null, null, true, new MockClock());
 
         $this->assertNull($tree->getId());
         $this->assertEquals($name, $tree->getName());
@@ -45,7 +46,7 @@ class TreeTest extends TestCase
 
     public function testConstructorWithNullId(): void
     {
-        $tree = new Tree(null, 'Tree with Null ID');
+        $tree = new Tree(null, 'Tree with Null ID', null, null, null, true, new MockClock());
 
         $this->assertNull($tree->getId());
         $this->assertEquals('Tree with Null ID', $tree->getName());
@@ -53,7 +54,7 @@ class TreeTest extends TestCase
 
     public function testConstructorWithZeroId(): void
     {
-        $tree = new Tree(0, 'Tree with Zero ID');
+        $tree = new Tree(0, 'Tree with Zero ID', null, null, null, true, new MockClock());
 
         $this->assertEquals(0, $tree->getId());
         $this->assertEquals('Tree with Zero ID', $tree->getName());
@@ -61,7 +62,7 @@ class TreeTest extends TestCase
 
     public function testConstructorWithEmptyName(): void
     {
-        $tree = new Tree(1, '');
+        $tree = new Tree(1, '', null, null, null, true, new MockClock());
 
         $this->assertEquals(1, $tree->getId());
         $this->assertEquals('', $tree->getName());
@@ -69,42 +70,42 @@ class TreeTest extends TestCase
 
     public function testConstructorWithNullDescription(): void
     {
-        $tree = new Tree(1, 'Tree Name', null);
+        $tree = new Tree(1, 'Tree Name', null, null, null, true, new MockClock());
 
         $this->assertNull($tree->getDescription());
     }
 
     public function testConstructorWithEmptyDescription(): void
     {
-        $tree = new Tree(1, 'Tree Name', '');
+        $tree = new Tree(1, 'Tree Name', '', null, null, true, new MockClock());
 
         $this->assertEquals('', $tree->getDescription());
     }
 
     public function testConstructorWithInactiveTree(): void
     {
-        $tree = new Tree(1, 'Inactive Tree', 'Description', null, null, false);
+        $tree = new Tree(1, 'Inactive Tree', 'Description', null, null, false, new MockClock());
 
         $this->assertFalse($tree->isActive());
     }
 
     public function testGetId(): void
     {
-        $tree = new Tree(123, 'Test Tree');
+        $tree = new Tree(123, 'Test Tree', null, null, null, true, new MockClock());
 
         $this->assertEquals(123, $tree->getId());
     }
 
     public function testGetName(): void
     {
-        $tree = new Tree(1, 'My Tree Name');
+        $tree = new Tree(1, 'My Tree Name', null, null, null, true, new MockClock());
 
         $this->assertEquals('My Tree Name', $tree->getName());
     }
 
     public function testGetDescription(): void
     {
-        $tree = new Tree(1, 'Tree Name', 'Tree Description');
+        $tree = new Tree(1, 'Tree Name', 'Tree Description', null, null, true, new MockClock());
 
         $this->assertEquals('Tree Description', $tree->getDescription());
     }
@@ -112,7 +113,7 @@ class TreeTest extends TestCase
     public function testGetCreatedAt(): void
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
-        $tree = new Tree(1, 'Tree Name', null, $createdAt);
+        $tree = new Tree(1, 'Tree Name', null, $createdAt, null, true, new MockClock());
 
         $this->assertEquals($createdAt, $tree->getCreatedAt());
     }
@@ -120,25 +121,26 @@ class TreeTest extends TestCase
     public function testGetUpdatedAt(): void
     {
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Tree Name', null, null, $updatedAt);
+        $tree = new Tree(1, 'Tree Name', null, null, $updatedAt, true, new MockClock());
 
         $this->assertEquals($updatedAt, $tree->getUpdatedAt());
     }
 
     public function testIsActive(): void
     {
-        $tree = new Tree(1, 'Tree Name', null, null, null, true);
+        $tree = new Tree(1, 'Tree Name', null, null, null, true, new MockClock());
 
         $this->assertTrue($tree->isActive());
     }
 
     public function testSetName(): void
     {
-        $tree = new Tree(1, 'Original Name');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Original Name', null, null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        // Wait a moment to ensure different timestamps
-        usleep(1000);
+        // Advance clock time to simulate time passing
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setName('New Name');
 
@@ -148,10 +150,11 @@ class TreeTest extends TestCase
 
     public function testSetNameWithEmptyString(): void
     {
-        $tree = new Tree(1, 'Original Name');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Original Name', null, null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setName('');
 
@@ -161,10 +164,11 @@ class TreeTest extends TestCase
 
     public function testSetDescription(): void
     {
-        $tree = new Tree(1, 'Tree Name', 'Original Description');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Tree Name', 'Original Description', null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setDescription('New Description');
 
@@ -174,10 +178,11 @@ class TreeTest extends TestCase
 
     public function testSetDescriptionWithNull(): void
     {
-        $tree = new Tree(1, 'Tree Name', 'Original Description');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Tree Name', 'Original Description', null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setDescription(null);
 
@@ -187,10 +192,11 @@ class TreeTest extends TestCase
 
     public function testSetDescriptionWithEmptyString(): void
     {
-        $tree = new Tree(1, 'Tree Name', 'Original Description');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Tree Name', 'Original Description', null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setDescription('');
 
@@ -200,10 +206,11 @@ class TreeTest extends TestCase
 
     public function testSetActive(): void
     {
-        $tree = new Tree(1, 'Tree Name', null, null, null, true);
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Tree Name', null, null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setActive(false);
 
@@ -213,10 +220,11 @@ class TreeTest extends TestCase
 
     public function testSetActiveToTrue(): void
     {
-        $tree = new Tree(1, 'Tree Name', null, null, null, false);
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Tree Name', null, null, null, false, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
 
         $tree->setActive(true);
 
@@ -228,7 +236,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Test Tree', 'Test Description', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Test Tree', 'Test Description', $createdAt, $updatedAt, true, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -248,7 +256,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(null, 'Test Tree', null, $createdAt, $updatedAt, false);
+        $tree = new Tree(null, 'Test Tree', null, $createdAt, $updatedAt, false, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -268,7 +276,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Test Tree', '', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Test Tree', '', $createdAt, $updatedAt, true, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -288,7 +296,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(0, 'Test Tree', 'Description', $createdAt, $updatedAt, true);
+        $tree = new Tree(0, 'Test Tree', 'Description', $createdAt, $updatedAt, true, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -308,7 +316,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Tree with "quotes" & symbols', 'Description with "quotes" & <tags>', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Tree with "quotes" & symbols', 'Description with "quotes" & <tags>', $createdAt, $updatedAt, true, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -328,7 +336,7 @@ class TreeTest extends TestCase
     {
         $createdAt = new DateTime('2023-01-01 10:00:00');
         $updatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Tree with émojis 🌳', 'Description with émojis 🌲', $createdAt, $updatedAt, true);
+        $tree = new Tree(1, 'Tree with émojis 🌳', 'Description with émojis 🌲', $createdAt, $updatedAt, true, new MockClock());
 
         $serialized = $tree->jsonSerialize();
 
@@ -346,16 +354,17 @@ class TreeTest extends TestCase
 
     public function testMultipleSettersUpdateTimestamp(): void
     {
-        $tree = new Tree(1, 'Original Name', 'Original Description');
+        $mockClock = new MockClock(new DateTime('2023-01-01 10:00:00'));
+        $tree = new Tree(1, 'Original Name', 'Original Description', null, null, true, $mockClock);
         $originalUpdatedAt = $tree->getUpdatedAt();
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:01'));
         $tree->setName('New Name');
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:02'));
         $tree->setDescription('New Description');
 
-        usleep(1000);
+        $mockClock->setTime(new DateTime('2023-01-01 10:00:03'));
         $tree->setActive(false);
 
         $this->assertEquals('New Name', $tree->getName());
@@ -369,7 +378,7 @@ class TreeTest extends TestCase
         $customCreatedAt = new DateTime('2022-12-31 23:59:59');
         $customUpdatedAt = new DateTime('2023-01-01 00:00:01');
 
-        $tree = new Tree(1, 'Custom Tree', 'Custom Description', $customCreatedAt, $customUpdatedAt, true);
+        $tree = new Tree(1, 'Custom Tree', 'Custom Description', $customCreatedAt, $customUpdatedAt, true, new MockClock());
 
         $this->assertEquals($customCreatedAt, $tree->getCreatedAt());
         $this->assertEquals($customUpdatedAt, $tree->getUpdatedAt());
@@ -378,7 +387,8 @@ class TreeTest extends TestCase
     public function testConstructorWithOnlyCreatedAt(): void
     {
         $customCreatedAt = new DateTime('2023-01-01 10:00:00');
-        $tree = new Tree(1, 'Tree Name', 'Description', $customCreatedAt);
+        $mockClock = new MockClock(new DateTime('2023-01-01 11:00:00'));
+        $tree = new Tree(1, 'Tree Name', 'Description', $customCreatedAt, null, true, $mockClock);
 
         $this->assertEquals($customCreatedAt, $tree->getCreatedAt());
         $this->assertInstanceOf(DateTime::class, $tree->getUpdatedAt());
@@ -388,7 +398,7 @@ class TreeTest extends TestCase
     public function testConstructorWithOnlyUpdatedAt(): void
     {
         $customUpdatedAt = new DateTime('2023-01-01 11:00:00');
-        $tree = new Tree(1, 'Tree Name', 'Description', null, $customUpdatedAt);
+        $tree = new Tree(1, 'Tree Name', 'Description', null, $customUpdatedAt, true, new MockClock());
 
         $this->assertInstanceOf(DateTime::class, $tree->getCreatedAt());
         $this->assertEquals($customUpdatedAt, $tree->getUpdatedAt());

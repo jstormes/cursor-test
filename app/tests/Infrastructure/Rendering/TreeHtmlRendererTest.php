@@ -10,6 +10,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\AbstractTreeNode;
 use App\Domain\Tree\ButtonNode;
 use App\Domain\Tree\SimpleNode;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use DateTime;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,7 +30,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderTreeViewWithNodes(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Test Description', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'));
+        $tree = new Tree(1, 'Test Tree', 'Test Description', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), true, new MockClock());
         $rootNodes = [
             new SimpleNode(1, 'Root Node 1', 1),
             new ButtonNode(2, 'Root Node 2', 1, null, 0, ['href' => '#', 'class' => 'primary'])
@@ -58,7 +59,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderTreeViewWithNullDescription(): void
     {
-        $tree = new Tree(2, 'Tree Without Description', null, new DateTime('2023-02-01'));
+        $tree = new Tree(2, 'Tree Without Description', null, new DateTime('2023-02-01'), null, true, new MockClock());
         $rootNodes = [new SimpleNode(1, 'Single Node', 2)];
 
         $this->mockCssProvider->expects($this->once())
@@ -74,7 +75,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderTreeViewEscapesHtmlSpecialChars(): void
     {
-        $tree = new Tree(3, '<script>alert("xss")</script>', '<img src="x" onerror="alert(1)">', new DateTime('2023-03-01'));
+        $tree = new Tree(3, '<script>alert("xss")</script>', '<img src="x" onerror="alert(1)">', new DateTime('2023-03-01'), null, true, new MockClock());
         $rootNodes = [];
 
         $this->mockCssProvider->expects($this->once())
@@ -92,8 +93,8 @@ class TreeHtmlRendererTest extends TestCase
     public function testRenderTreeListWithTrees(): void
     {
         $trees = [
-            new Tree(1, 'First Tree', 'First description', new DateTime('2023-01-01 08:30:00')),
-            new Tree(2, 'Second Tree', null, new DateTime('2023-02-15 14:45:00'))
+            new Tree(1, 'First Tree', 'First description', new DateTime('2023-01-01 08:30:00'), null, true, new MockClock()),
+            new Tree(2, 'Second Tree', null, new DateTime('2023-02-15 14:45:00'), null, true, new MockClock())
         ];
 
         $this->mockCssProvider->expects($this->once())
@@ -147,7 +148,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderEmptyTree(): void
     {
-        $tree = new Tree(5, 'Empty Tree Name', 'Empty tree description', new DateTime('2023-05-01'));
+        $tree = new Tree(5, 'Empty Tree Name', 'Empty tree description', new DateTime('2023-05-01'), null, true, new MockClock());
 
         $this->mockCssProvider->expects($this->once())
             ->method('getSimplePageCSS')
@@ -164,7 +165,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderEmptyTreeEscapesHtml(): void
     {
-        $tree = new Tree(6, '<b>Bold Tree</b>', 'Description', new DateTime('2023-06-01'));
+        $tree = new Tree(6, '<b>Bold Tree</b>', 'Description', new DateTime('2023-06-01'), null, true, new MockClock());
 
         $this->mockCssProvider->expects($this->once())
             ->method('getSimplePageCSS')
@@ -178,7 +179,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderNoRootNodes(): void
     {
-        $tree = new Tree(7, 'No Root Nodes Tree', 'Has nodes but no root', new DateTime('2023-07-01'));
+        $tree = new Tree(7, 'No Root Nodes Tree', 'Has nodes but no root', new DateTime('2023-07-01'), null, true, new MockClock());
 
         $this->mockCssProvider->expects($this->once())
             ->method('getSimplePageCSS')
@@ -345,8 +346,8 @@ class TreeHtmlRendererTest extends TestCase
     public function testRenderDeletedTrees(): void
     {
         $deletedTrees = [
-            new Tree(1, 'Deleted Tree 1', 'First deleted', new DateTime('2023-01-01'), new DateTime('2023-01-05'), false),
-            new Tree(2, 'Deleted Tree 2', null, new DateTime('2023-02-01'), new DateTime('2023-02-10'), false)
+            new Tree(1, 'Deleted Tree 1', 'First deleted', new DateTime('2023-01-01'), new DateTime('2023-01-05'), false, new MockClock()),
+            new Tree(2, 'Deleted Tree 2', null, new DateTime('2023-02-01'), new DateTime('2023-02-10'), false, new MockClock())
         ];
 
         $this->mockCssProvider->expects($this->once())
@@ -389,7 +390,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRenderPageStructure(): void
     {
-        $tree = new Tree(1, 'Test', 'Description', new DateTime('2023-01-01'));
+        $tree = new Tree(1, 'Test', 'Description', new DateTime('2023-01-01'), null, true, new MockClock());
 
         $this->mockCssProvider->expects($this->once())
             ->method('getMainCSS')
@@ -412,7 +413,7 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testCssProviderIntegration(): void
     {
-        $tree = new Tree(1, 'CSS Test', null, new DateTime());
+        $tree = new Tree(1, 'CSS Test', null, new DateTime(), null, true, new MockClock());
 
         // Test that the main CSS and tree CSS are requested
         $this->mockCssProvider->expects($this->atLeastOnce())
@@ -450,8 +451,8 @@ class TreeHtmlRendererTest extends TestCase
 
     public function testRendererIsStateless(): void
     {
-        $tree1 = new Tree(1, 'Tree 1', null, new DateTime());
-        $tree2 = new Tree(2, 'Tree 2', null, new DateTime());
+        $tree1 = new Tree(1, 'Tree 1', null, new DateTime(), null, true, new MockClock());
+        $tree2 = new Tree(2, 'Tree 2', null, new DateTime(), null, true, new MockClock());
 
         $this->mockCssProvider->expects($this->exactly(2))
             ->method('getMainCSS')

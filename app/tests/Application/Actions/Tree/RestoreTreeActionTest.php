@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\RestoreTreeAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,7 +40,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testGetShowsConfirmationForm(): void
     {
-        $deletedTree = new Tree(1, 'Deleted Tree', 'A deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false);
+        $deletedTree = new Tree(1, 'Deleted Tree', 'A deleted tree', new DateTime('2023-01-01 10:00:00'), new DateTime('2023-01-02 15:30:00'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -115,7 +116,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testGetAlreadyActiveTree(): void
     {
-        $activeTree = new Tree(1, 'Active Tree', 'An active tree', new DateTime(), new DateTime(), true);
+        $activeTree = new Tree(1, 'Active Tree', 'An active tree', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -152,7 +153,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testPostSuccessfulRestore(): void
     {
-        $deletedTree = new Tree(1, 'Restore Me', 'Tree to be restored', new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'Restore Me', 'Tree to be restored', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -231,7 +232,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testPostAlreadyActiveTree(): void
     {
-        $activeTree = new Tree(1, 'Active Tree', 'Already active', new DateTime(), new DateTime(), true);
+        $activeTree = new Tree(1, 'Active Tree', 'Already active', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -340,7 +341,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testHtmlStructureAndContent(): void
     {
-        $deletedTree = new Tree(42, 'Structure Test', 'Testing HTML structure', new DateTime('2023-05-15 14:30:00'), new DateTime('2023-06-20 09:15:30'), false);
+        $deletedTree = new Tree(42, 'Structure Test', 'Testing HTML structure', new DateTime('2023-05-15 14:30:00'), new DateTime('2023-06-20 09:15:30'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -385,7 +386,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testTreeWithNullDescription(): void
     {
-        $deletedTree = new Tree(1, 'No Description Tree', null, new DateTime(), new DateTime(), false);
+        $deletedTree = new Tree(1, 'No Description Tree', null, new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -418,7 +419,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testConfirmationFormContent(): void
     {
-        $deletedTree = new Tree(5, 'Confirm Test', 'Testing confirmation', new DateTime('2023-01-15 10:30:00'), new DateTime('2023-02-20 16:45:00'), false);
+        $deletedTree = new Tree(5, 'Confirm Test', 'Testing confirmation', new DateTime('2023-01-15 10:30:00'), new DateTime('2023-02-20 16:45:00'), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -470,7 +471,7 @@ class RestoreTreeActionTest extends TestCase
 
     public function testSuccessPageContent(): void
     {
-        $restoredTree = new Tree(10, 'Successfully Restored', 'This tree was restored', new DateTime(), new DateTime(), false);
+        $restoredTree = new Tree(10, 'Successfully Restored', 'This tree was restored', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')

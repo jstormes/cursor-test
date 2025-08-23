@@ -8,6 +8,7 @@ use App\Domain\Tree\Tree;
 use App\Infrastructure\Database\DatabaseConnection;
 use App\Infrastructure\Database\TreeDataMapper;
 use App\Infrastructure\Persistence\Tree\DatabaseTreeRepository;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use DateTime;
 use PDOStatement;
@@ -46,7 +47,7 @@ class DatabaseTreeRepositoryTest extends TestCase
             ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE id = ?', [1])
             ->willReturn($mockStatement);
 
-        $expectedTree = new Tree(1, 'Test Tree', 'A test tree');
+        $expectedTree = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToEntity')
@@ -110,7 +111,7 @@ class DatabaseTreeRepositoryTest extends TestCase
             ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE name = ?', ['Test Tree'])
             ->willReturn($mockStatement);
 
-        $expectedTree = new Tree(1, 'Test Tree', 'A test tree');
+        $expectedTree = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToEntity')
@@ -185,8 +186,8 @@ class DatabaseTreeRepositoryTest extends TestCase
             ->willReturn($mockStatement);
 
         $expectedTrees = [
-            new Tree(1, 'Tree 1', 'First tree'),
-            new Tree(2, 'Tree 2', 'Second tree')
+            new Tree(1, 'Tree 1', 'First tree', null, null, true, new MockClock()),
+            new Tree(2, 'Tree 2', 'Second tree', null, null, true, new MockClock())
         ];
 
         $this->mockDataMapper->expects($this->once())
@@ -241,7 +242,7 @@ class DatabaseTreeRepositoryTest extends TestCase
             ->willReturn($mockStatement);
 
         $expectedTrees = [
-            new Tree(1, 'Active Tree', 'An active tree')
+            new Tree(1, 'Active Tree', 'An active tree', null, null, true, new MockClock())
         ];
 
         $this->mockDataMapper->expects($this->once())
@@ -296,7 +297,7 @@ class DatabaseTreeRepositoryTest extends TestCase
             ->willReturn($mockStatement);
 
         $expectedTrees = [
-            new Tree(1, 'Deleted Tree', 'A deleted tree')
+            new Tree(1, 'Deleted Tree', 'A deleted tree', null, null, true, new MockClock())
         ];
 
         $this->mockDataMapper->expects($this->once())
@@ -331,7 +332,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
     public function testSaveInsert(): void
     {
-        $tree = new Tree(null, 'New Tree', 'A new tree');
+        $tree = new Tree(null, 'New Tree', 'A new tree', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
@@ -361,7 +362,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
     public function testSaveUpdate(): void
     {
-        $tree = new Tree(1, 'Updated Tree', 'An updated tree');
+        $tree = new Tree(1, 'Updated Tree', 'An updated tree', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
@@ -387,7 +388,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
     public function testSaveWithZeroId(): void
     {
-        $tree = new Tree(0, 'Tree with Zero ID', 'A tree with zero ID');
+        $tree = new Tree(0, 'Tree with Zero ID', 'A tree with zero ID', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
@@ -467,7 +468,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
     public function testSaveWithNullDescription(): void
     {
-        $tree = new Tree(null, 'Tree with Null Description', null);
+        $tree = new Tree(null, 'Tree with Null Description', null, null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')
@@ -497,7 +498,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
     public function testSaveWithEmptyName(): void
     {
-        $tree = new Tree(null, '', 'Empty name tree');
+        $tree = new Tree(null, '', 'Empty name tree', null, null, true, new MockClock());
 
         $this->mockDataMapper->expects($this->once())
             ->method('mapToArray')

@@ -20,6 +20,8 @@ use App\Domain\Tree\TreeNotFoundException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Database\UnitOfWork;
+use App\Infrastructure\Time\ClockInterface;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 
 class TreeServiceTest extends TestCase
@@ -31,6 +33,7 @@ class TreeServiceTest extends TestCase
     private TreeNodeFactory $mockNodeFactory;
     private TreeValidator $mockTreeValidator;
     private TreeNodeValidator $mockNodeValidator;
+    private ClockInterface $mockClock;
 
     protected function setUp(): void
     {
@@ -42,6 +45,7 @@ class TreeServiceTest extends TestCase
         $this->mockNodeFactory = $this->createMock(TreeNodeFactory::class);
         $this->mockTreeValidator = $this->createMock(TreeValidator::class);
         $this->mockNodeValidator = $this->createMock(TreeNodeValidator::class);
+        $this->mockClock = $this->createMock(ClockInterface::class);
 
         $this->service = new TreeService(
             $this->mockTreeRepository,
@@ -49,7 +53,8 @@ class TreeServiceTest extends TestCase
             $this->mockUnitOfWork,
             $this->mockNodeFactory,
             $this->mockTreeValidator,
-            $this->mockNodeValidator
+            $this->mockNodeValidator,
+            $this->mockClock
         );
     }
 
@@ -88,7 +93,7 @@ class TreeServiceTest extends TestCase
             ]
         ];
 
-        $expectedTree = new Tree(null, 'Test Tree', 'A test tree');
+        $expectedTree = new Tree(null, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         // Mock validation
         $validResult = new ValidationResult(true);
@@ -543,7 +548,7 @@ class TreeServiceTest extends TestCase
     public function testDeleteTreeWithNodes(): void
     {
         $nodes = [new SimpleNode(1, 'Node', 1, null, 0)];
-        $tree = new Tree(1, 'Test Tree', 'A test tree');
+        $tree = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->mockUnitOfWork->expects($this->once())
             ->method('beginTransaction');
@@ -615,7 +620,7 @@ class TreeServiceTest extends TestCase
 
     public function testGetTreeStructure(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree');
+        $tree = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
         $nodes = [
             new SimpleNode(1, 'Root', 1, null, 0),
             new ButtonNode(2, 'Button', 1, 1, 0, [
@@ -654,7 +659,7 @@ class TreeServiceTest extends TestCase
 
     public function testGetTreeStructureWithEmptyNodes(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'A test tree');
+        $tree = new Tree(1, 'Test Tree', 'A test tree', null, null, true, new MockClock());
 
         $this->mockTreeRepository->expects($this->once())
             ->method('findById')

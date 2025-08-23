@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,7 +46,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testCreateSimpleNodeSuccess(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -93,7 +94,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testCreateButtonNodeSuccess(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -171,7 +172,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testInvalidJsonData(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -205,7 +206,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testEmptyNodeName(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -245,7 +246,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testNodeNameTooLong(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $longName = str_repeat('A', 256);
 
         $this->request->expects($this->once())
@@ -286,7 +287,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testButtonNodeWithoutButtonText(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -327,7 +328,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testInvalidParentNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getParsedBody')
@@ -373,7 +374,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testValidParentNode(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $parentNode = new SimpleNode(5, 'Parent', 1, null, 0);
 
         $this->request->expects($this->once())
@@ -457,7 +458,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testButtonTextTooLong(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $longButtonText = str_repeat('A', 101);
 
         $this->request->expects($this->once())
@@ -499,7 +500,7 @@ class AddNodeJsonActionTest extends TestCase
 
     public function testButtonActionTooLong(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
         $longButtonAction = str_repeat('A', 256);
 
         $this->request->expects($this->once())

@@ -7,6 +7,7 @@ namespace App\Tests\Application\Actions\Tree;
 use App\Application\Actions\Tree\DeleteTreeAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Tests\Utilities\MockClock;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,7 +40,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testGetRequestShowsConfirmationForm(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -106,7 +107,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testGetRequestWithAlreadyDeletedTree(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -140,7 +141,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testPostRequestDeletesTree(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -212,7 +213,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testPostRequestWithAlreadyDeletedTree(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), false, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -297,7 +298,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testConfirmationFormHtmlStructure(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Test description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Test description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
@@ -339,7 +340,7 @@ class DeleteTreeActionTest extends TestCase
 
     public function testSuccessHtmlContent(): void
     {
-        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true);
+        $tree = new Tree(1, 'Test Tree', 'Description', new DateTime(), new DateTime(), true, new MockClock());
 
         $this->request->expects($this->once())
             ->method('getMethod')
