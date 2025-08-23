@@ -237,7 +237,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
         $this->mockConnection->expects($this->once())
             ->method('query')
-            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 1 ORDER BY name')
+            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = ? ORDER BY name', [1])
             ->willReturn($mockStatement);
 
         $expectedTrees = [
@@ -262,7 +262,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
         $this->mockConnection->expects($this->once())
             ->method('query')
-            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 1 ORDER BY name')
+            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = ? ORDER BY name', [1])
             ->willReturn($mockStatement);
 
         $this->mockDataMapper->expects($this->once())
@@ -292,7 +292,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
         $this->mockConnection->expects($this->once())
             ->method('query')
-            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 0 ORDER BY name')
+            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = ? ORDER BY name', [0])
             ->willReturn($mockStatement);
 
         $expectedTrees = [
@@ -317,7 +317,7 @@ class DatabaseTreeRepositoryTest extends TestCase
 
         $this->mockConnection->expects($this->once())
             ->method('query')
-            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 0 ORDER BY name')
+            ->with('SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = ? ORDER BY name', [0])
             ->willReturn($mockStatement);
 
         $this->mockDataMapper->expects($this->once())

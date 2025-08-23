@@ -9,6 +9,7 @@ use App\Application\Validation\TreeValidator;
 use App\Application\Exceptions\ValidationException;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Infrastructure\Rendering\CssProviderInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -19,7 +20,8 @@ final class AddTreeAction extends Action
     public function __construct(
         LoggerInterface $logger,
         private TreeRepository $treeRepository,
-        private TreeValidator $validator
+        private TreeValidator $validator,
+        private CssProviderInterface $cssProvider
     ) {
         parent::__construct($logger);
     }
@@ -107,7 +109,7 @@ final class AddTreeAction extends Action
         $description = htmlspecialchars($formData['description'] ?? '');
         $errorHtml = $error ? "<div class='error-message'>{$this->escapeHtml($error)}</div>" : '';
 
-        $css = $this->getCSS();
+        $css = $this->cssProvider->getMainCSS();
 
         return <<<HTML
 <!DOCTYPE html>
@@ -211,167 +213,5 @@ HTML;
 
         $this->response->getBody()->write($html);
         return $this->response->withHeader('Content-Type', 'text/html');
-    }
-
-
-    private function getCSS(): string
-    {
-        return <<<CSS
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    color: #333;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-    color: white;
-}
-
-.header h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.description {
-    font-size: 1.2em;
-    opacity: 0.9;
-    margin-bottom: 20px;
-}
-
-.form-container {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-}
-
-.error-message {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
-}
-
-.tree-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-group label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group textarea {
-    padding: 12px;
-    border: 2px solid #e1e5e9;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-    font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.form-group small {
-    color: #666;
-    font-size: 12px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    
-    .header h1 {
-        font-size: 2em;
-    }
-    
-    .form-container {
-        padding: 20px;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn {
-        width: 200px;
-    }
-}
-CSS;
     }
 }

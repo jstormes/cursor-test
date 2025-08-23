@@ -9,6 +9,7 @@ use App\Application\Validation\TreeValidator;
 use App\Application\Validation\ValidationResult;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\Tree;
+use App\Infrastructure\Rendering\CssProviderInterface;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,6 +26,7 @@ class AddTreeActionTest extends TestCase
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
     private TreeValidator $validator;
+    private CssProviderInterface $cssProvider;
 
     protected function setUp(): void
     {
@@ -34,11 +36,13 @@ class AddTreeActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->validator = $this->createMock(TreeValidator::class);
+        $this->cssProvider = $this->createMock(CssProviderInterface::class);
 
         $this->action = new AddTreeAction(
             $this->logger,
             $this->treeRepository,
-            $this->validator
+            $this->validator,
+            $this->cssProvider
         );
     }
 

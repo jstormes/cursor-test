@@ -8,21 +8,24 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\TreeRepository;
 use App\Infrastructure\Database\DatabaseConnection;
 use App\Infrastructure\Database\TreeDataMapper;
+use App\Infrastructure\Persistence\BaseRepository;
 
-class DatabaseTreeRepository implements TreeRepository
+class DatabaseTreeRepository extends BaseRepository implements TreeRepository
 {
+    private const TABLE = 'trees';
+    private const COLUMNS = 'id, name, description, created_at, updated_at, is_active';
+
     public function __construct(
-        private DatabaseConnection $connection,
+        DatabaseConnection $connection,
         private TreeDataMapper $dataMapper
     ) {
+        parent::__construct($connection);
     }
 
     #[\Override]
     public function findById(int $id): ?Tree
     {
-        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE id = ?';
-        $statement = $this->connection->query($sql, [$id]);
-        $data = $statement->fetch();
+        $data = $this->findByField(self::TABLE, 'id', $id, self::COLUMNS);
 
         if (!$data) {
             return null;
@@ -34,9 +37,7 @@ class DatabaseTreeRepository implements TreeRepository
     #[\Override]
     public function findByName(string $name): ?Tree
     {
-        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE name = ?';
-        $statement = $this->connection->query($sql, [$name]);
-        $data = $statement->fetch();
+        $data = $this->findByField(self::TABLE, 'name', $name, self::COLUMNS);
 
         if (!$data) {
             return null;
@@ -48,9 +49,7 @@ class DatabaseTreeRepository implements TreeRepository
     #[\Override]
     public function findAll(): array
     {
-        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees ORDER BY name';
-        $statement = $this->connection->query($sql);
-        $data = $statement->fetchAll();
+        $data = $this->findAllRecords(self::TABLE, self::COLUMNS, 'name');
 
         return $this->dataMapper->mapToEntities($data);
     }
@@ -58,9 +57,7 @@ class DatabaseTreeRepository implements TreeRepository
     #[\Override]
     public function findActive(): array
     {
-        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 1 ORDER BY name';
-        $statement = $this->connection->query($sql);
-        $data = $statement->fetchAll();
+        $data = $this->findAllByField(self::TABLE, 'is_active', 1, self::COLUMNS, 'name');
 
         return $this->dataMapper->mapToEntities($data);
     }
@@ -71,61 +68,57 @@ class DatabaseTreeRepository implements TreeRepository
         $data = $this->dataMapper->mapToArray($tree);
 
         if ($tree->getId() === null) {
-            // Insert
-            $sql = 'INSERT INTO trees (name, description, created_at, updated_at, is_active) VALUES (?, ?, ?, ?, ?)';
-            $this->connection->execute($sql, [
-                $data['name'],
-                $data['description'],
-                $data['created_at'],
-                $data['updated_at'],
-                $data['is_active']
-            ]);
+            // Insert - exclude ID from data
+            $insertData = [
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'created_at' => $data['created_at'],
+                'updated_at' => $data['updated_at'],
+                'is_active' => $data['is_active']
+            ];
+            
+            $newId = $this->insert(self::TABLE, $insertData);
 
             // Set the ID using reflection since there's no setId method
             $reflection = new \ReflectionClass($tree);
             $idProperty = $reflection->getProperty('id');
             $idProperty->setAccessible(true);
-            $idProperty->setValue($tree, (int) $this->connection->lastInsertId());
+            $idProperty->setValue($tree, $newId);
         } else {
-            // Update
-            $sql = 'UPDATE trees SET name = ?, description = ?, updated_at = ?, is_active = ? WHERE id = ?';
-            $this->connection->execute($sql, [
-                $data['name'],
-                $data['description'],
-                $data['updated_at'],
-                $data['is_active'],
-                $data['id']
-            ]);
+            // Update - exclude ID from data
+            $updateData = [
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'updated_at' => $data['updated_at'],
+                'is_active' => $data['is_active']
+            ];
+            
+            $this->update(self::TABLE, $updateData, 'id', $data['id']);
         }
     }
 
     #[\Override]
     public function delete(int $id): void
     {
-        $sql = 'DELETE FROM trees WHERE id = ?';
-        $this->connection->execute($sql, [$id]);
+        $this->deleteById(self::TABLE, 'id', $id);
     }
 
     #[\Override]
     public function softDelete(int $id): void
     {
-        $sql = 'UPDATE trees SET is_active = 0, updated_at = NOW() WHERE id = ?';
-        $this->connection->execute($sql, [$id]);
+        $this->softDeleteRecord(self::TABLE, 'id', $id, 'is_active');
     }
 
     #[\Override]
     public function restore(int $id): void
     {
-        $sql = 'UPDATE trees SET is_active = 1, updated_at = NOW() WHERE id = ?';
-        $this->connection->execute($sql, [$id]);
+        $this->restoreRecord(self::TABLE, 'id', $id, 'is_active');
     }
 
     #[\Override]
     public function findDeleted(): array
     {
-        $sql = 'SELECT id, name, description, created_at, updated_at, is_active FROM trees WHERE is_active = 0 ORDER BY name';
-        $statement = $this->connection->query($sql);
-        $data = $statement->fetchAll();
+        $data = $this->findAllByField(self::TABLE, 'is_active', 0, self::COLUMNS, 'name');
 
         return $this->dataMapper->mapToEntities($data);
     }
@@ -136,8 +129,7 @@ class DatabaseTreeRepository implements TreeRepository
         // This method is for deleting nodes associated with a tree
         // For the tree repository, this might be handled by cascading deletes
         // or delegated to a node repository
-        $sql = 'DELETE FROM tree_nodes WHERE tree_id = ?';
-        $this->connection->execute($sql, [$treeId]);
+        $this->deleteById('tree_nodes', 'tree_id', $treeId);
     }
 
     #[\Override]

@@ -8,22 +8,25 @@ use App\Domain\Tree\AbstractTreeNode;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Database\DatabaseConnection;
 use App\Infrastructure\Database\TreeNodeDataMapper;
+use App\Infrastructure\Persistence\BaseRepository;
 use DateTime;
 
-class DatabaseTreeNodeRepository implements TreeNodeRepository
+class DatabaseTreeNodeRepository extends BaseRepository implements TreeNodeRepository
 {
+    private const TABLE = 'tree_nodes';
+    private const COLUMNS = 'id, tree_id, parent_id, name, sort_order, type_class, type_data';
+
     public function __construct(
-        private DatabaseConnection $connection,
+        DatabaseConnection $connection,
         private TreeNodeDataMapper $dataMapper
     ) {
+        parent::__construct($connection);
     }
 
     #[\Override]
     public function findById(int $id): ?AbstractTreeNode
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data FROM tree_nodes WHERE id = ?';
-        $statement = $this->connection->query($sql, [$id]);
-        $data = $statement->fetch();
+        $data = $this->findByField(self::TABLE, 'id', $id, self::COLUMNS);
 
         if (!$data) {
             return null;
@@ -35,10 +38,7 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findByTreeId(int $treeId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
-               'FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
-        $statement = $this->connection->query($sql, [$treeId]);
-        $data = $statement->fetchAll();
+        $data = $this->findAllByField(self::TABLE, 'tree_id', $treeId, self::COLUMNS, 'sort_order');
 
         return $this->dataMapper->mapToEntities($data);
     }
@@ -46,15 +46,11 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findChildren(int $parentId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
-               'FROM tree_nodes WHERE parent_id = ? ORDER BY sort_order';
-        $statement = $this->connection->query($sql, [$parentId]);
-        $data = $statement->fetchAll();
+        $data = $this->findAllByField(self::TABLE, 'parent_id', $parentId, self::COLUMNS, 'sort_order');
 
         return $this->dataMapper->mapToEntities($data);
     }
 
-    #[\Override]
     public function findRootNodes(int $treeId): array
     {
         $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
@@ -68,11 +64,7 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
     #[\Override]
     public function findTreeStructure(int $treeId): array
     {
-        $sql = 'SELECT id, tree_id, parent_id, name, sort_order, type_class, type_data ' .
-               'FROM tree_nodes WHERE tree_id = ? ORDER BY sort_order';
-        $statement = $this->connection->query($sql, [$treeId]);
-        $data = $statement->fetchAll();
-
+        $data = $this->findAllByField(self::TABLE, 'tree_id', $treeId, self::COLUMNS, 'sort_order');
         $nodes = $this->dataMapper->mapToEntities($data);
 
         // Build tree structure
@@ -104,47 +96,44 @@ class DatabaseTreeNodeRepository implements TreeNodeRepository
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
         if ($node->getId() === null) {
-            // Insert
-            $sql = 'INSERT INTO tree_nodes (tree_id, parent_id, name, sort_order, type_class, type_data, ' .
-                   'created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-            $this->connection->execute($sql, [
-                $data['tree_id'],
-                $data['parent_id'],
-                $data['name'],
-                $data['sort_order'],
-                $data['type_class'],
-                $data['type_data'],
-                $now,
-                $now
-            ]);
+            // Insert - exclude ID from data, add timestamps
+            $insertData = [
+                'tree_id' => $data['tree_id'],
+                'parent_id' => $data['parent_id'],
+                'name' => $data['name'],
+                'sort_order' => $data['sort_order'],
+                'type_class' => $data['type_class'],
+                'type_data' => $data['type_data'],
+                'created_at' => $now,
+                'updated_at' => $now
+            ];
+            
+            $this->insert(self::TABLE, $insertData);
         } else {
-            // Update
-            $sql = 'UPDATE tree_nodes SET tree_id = ?, parent_id = ?, name = ?, sort_order = ?, ' .
-                   'type_class = ?, type_data = ?, updated_at = ? WHERE id = ?';
-            $this->connection->execute($sql, [
-                $data['tree_id'],
-                $data['parent_id'],
-                $data['name'],
-                $data['sort_order'],
-                $data['type_class'],
-                $data['type_data'],
-                $now,
-                $data['id']
-            ]);
+            // Update - exclude ID and created_at from data
+            $updateData = [
+                'tree_id' => $data['tree_id'],
+                'parent_id' => $data['parent_id'],
+                'name' => $data['name'],
+                'sort_order' => $data['sort_order'],
+                'type_class' => $data['type_class'],
+                'type_data' => $data['type_data'],
+                'updated_at' => $now
+            ];
+            
+            $this->update(self::TABLE, $updateData, 'id', $data['id']);
         }
     }
 
     #[\Override]
     public function delete(int $id): void
     {
-        $sql = 'DELETE FROM tree_nodes WHERE id = ?';
-        $this->connection->execute($sql, [$id]);
+        $this->deleteById(self::TABLE, 'id', $id);
     }
 
     #[\Override]
     public function deleteByTreeId(int $treeId): void
     {
-        $sql = 'DELETE FROM tree_nodes WHERE tree_id = ?';
-        $this->connection->execute($sql, [$treeId]);
+        $this->deleteById(self::TABLE, 'tree_id', $treeId);
     }
 }
