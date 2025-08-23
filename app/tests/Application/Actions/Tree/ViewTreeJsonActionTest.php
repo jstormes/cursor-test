@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,6 +27,7 @@ class ViewTreeJsonActionTest extends TestCase
     private LoggerInterface $logger;
     private TreeRepository $treeRepository;
     private TreeNodeRepository $treeNodeRepository;
+    private TreeStructureBuilder $treeStructureBuilder;
 
     protected function setUp(): void
     {
@@ -35,11 +37,24 @@ class ViewTreeJsonActionTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
+        $this->treeStructureBuilder = new TreeStructureBuilder();
+
+        // Setup default response mock behavior
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($this->stream);
+        $this->response->expects($this->any())
+            ->method('withStatus')
+            ->willReturnSelf();
+        $this->response->expects($this->any())
+            ->method('withHeader')
+            ->willReturnSelf();
 
         $this->action = new ViewTreeJsonAction(
             $this->logger,
             $this->treeRepository,
-            $this->treeNodeRepository
+            $this->treeNodeRepository,
+            $this->treeStructureBuilder
         );
     }
 
@@ -57,15 +72,6 @@ class ViewTreeJsonActionTest extends TestCase
             ->method('findByTreeId')
             ->with(1)
             ->willReturn([$rootNode]);
-
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')

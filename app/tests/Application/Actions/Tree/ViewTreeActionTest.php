@@ -11,6 +11,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,6 +29,7 @@ class ViewTreeActionTest extends TestCase
     private TreeRepository $treeRepository;
     private TreeNodeRepository $treeNodeRepository;
     private HtmlRendererInterface $htmlRenderer;
+    private TreeStructureBuilder $treeStructureBuilder;
 
     protected function setUp(): void
     {
@@ -38,12 +40,25 @@ class ViewTreeActionTest extends TestCase
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
         $this->htmlRenderer = $this->createMock(HtmlRendererInterface::class);
+        $this->treeStructureBuilder = new TreeStructureBuilder();
+
+        // Setup default response mock behavior
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($this->stream);
+        $this->response->expects($this->any())
+            ->method('withStatus')
+            ->willReturnSelf();
+        $this->response->expects($this->any())
+            ->method('withHeader')
+            ->willReturnSelf();
 
         $this->action = new ViewTreeAction(
             $this->logger,
+            $this->htmlRenderer,
             $this->treeRepository,
             $this->treeNodeRepository,
-            $this->htmlRenderer
+            $this->treeStructureBuilder
         );
     }
 

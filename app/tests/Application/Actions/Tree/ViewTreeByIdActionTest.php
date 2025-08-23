@@ -11,6 +11,7 @@ use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
 use App\Infrastructure\Rendering\CssProviderInterface;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -52,11 +53,25 @@ class ViewTreeByIdActionTest extends TestCase
             .tree li div { border: 1px solid #ccc; }
         ');
 
+        // Setup default response mock behavior
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($this->stream);
+        $this->response->expects($this->any())
+            ->method('withStatus')
+            ->willReturnSelf();
+        $this->response->expects($this->any())
+            ->method('withHeader')
+            ->willReturnSelf();
+
+        $treeStructureBuilder = new TreeStructureBuilder();
+        
         $this->action = new ViewTreeByIdAction(
             $this->logger,
             $this->treeRepository,
             $this->treeNodeRepository,
-            $this->cssProvider
+            $this->cssProvider,
+            $treeStructureBuilder
         );
     }
 

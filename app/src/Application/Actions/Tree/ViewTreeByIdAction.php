@@ -9,6 +9,7 @@ use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\HtmlTreeNodeRenderer;
 use App\Infrastructure\Rendering\CssProviderInterface;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -19,7 +20,8 @@ class ViewTreeByIdAction extends Action
         LoggerInterface $logger,
         private TreeRepository $treeRepository,
         private TreeNodeRepository $treeNodeRepository,
-        private CssProviderInterface $cssProvider
+        private CssProviderInterface $cssProvider,
+        private TreeStructureBuilder $treeStructureBuilder
     ) {
         parent::__construct($logger);
     }
@@ -46,7 +48,7 @@ class ViewTreeByIdAction extends Action
             }
 
             // Build the tree structure from database nodes
-            $rootNodes = $this->buildTreeFromNodes($nodes);
+            $rootNodes = $this->treeStructureBuilder->buildTreeFromNodes($nodes);
 
             if (empty($rootNodes)) {
                 return $this->generateNoRootNodesHTML($tree);
@@ -75,33 +77,6 @@ class ViewTreeByIdAction extends Action
             $this->logger->error('Error loading tree by ID: ' . $e->getMessage());
             return $this->generateErrorHTML($e->getMessage(), 'Error Loading Tree');
         }
-    }
-
-    private function buildTreeFromNodes(array $nodes): array
-    {
-        $nodeMap = [];
-        $rootNodes = [];
-
-        // Create a map of all nodes by ID
-        foreach ($nodes as $node) {
-            $nodeMap[$node->getId()] = $node;
-        }
-
-        // Build the tree structure
-        foreach ($nodes as $node) {
-            if ($node->getParentId() === null) {
-                // This is a root node
-                $rootNodes[] = $node;
-            } else {
-                // This is a child node
-                $parent = $nodeMap[$node->getParentId()] ?? null;
-                if ($parent) {
-                    $parent->addChild($node);
-                }
-            }
-        }
-
-        return $rootNodes;
     }
 
     private function generateHTML(string $treeHtml, \App\Domain\Tree\Tree $tree): string

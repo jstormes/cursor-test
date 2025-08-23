@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Application\Middleware\PerformanceMiddleware;
 use App\Application\Settings\SettingsInterface;
 use App\Application\Services\TreeService;
+use App\Application\Services\ValidationService;
 use App\Application\Validation\TreeValidator;
 use App\Application\Validation\TreeNodeValidator;
 use App\Application\Configuration\EnvironmentValidator;
@@ -28,6 +29,7 @@ use App\Infrastructure\Rendering\CssProviderInterface;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
 use App\Infrastructure\Rendering\StaticCssProvider;
 use App\Infrastructure\Rendering\TreeHtmlRenderer;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use App\Infrastructure\Time\ClockInterface;
 use App\Infrastructure\Time\SystemClock;
 use DI\ContainerBuilder;
@@ -136,6 +138,17 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(TreeValidator::class),
                 $c->get(TreeNodeValidator::class)
             );
+        },
+
+        ValidationService::class => function (ContainerInterface $c) {
+            return new ValidationService(
+                $c->get(TreeValidator::class),
+                $c->get(TreeNodeValidator::class)
+            );
+        },
+
+        TreeStructureBuilder::class => function (ContainerInterface $c) {
+            return new TreeStructureBuilder();
         },
 
         // Validators

@@ -8,6 +8,7 @@ use App\Application\Actions\Action;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\HtmlTreeNodeRenderer;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
@@ -17,7 +18,8 @@ class ViewTreeByIdReadOnlyAction extends Action
     public function __construct(
         LoggerInterface $logger,
         private TreeRepository $treeRepository,
-        private TreeNodeRepository $treeNodeRepository
+        private TreeNodeRepository $treeNodeRepository,
+        private TreeStructureBuilder $treeStructureBuilder
     ) {
         parent::__construct($logger);
     }
@@ -44,7 +46,7 @@ class ViewTreeByIdReadOnlyAction extends Action
             }
 
             // Build the tree structure from database nodes
-            $rootNodes = $this->buildTreeFromNodes($nodes);
+            $rootNodes = $this->treeStructureBuilder->buildTreeFromNodes($nodes);
 
             if (empty($rootNodes)) {
                 return $this->generateNoRootNodesHTML($tree);
@@ -70,32 +72,6 @@ class ViewTreeByIdReadOnlyAction extends Action
         }
     }
 
-    private function buildTreeFromNodes(array $nodes): array
-    {
-        $nodeMap = [];
-        $rootNodes = [];
-
-        // Create a map of all nodes by ID
-        foreach ($nodes as $node) {
-            $nodeMap[$node->getId()] = $node;
-        }
-
-        // Build the tree structure
-        foreach ($nodes as $node) {
-            if ($node->getParentId() === null) {
-                // This is a root node
-                $rootNodes[] = $node;
-            } else {
-                // This is a child node
-                $parent = $nodeMap[$node->getParentId()] ?? null;
-                if ($parent) {
-                    $parent->addChild($node);
-                }
-            }
-        }
-
-        return $rootNodes;
-    }
 
     private function generateHTML(string $treeHtml, \App\Domain\Tree\Tree $tree): string
     {

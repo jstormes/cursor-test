@@ -4,23 +4,25 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\Tree;
 
-use App\Application\Actions\Action;
+use App\Application\Actions\AbstractHtmlAction;
 use App\Domain\Tree\TreeRepository;
 use App\Domain\Tree\TreeNodeRepository;
 use App\Infrastructure\Rendering\HtmlRendererInterface;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 
-class ViewTreeAction extends Action
+class ViewTreeAction extends AbstractHtmlAction
 {
     public function __construct(
         LoggerInterface $logger,
+        HtmlRendererInterface $htmlRenderer,
         private TreeRepository $treeRepository,
         private TreeNodeRepository $treeNodeRepository,
-        private HtmlRendererInterface $htmlRenderer
+        private TreeStructureBuilder $treeStructureBuilder
     ) {
-        parent::__construct($logger);
+        parent::__construct($logger, $htmlRenderer);
     }
 
     #[\Override]
@@ -32,8 +34,7 @@ class ViewTreeAction extends Action
 
             if (empty($trees)) {
                 $html = $this->htmlRenderer->renderNoTrees();
-                $this->response->getBody()->write($html);
-                return $this->response->withHeader('Content-Type', 'text/html');
+                return $this->respondWithHtml($html);
             }
 
             $tree = $trees[0]; // Use the first active tree
@@ -44,54 +45,21 @@ class ViewTreeAction extends Action
 
             if (empty($nodes)) {
                 $html = $this->htmlRenderer->renderEmptyTree($tree);
-                $this->response->getBody()->write($html);
-                return $this->response->withHeader('Content-Type', 'text/html');
+                return $this->respondWithHtml($html);
             }
 
             // Build the tree structure from database nodes
-            $rootNodes = $this->buildTreeFromNodes($nodes);
+            $rootNodes = $this->treeStructureBuilder->buildTreeFromNodes($nodes);
 
             if (empty($rootNodes)) {
                 $html = $this->htmlRenderer->renderNoRootNodes($tree);
-                $this->response->getBody()->write($html);
-                return $this->response->withHeader('Content-Type', 'text/html');
+                return $this->respondWithHtml($html);
             }
 
             $html = $this->htmlRenderer->renderTreeView($tree, $rootNodes);
-            $this->response->getBody()->write($html);
-            return $this->response->withHeader('Content-Type', 'text/html');
+            return $this->respondWithHtml($html);
         } catch (\Exception $e) {
-            $this->logger->error('Error loading tree: ' . $e->getMessage());
-            $html = $this->htmlRenderer->renderError($e->getMessage(), 'Error Loading Tree');
-            $this->response->getBody()->write($html);
-            return $this->response->withHeader('Content-Type', 'text/html');
+            return $this->handleError($e, 'Error Loading Tree');
         }
-    }
-
-    private function buildTreeFromNodes(array $nodes): array
-    {
-        $nodeMap = [];
-        $rootNodes = [];
-
-        // Create a map of all nodes by ID
-        foreach ($nodes as $node) {
-            $nodeMap[$node->getId()] = $node;
-        }
-
-        // Build the tree structure
-        foreach ($nodes as $node) {
-            if ($node->getParentId() === null) {
-                // This is a root node
-                $rootNodes[] = $node;
-            } else {
-                // This is a child node
-                $parent = $nodeMap[$node->getParentId()] ?? null;
-                if ($parent) {
-                    $parent->addChild($node);
-                }
-            }
-        }
-
-        return $rootNodes;
     }
 }

@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,10 +37,24 @@ class ViewTreeByIdReadOnlyActionTest extends TestCase
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
 
+        // Setup default response mock behavior
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($this->stream);
+        $this->response->expects($this->any())
+            ->method('withStatus')
+            ->willReturnSelf();
+        $this->response->expects($this->any())
+            ->method('withHeader')
+            ->willReturnSelf();
+
+        $treeStructureBuilder = new TreeStructureBuilder();
+        
         $this->action = new ViewTreeByIdReadOnlyAction(
             $this->logger,
             $this->treeRepository,
-            $this->treeNodeRepository
+            $this->treeNodeRepository,
+            $treeStructureBuilder
         );
     }
 

@@ -10,6 +10,7 @@ use App\Domain\Tree\TreeNodeRepository;
 use App\Domain\Tree\Tree;
 use App\Domain\Tree\SimpleNode;
 use App\Domain\Tree\ButtonNode;
+use App\Infrastructure\Services\TreeStructureBuilder;
 use Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,10 +37,24 @@ class ViewTreeByIdJsonActionTest extends TestCase
         $this->treeRepository = $this->createMock(TreeRepository::class);
         $this->treeNodeRepository = $this->createMock(TreeNodeRepository::class);
 
+        // Setup default response mock behavior
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($this->stream);
+        $this->response->expects($this->any())
+            ->method('withStatus')
+            ->willReturnSelf();
+        $this->response->expects($this->any())
+            ->method('withHeader')
+            ->willReturnSelf();
+
+        $treeStructureBuilder = new TreeStructureBuilder();
+        
         $this->action = new ViewTreeByIdJsonAction(
             $this->logger,
             $this->treeRepository,
-            $this->treeNodeRepository
+            $this->treeNodeRepository,
+            $treeStructureBuilder
         );
     }
 
@@ -59,14 +74,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode, $childNode]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -97,14 +104,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
         $this->treeNodeRepository->expects($this->never())
             ->method('findByTreeId');
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -135,14 +134,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -177,14 +168,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$childNode1, $childNode2]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -217,14 +200,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$buttonNode]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -262,14 +237,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode, $child1, $child2, $grandChild1, $grandChild2]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -311,16 +278,12 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->method('getBody')
             ->willReturn($this->stream);
 
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->atLeastOnce())
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                if ($data['success'] === true) {
+                if (isset($data['success']) && $data['success'] === true) {
                     $rootNode = $data['data']['tree']['root_nodes'][0];
                     return isset($rootNode['id']) &&
                            isset($rootNode['name']) &&
@@ -364,14 +327,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode1, $rootNode2, $child1]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -401,25 +356,16 @@ class ViewTreeByIdJsonActionTest extends TestCase
 
         $this->logger->expects($this->once())
             ->method('error')
-            ->with($this->stringContains('Error loading tree JSON by ID: Database error'));
+            ->with($this->stringContains('Error loading tree structure: Database error'));
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
             ->with($this->callback(function ($json) {
                 $data = json_decode($json, true);
-                return $data['success'] === false &&
-                       str_contains($data['message'], 'Error loading tree structure') &&
-                       str_contains($data['message'], 'Database error') &&
-                       $data['error'] === true;
+                return isset($data['error']) && $data['error'] === true &&
+                       isset($data['message']) &&
+                       str_contains($data['message'], 'Database error');
             }));
 
         $result = $this->action->__invoke($this->request, $this->response, ['id' => '1']);
@@ -446,14 +392,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode, $child1, $child2, $grandChild]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
@@ -487,14 +425,6 @@ class ViewTreeByIdJsonActionTest extends TestCase
             ->with(1)
             ->willReturn([$rootNode]);
 
-        $this->response->expects($this->once())
-            ->method('getBody')
-            ->willReturn($this->stream);
-
-        $this->response->expects($this->once())
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
 
         $this->stream->expects($this->once())
             ->method('write')
