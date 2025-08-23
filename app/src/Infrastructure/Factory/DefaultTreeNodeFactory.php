@@ -15,6 +15,11 @@ final class DefaultTreeNodeFactory implements TreeNodeFactory
     #[\Override]
     public function createFromData(array $nodeData, int $treeId): AbstractTreeNode
     {
+        // Validate required field
+        if (!isset($nodeData['name'])) {
+            throw new \InvalidArgumentException('Missing required field: name');
+        }
+
         $type = $nodeData['type'] ?? 'SimpleNode';
         $name = $nodeData['name'];
         $parentId = $nodeData['parent_id'] ?? null;

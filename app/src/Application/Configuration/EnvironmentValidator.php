@@ -28,7 +28,7 @@ class EnvironmentValidator
         foreach ($this->requiredEnvVars as $envVar) {
             $value = $_ENV[$envVar] ?? getenv($envVar);
 
-            if ($value === false || $value === null || trim($value) === '') {
+            if ($value === false || trim((string)$value) === '') {
                 $errors[] = "Required environment variable '{$envVar}' is not set";
                 continue;
             }

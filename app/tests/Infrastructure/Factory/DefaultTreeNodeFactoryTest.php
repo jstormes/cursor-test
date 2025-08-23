@@ -154,10 +154,9 @@ class DefaultTreeNodeFactoryTest extends TestCase
         ];
         $treeId = 6;
 
-        // PHP 8+ will show a warning but not throw TypeError
-        // The actual error is "Undefined array key"
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "name"');
+        // Now throws InvalidArgumentException for missing name
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required field: name');
 
         $this->factory->createFromData($nodeData, $treeId);
     }

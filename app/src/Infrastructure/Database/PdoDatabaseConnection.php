@@ -14,6 +14,14 @@ class PdoDatabaseConnection implements DatabaseConnection
 
     public function __construct(array $config)
     {
+        // Validate required configuration parameters
+        $requiredParams = ['host', 'database', 'username', 'password'];
+        foreach ($requiredParams as $param) {
+            if (!array_key_exists($param, $config) || $config[$param] === null || $config[$param] === '') {
+                throw new \InvalidArgumentException("Missing required database configuration parameter: {$param}");
+            }
+        }
+
         $dsn = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
             $config['host'],

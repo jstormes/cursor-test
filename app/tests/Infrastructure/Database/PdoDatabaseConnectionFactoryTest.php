@@ -106,9 +106,9 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
             'password' => 'test'
         ];
 
-        // This will cause a PHP warning about undefined array key
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "host"');
+        // This will throw InvalidArgumentException for missing host
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: host');
         $this->factory->create($config);
     }
 
@@ -120,9 +120,9 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
             'password' => 'test'
         ];
 
-        // This will cause a PHP warning about undefined array key
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "database"');
+        // This will throw InvalidArgumentException for missing database
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: database');
         $this->factory->create($config);
     }
 
@@ -134,9 +134,9 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
             'password' => 'test'
         ];
 
-        // This will cause a PHP warning about undefined array key
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "username"');
+        // This will throw InvalidArgumentException for missing username
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: username');
         $this->factory->create($config);
     }
 
@@ -148,9 +148,9 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
             'username' => 'test'
         ];
 
-        // This will cause a PHP warning about undefined array key
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "password"');
+        // This will throw InvalidArgumentException for missing password
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: password');
         $this->factory->create($config);
     }
 
@@ -158,8 +158,8 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
     {
         $config = [];
 
-        $this->expectWarning();
-        $this->expectWarningMessage('Undefined array key "host"');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: host');
         $this->factory->create($config);
     }
 
@@ -274,8 +274,9 @@ class PdoDatabaseConnectionFactoryTest extends TestCase
             'password' => 'test'
         ];
 
-        // In PDO context, null host becomes empty string and causes PDOException
-        $this->expectException(\PDOException::class);
+        // Null values are treated as missing parameters
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required database configuration parameter: host');
         $this->factory->create($config);
     }
 
