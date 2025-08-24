@@ -59,6 +59,18 @@
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public",
-        "test": "phpunit"
+        "test": "phpunit",
+        "keys:generate": [
+            "@keys:private",
+            "@keys:public"
+        ],
+        "keys:private": "openssl genrsa -out private.key 2048",
+        "keys:public": "openssl rsa -in private.key -pubout -out public.key",
+        "post-install-cmd": [
+            "@keys:generate"
+        ],
+        "post-update-cmd": [
+            "@keys:generate"
+        ]
     }
 }
