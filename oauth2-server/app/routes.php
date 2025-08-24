@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Application\Actions\OAuth2\ClientCredentialsAction;
 use App\Application\Actions\User\ListUsersAction;
 use App\Application\Actions\User\ViewUserAction;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -24,4 +25,7 @@ return function (App $app) {
         $group->get('', ListUsersAction::class);
         $group->get('/{id}', ViewUserAction::class);
     });
+
+    // OAuth2 routes
+    $app->post('/oauth2/access_token', ClientCredentialsAction::class);
 };
