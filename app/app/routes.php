@@ -20,6 +20,10 @@ use App\Application\Actions\Tree\RestoreTreeJsonAction;
 use App\Application\Actions\Tree\ViewDeletedTreesAction;
 use App\Application\Actions\Tree\ViewDeletedTreesJsonAction;
 use App\Application\Actions\Tree\DeleteNodeAction;
+use App\Application\Actions\Tree\SortNodeLeftAction;
+use App\Application\Actions\Tree\SortNodeRightAction;
+use App\Application\Actions\Tree\NodeSortApiAction;
+use App\Application\Actions\Tree\BulkNodeSortApiAction;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -61,4 +65,12 @@ return function (App $app) {
     
     // Delete node routes
     $app->map(['GET', 'POST'], '/tree/{treeId}/node/{nodeId}/delete', DeleteNodeAction::class);
+    
+    // Sort node routes
+    $app->get('/tree/{treeId}/node/{nodeId}/sort-left', SortNodeLeftAction::class);
+    $app->get('/tree/{treeId}/node/{nodeId}/sort-right', SortNodeRightAction::class);
+    
+    // API sort node routes
+    $app->patch('/api/tree/{treeId}/node/{nodeId}/sort', NodeSortApiAction::class);
+    $app->put('/api/tree/{treeId}/nodes/sort', BulkNodeSortApiAction::class);
 };

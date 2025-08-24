@@ -6,7 +6,8 @@
       "Bash(curl:*)",
       "Bash(docker-compose:*)",
       "Bash(tree:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": [],
     "ask": []

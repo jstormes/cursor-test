@@ -68,4 +68,27 @@ final class DefaultTreeNodeFactory implements TreeNodeFactory
             default => throw InvalidTreeOperationException::unknownNodeType($node->getType())
         };
     }
+
+    #[\Override]
+    public function createWithNewSortOrder(AbstractTreeNode $node, int $newSortOrder): AbstractTreeNode
+    {
+        return match ($node->getType()) {
+            'SimpleNode' => new SimpleNode(
+                $node->getId(),
+                $node->getName(),
+                $node->getTreeId(),
+                $node->getParentId(),
+                $newSortOrder
+            ),
+            'ButtonNode' => new ButtonNode(
+                $node->getId(),
+                $node->getName(),
+                $node->getTreeId(),
+                $node->getParentId(),
+                $newSortOrder,
+                $node->getTypeData()
+            ),
+            default => throw InvalidTreeOperationException::unknownNodeType($node->getType())
+        };
+    }
 }

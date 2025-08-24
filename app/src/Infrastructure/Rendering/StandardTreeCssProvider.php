@@ -19,6 +19,7 @@ final class StandardTreeCssProvider
 
         .tree ul {
             padding-top: 20px; 
+            padding-inline-start: 10px;
             position: relative;
             display: flex;
             flex-wrap: nowrap;

@@ -40,4 +40,14 @@ interface TreeNodeRepository
      * Find tree structure for a specific tree
      */
     public function findTreeStructure(int $treeId): array;
+
+    /**
+     * Find the previous sibling of a node (same parent, lower sort_order)
+     */
+    public function findPreviousSibling(int $nodeId): ?AbstractTreeNode;
+
+    /**
+     * Find the next sibling of a node (same parent, higher sort_order)
+     */
+    public function findNextSibling(int $nodeId): ?AbstractTreeNode;
 }

@@ -12,4 +12,6 @@ interface TreeNodeFactory
     public function createFromData(array $nodeData, int $treeId): AbstractTreeNode;
 
     public function createWithNewParent(AbstractTreeNode $node, int $newParentId): AbstractTreeNode;
+
+    public function createWithNewSortOrder(AbstractTreeNode $node, int $newSortOrder): AbstractTreeNode;
 }

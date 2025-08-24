@@ -93,6 +93,7 @@ return function (ContainerBuilder $containerBuilder) {
         UnitOfWork::class => function (ContainerInterface $c) {
             return new DatabaseUnitOfWork(
                 $c->get(DatabaseConnection::class),
+                $c->get(ClockInterface::class),
                 $c->get(TreeDataMapper::class),
                 $c->get(TreeNodeDataMapper::class)
             );
@@ -136,7 +137,8 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(UnitOfWork::class),
                 $c->get(TreeNodeFactory::class),
                 $c->get(TreeValidator::class),
-                $c->get(TreeNodeValidator::class)
+                $c->get(TreeNodeValidator::class),
+                $c->get(ClockInterface::class)
             );
         },
 

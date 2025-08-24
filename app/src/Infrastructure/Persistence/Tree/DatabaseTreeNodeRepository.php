@@ -136,4 +136,74 @@ class DatabaseTreeNodeRepository extends BaseRepository implements TreeNodeRepos
     {
         $this->deleteById(self::TABLE, 'tree_id', $treeId);
     }
+
+    #[\Override]
+    public function findPreviousSibling(int $nodeId): ?AbstractTreeNode
+    {
+        // First get the current node to find its parent and sort_order
+        $currentNode = $this->findById($nodeId);
+        if (!$currentNode) {
+            return null;
+        }
+
+        // Query for the previous sibling (same parent, highest sort_order that's lower than current)
+        $sql = 'SELECT ' . self::COLUMNS . ' FROM ' . self::TABLE . ' ' .
+               'WHERE tree_id = ? AND parent_id ';
+        
+        $params = [$currentNode->getTreeId()];
+        
+        if ($currentNode->getParentId() === null) {
+            $sql .= 'IS NULL ';
+        } else {
+            $sql .= '= ? ';
+            $params[] = $currentNode->getParentId();
+        }
+        
+        $sql .= 'AND sort_order < ? ORDER BY sort_order DESC LIMIT 1';
+        $params[] = $currentNode->getSortOrder();
+
+        $statement = $this->connection->query($sql, $params);
+        $data = $statement->fetch();
+
+        if (!$data) {
+            return null;
+        }
+
+        return $this->dataMapper->mapToEntity($data);
+    }
+
+    #[\Override]
+    public function findNextSibling(int $nodeId): ?AbstractTreeNode
+    {
+        // First get the current node to find its parent and sort_order
+        $currentNode = $this->findById($nodeId);
+        if (!$currentNode) {
+            return null;
+        }
+
+        // Query for the next sibling (same parent, lowest sort_order that's higher than current)
+        $sql = 'SELECT ' . self::COLUMNS . ' FROM ' . self::TABLE . ' ' .
+               'WHERE tree_id = ? AND parent_id ';
+        
+        $params = [$currentNode->getTreeId()];
+        
+        if ($currentNode->getParentId() === null) {
+            $sql .= 'IS NULL ';
+        } else {
+            $sql .= '= ? ';
+            $params[] = $currentNode->getParentId();
+        }
+        
+        $sql .= 'AND sort_order > ? ORDER BY sort_order ASC LIMIT 1';
+        $params[] = $currentNode->getSortOrder();
+
+        $statement = $this->connection->query($sql, $params);
+        $data = $statement->fetch();
+
+        if (!$data) {
+            return null;
+        }
+
+        return $this->dataMapper->mapToEntity($data);
+    }
 }

@@ -141,4 +141,141 @@ class TreeService
 
         return $this->nodeRepository->findTreeStructure($treeId);
     }
+
+    /**
+     * Sort node left (decrease sort order by swapping with previous sibling)
+     */
+    public function sortNodeLeft(int $nodeId): void
+    {
+        $this->unitOfWork->beginTransaction();
+
+        try {
+            $node = $this->nodeRepository->findById($nodeId);
+            if (!$node) {
+                throw new TreeNodeNotFoundException($nodeId);
+            }
+
+            // Find previous sibling (same parent, lower sort_order)
+            $previousSibling = $this->nodeRepository->findPreviousSibling($nodeId);
+            if (!$previousSibling) {
+                // Node is already first among siblings, nothing to do
+                $this->unitOfWork->rollback();
+                return;
+            }
+
+            // Swap sort orders
+            $currentSortOrder = $node->getSortOrder();
+            $previousSortOrder = $previousSibling->getSortOrder();
+
+            // Update both nodes using the factory to create new instances with updated sort orders
+            $updatedNode = $this->nodeFactory->createWithNewSortOrder($node, $previousSortOrder);
+            $updatedPrevious = $this->nodeFactory->createWithNewSortOrder($previousSibling, $currentSortOrder);
+
+            // Register both nodes as dirty
+            $this->unitOfWork->registerDirty($updatedNode);
+            $this->unitOfWork->registerDirty($updatedPrevious);
+
+            $this->unitOfWork->commit();
+        } catch (\Exception $e) {
+            $this->unitOfWork->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Sort node right (increase sort order by swapping with next sibling)
+     */
+    public function sortNodeRight(int $nodeId): void
+    {
+        $this->unitOfWork->beginTransaction();
+
+        try {
+            $node = $this->nodeRepository->findById($nodeId);
+            if (!$node) {
+                throw new TreeNodeNotFoundException($nodeId);
+            }
+
+            // Find next sibling (same parent, higher sort_order)
+            $nextSibling = $this->nodeRepository->findNextSibling($nodeId);
+            if (!$nextSibling) {
+                // Node is already last among siblings, nothing to do
+                $this->unitOfWork->rollback();
+                return;
+            }
+
+            // Swap sort orders
+            $currentSortOrder = $node->getSortOrder();
+            $nextSortOrder = $nextSibling->getSortOrder();
+
+            // Update both nodes using the factory to create new instances with updated sort orders
+            $updatedNode = $this->nodeFactory->createWithNewSortOrder($node, $nextSortOrder);
+            $updatedNext = $this->nodeFactory->createWithNewSortOrder($nextSibling, $currentSortOrder);
+
+            // Register both nodes as dirty
+            $this->unitOfWork->registerDirty($updatedNode);
+            $this->unitOfWork->registerDirty($updatedNext);
+
+            $this->unitOfWork->commit();
+        } catch (\Exception $e) {
+            $this->unitOfWork->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Update node sort order directly
+     */
+    public function updateNodeSortOrder(int $nodeId, int $newSortOrder): void
+    {
+        $this->unitOfWork->beginTransaction();
+
+        try {
+            $node = $this->nodeRepository->findById($nodeId);
+            if (!$node) {
+                throw new TreeNodeNotFoundException($nodeId);
+            }
+
+            // Create updated node with new sort order
+            $updatedNode = $this->nodeFactory->createWithNewSortOrder($node, $newSortOrder);
+
+            // Register node as dirty
+            $this->unitOfWork->registerDirty($updatedNode);
+
+            $this->unitOfWork->commit();
+        } catch (\Exception $e) {
+            $this->unitOfWork->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Bulk update sort orders for multiple nodes
+     */
+    public function bulkUpdateSortOrders(array $updates): void
+    {
+        $this->unitOfWork->beginTransaction();
+
+        try {
+            foreach ($updates as $update) {
+                $nodeId = $update['nodeId'];
+                $newSortOrder = $update['sortOrder'];
+
+                $node = $this->nodeRepository->findById($nodeId);
+                if (!$node) {
+                    throw new TreeNodeNotFoundException($nodeId);
+                }
+
+                // Create updated node with new sort order
+                $updatedNode = $this->nodeFactory->createWithNewSortOrder($node, $newSortOrder);
+
+                // Register node as dirty
+                $this->unitOfWork->registerDirty($updatedNode);
+            }
+
+            $this->unitOfWork->commit();
+        } catch (\Exception $e) {
+            $this->unitOfWork->rollback();
+            throw $e;
+        }
+    }
 }
