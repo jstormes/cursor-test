@@ -1,15 +1,33 @@
-# Tree Structure Manager
+# PHP Development Projects
+
+This repository contains two production-ready PHP applications demonstrating modern development practices and architectural patterns.
+
+## 🌳 Tree Structure Manager
 
 A **stateless PHP web application** for creating and displaying tree structures using the **Composite Design Pattern** and **Visitor Pattern** for HTML rendering. Built with Clean Architecture principles, comprehensive testing, and designed for scalability.
 
-## 🌳 Project Overview
+## 🔐 OAuth2 Authorization Server
 
-This application demonstrates advanced object-oriented design patterns in PHP:
+A complete **OAuth2 Authorization Server** implementation built with **Slim Framework 4** and the `league/oauth2-server` package. Supports all major OAuth2 grant types with JWT tokens and modern security practices.
+
+## 🚀 Projects Overview
+
+### 🌳 Tree Structure Manager (`/app` directory)
+Demonstrates advanced object-oriented design patterns in PHP:
 - **Composite Pattern**: For building hierarchical tree structures with nodes
 - **Visitor Pattern**: For flexible HTML rendering of tree structures
 - **Repository Pattern**: For data access abstraction
 - **Unit of Work**: For transaction management
 - **Stateless Architecture**: No session dependencies, perfect for APIs and horizontal scaling
+
+### 🔐 OAuth2 Authorization Server (`/oauth2-server` directory)
+Complete OAuth2 server implementation featuring:
+- **Client Credentials Grant**: Machine-to-machine authentication
+- **Password Grant**: User credential authentication with refresh tokens
+- **Refresh Token Grant**: Token renewal without re-authentication
+- **Device Authorization Grant**: For IoT and limited-input devices
+- **JWT Access Tokens**: RSA256-signed tokens with configurable expiry
+- **Docker Integration**: Containerized development and deployment
 
 ## 🚀 Quick Start
 
@@ -17,29 +35,49 @@ This application demonstrates advanced object-oriented design patterns in PHP:
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 - [PhpStorm](https://www.jetbrains.com/phpstorm/) (optional, for debugging)
 
-### 1. Clone and Start
+### 1. Clone Repository
 ```bash
 git clone <repository-url>
 cd cursor-test
-docker-compose up -d
 ```
 
-### 2. Install Dependencies
+### 2. Start Projects
+
+#### Tree Structure Manager
 ```bash
-# Install PHP dependencies inside the development container
+# Start main application containers
+docker-compose up -d
+
+# Install PHP dependencies
 docker-compose exec php-dev bash -c "cd /app && composer install"
 ```
 
-### 3. Access Your Application
+#### OAuth2 Authorization Server
+```bash
+# Start OAuth2 server (from project root)
+cd oauth2-server
+docker-compose up -d
+
+# Install dependencies (automatically generates RSA keys)
+docker exec cursor-test-oauth2-server-1 composer install
+cd ..
+```
+
+### 3. Access Applications
+#### Tree Structure Manager
 - **Development server**: http://localhost:8088
 - **Production server**: http://localhost:9088
 - **PhpMyAdmin**: http://localhost:7088
+
+#### OAuth2 Authorization Server
+- **OAuth2 Server**: http://localhost:8087
+- **API Documentation**: See `/oauth2-server/README.md` for complete testing examples
 
 ## 📁 Project Structure
 
 ```
 cursor-test/
-├── app/                         # Application root
+├── app/                         # Tree Structure Manager
 │   ├── public/                  # Web root directory
 │   │   ├── index.php           # Main entry point
 │   │   └── .htaccess           # Apache configuration
@@ -53,16 +91,35 @@ cursor-test/
 │   │   └── Infrastructure/     # Infrastructure layer (database, repositories)
 │   │       ├── Database/       # Database abstraction layer
 │   │       └── Persistence/    # Concrete repository implementations
-│   ├── tests/                  # PHPUnit test suite (777+ tests)
+│   ├── tests/                  # PHPUnit test suite (799+ tests)
 │   ├── var/                    # Application cache and logs
 │   ├── vendor/                 # Composer dependencies
 │   ├── composer.json           # PHP dependencies
 │   └── phpunit.xml            # PHPUnit configuration
+├── oauth2-server/              # OAuth2 Authorization Server
+│   ├── app/                    # Slim 4 configuration
+│   │   ├── dependencies.php    # OAuth2 server configurations
+│   │   ├── routes.php          # API endpoints
+│   │   └── settings.php        # Application settings
+│   ├── src/
+│   │   ├── Application/Actions/OAuth2/  # OAuth2 grant action classes
+│   │   ├── Entities/           # OAuth2 entities (tokens, clients, etc.)
+│   │   └── Repositories/       # OAuth2 repository implementations
+│   ├── public/
+│   │   └── index.php          # OAuth2 server entry point
+│   ├── tests/                  # PHPUnit test suite
+│   ├── private.key            # RSA private key (auto-generated)
+│   ├── public.key             # RSA public key (auto-generated)
+│   ├── composer.json          # OAuth2 dependencies with key generation
+│   ├── docker-compose.yml     # OAuth2 server Docker config
+│   ├── CLAUDE.md              # OAuth2 development guide
+│   └── README.md              # Complete OAuth2 documentation
 ├── config/docker/              # Docker configuration files
 ├── database/                   # Database initialization scripts
 ├── docker-compose.yml          # Main Docker configuration
 ├── Dockerfile                  # Docker image definition
-└── CLAUDE.md                   # Development commands and architecture guide
+├── CLAUDE.md                   # Development commands and architecture guide
+└── README.md                   # This file
 ```
 
 ## 🔧 Key Features
@@ -74,6 +131,15 @@ cursor-test/
 - **Soft Delete Support**: Trees can be archived and restored without data loss
 - **Full CRUD Operations**: Create, read, update, delete, and sort functionality for trees and nodes
 - **Dual API Support**: Both HTML interface and RESTful JSON endpoints
+
+### OAuth2 Authorization Server
+- **Complete OAuth2 Compliance**: All major grant types (Client Credentials, Password, Refresh Token, Device Authorization)
+- **JWT Access Tokens**: RSA256-signed tokens with configurable expiry (1 hour default)
+- **Refresh Token Support**: Long-lived tokens (1 month) for seamless re-authentication
+- **Device Authorization**: Support for IoT devices and limited-input scenarios
+- **Automatic Key Generation**: RSA key pairs auto-generated via Composer scripts
+- **Docker Integration**: Containerized deployment with proper isolation
+- **Security Best Practices**: bcrypt client credentials, proper error handling, JWT validation
 
 ### Architecture & Design Patterns
 - **Stateless Architecture**: No server-side sessions, perfect for scaling and APIs
@@ -95,6 +161,36 @@ cursor-test/
 - **Username**: root, **Password**: password
 - **Database**: app
 - **Tables**: trees, tree_nodes with hierarchical relationships
+
+### OAuth2 Quick Testing
+
+Test the OAuth2 server with these example requests:
+
+```bash
+# Client Credentials Grant
+curl -X "POST" "http://localhost:8087/oauth2/access_token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "grant_type=client_credentials" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123" \
+    --data-urlencode "scope=basic email"
+
+# Password Grant (includes refresh token)
+curl -X "POST" "http://localhost:8087/oauth2/password/access_token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "grant_type=password" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123" \
+    --data-urlencode "username=alex" \
+    --data-urlencode "password=whisky" \
+    --data-urlencode "scope=basic email"
+```
+
+**Test Credentials:**
+- **Client**: `myawesomeapp` / `abc123`
+- **User**: `alex` / `whisky`
 
 ## 🎯 Design Patterns in Action
 
@@ -267,6 +363,7 @@ This project demonstrates:
 
 ## 🛠️ Common Commands
 
+### Tree Structure Manager Commands
 ```bash
 # Start development environment
 docker-compose up -d
@@ -289,6 +386,26 @@ docker-compose exec php-dev bash -c "cd /app && composer test:coverage"
 # Run all quality checks
 docker-compose exec php-dev bash -c "cd /app && vendor/bin/phpstan analyse --memory-limit=512M && vendor/bin/psalm && vendor/bin/phpcs"
 ```
+
+### OAuth2 Authorization Server Commands
+```bash
+# Start OAuth2 server
+cd oauth2-server && docker-compose up -d
+
+# Install dependencies (auto-generates RSA keys)
+docker exec cursor-test-oauth2-server-1 composer install
+
+# Regenerate RSA keys manually
+docker exec cursor-test-oauth2-server-1 composer keys:generate
+
+# Run OAuth2 server tests
+docker exec cursor-test-oauth2-server-1 composer test
+
+# Stop OAuth2 server
+cd oauth2-server && docker-compose down
+```
+
+> **📖 For complete OAuth2 documentation:** See `/oauth2-server/README.md` for detailed installation, testing, and production deployment guides.
 
 ## 🆘 Troubleshooting
 
@@ -382,16 +499,32 @@ docker-compose exec php-dev bash -c "cd /app && rm -rf vendor && composer instal
 - **🧪 Test Focus**: 777 tests covering tree functionality, 2,843 assertions for business logic
 - **📊 Quality Achievement**: A+ Grade (95/100) - Production-ready stateless application
 
-## 📝 Project Purpose
+## 📝 Projects Purpose
 
-This project serves as a comprehensive example of:
+This repository serves as a comprehensive example of:
+
+### 🌳 Tree Structure Manager
 - **Stateless Architecture**: Building scalable applications without server-side sessions
 - **Advanced PHP OOP**: Modern object-oriented programming with best practices
 - **Design Pattern Implementation**: Real-world usage of Composite, Visitor, Repository patterns
 - **Clean Architecture**: Domain-driven design with proper layer separation
 - **API-First Development**: Endpoints designed for both web and headless consumption
 - **Test-Driven Development**: Comprehensive testing focused on actual business logic
-- **Container-Ready Applications**: Perfect for Docker, Kubernetes, and microservices
 
-Perfect for learning modern PHP development, teaching scalable architecture patterns, or as a foundation for high-performance, stateless tree-based applications.
+### 🔐 OAuth2 Authorization Server
+- **OAuth2 Standard Implementation**: Complete compliance with OAuth2 specification
+- **Security Best Practices**: JWT tokens, bcrypt hashing, proper error handling
+- **Modern Authentication Flows**: All major grant types for different use cases
+- **Container-Ready Deployment**: Docker integration for consistent environments
+- **Automated Key Management**: Composer scripts for RSA key generation
+- **Production-Ready**: Configurable tokens, proper logging, scalable architecture
+
+### 🎯 Learning Objectives
+Perfect for:
+- **Learning Modern PHP Development** - Both projects demonstrate current PHP best practices
+- **Teaching Authentication Systems** - Complete OAuth2 implementation with security patterns
+- **Understanding Design Patterns** - Real-world pattern usage in tree structures
+- **Container-Based Development** - Docker workflows and multi-service architectures
+- **API Development** - RESTful design and stateless application architecture
+- **Production Deployment** - Scalable, secure, and maintainable applications
 
