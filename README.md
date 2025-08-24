@@ -78,6 +78,12 @@ cd ..
 ```
 cursor-test/
 ├── app/                         # Tree Structure Manager
+│   ├── app/                     # Slim 4 configuration
+│   │   ├── dependencies.php     # Dependency injection container
+│   │   ├── middleware.php       # Application middleware
+│   │   ├── repositories.php     # Repository bindings
+│   │   ├── routes.php          # Route definitions
+│   │   └── settings.php        # Application settings
 │   ├── public/                  # Web root directory
 │   │   ├── index.php           # Main entry point
 │   │   └── .htaccess           # Apache configuration
