@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use App\Application\Actions\OAuth2\ClientCredentialsAction;
+use App\Application\Actions\OAuth2\DeviceAccessTokenAction;
+use App\Application\Actions\OAuth2\DeviceAuthorizationAction;
+use App\Application\Actions\OAuth2\PasswordGrantAction;
+use App\Application\Actions\OAuth2\RefreshTokenGrantAction;
 use App\Application\Actions\User\ListUsersAction;
 use App\Application\Actions\User\ViewUserAction;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -28,4 +32,8 @@ return function (App $app) {
 
     // OAuth2 routes
     $app->post('/oauth2/access_token', ClientCredentialsAction::class);
+    $app->post('/oauth2/password/access_token', PasswordGrantAction::class);
+    $app->post('/oauth2/refresh_token/access_token', RefreshTokenGrantAction::class);
+    $app->post('/oauth2/device_code/device_authorization', DeviceAuthorizationAction::class);
+    $app->post('/oauth2/device_code/access_token', DeviceAccessTokenAction::class);
 };

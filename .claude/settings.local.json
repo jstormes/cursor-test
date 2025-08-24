@@ -7,7 +7,8 @@
       "Bash(docker-compose:*)",
       "Bash(tree:*)",
       "Bash(find:*)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []

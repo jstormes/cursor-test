@@ -92,6 +92,53 @@ curl -X "POST" "http://localhost:8087/oauth2/access_token" \
     --data-urlencode "scope=basic email"
 ```
 
+### Password Grant
+```bash
+curl -X "POST" "http://localhost:8087/oauth2/password/access_token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "grant_type=password" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123" \
+    --data-urlencode "username=alex" \
+    --data-urlencode "password=whisky" \
+    --data-urlencode "scope=basic email"
+```
+
+### Refresh Token Grant
+```bash
+curl -X "POST" "http://localhost:8087/oauth2/refresh_token/access_token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "grant_type=refresh_token" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123" \
+    --data-urlencode "refresh_token=<REFRESH_TOKEN_FROM_PASSWORD_GRANT>"
+```
+
+### Device Authorization Grant
+
+#### Step 1: Request Device Authorization
+```bash
+curl -X "POST" "http://localhost:8087/oauth2/device_code/device_authorization" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123" \
+    --data-urlencode "scope=basic email"
+```
+
+#### Step 2: Exchange Device Code for Access Token
+```bash
+curl -X "POST" "http://localhost:8087/oauth2/device_code/access_token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -H "Accept: application/json" \
+    --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:device_code" \
+    --data-urlencode "device_code=<DEVICE_CODE_FROM_STEP_1>" \
+    --data-urlencode "client_id=myawesomeapp" \
+    --data-urlencode "client_secret=abc123"
+```
+
 ## Important Development Rules
 
 **NEVER install PHP locally** - All PHP execution must happen in containers:
