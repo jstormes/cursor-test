@@ -177,15 +177,15 @@ services:
       # Application environment
       - APP_ENV=production
       
-      # Database connection environment variables
+      # Database connection environment variables (production user)
       - MYSQL_HOST=mariadb
       - MYSQL_PORT=3306
       - MYSQL_DATABASE=app
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
+      - MYSQL_USER=app_prod
+      - MYSQL_PASSWORD=prod_secure_2025!
       
-      # Legacy DSN for backward compatibility
-      - MYSQL_DSN=mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password
+      # Legacy DSN for backward compatibility (production user)
+      - MYSQL_DSN=mysql:host=mariadb;dbname=app;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=app_prod;password=prod_secure_2025!
     ports:
       - "9088:80"
 
