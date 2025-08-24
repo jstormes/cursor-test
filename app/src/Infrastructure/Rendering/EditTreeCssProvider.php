@@ -32,7 +32,7 @@ final class EditTreeCssProvider
             text-align: center;
             list-style-type: none;
             position: relative;
-            padding: 20px 5px 0 5px;
+            padding: 20px 15px 0 15px;
             transition: all 0.5s;
             -webkit-transition: all 0.5s;
             -moz-transition: all 0.5s;
@@ -93,7 +93,7 @@ final class EditTreeCssProvider
         /* Tree node styling - edit view */
         .tree li div {
             border: 1px solid #1e3a8a;
-            padding: 15px 10px;
+            padding: 15px 20px;
             color: #1e3a8a;
             background-color: #ffffff;
             font-family: arial, verdana, tahoma;
@@ -168,6 +168,66 @@ final class EditTreeCssProvider
             transform: translateX(-50%) scale(1.1);
         }
 
+        /* Sort left icon styling */
+        .tree li div .sort-left-icon {
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #1e3a8a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 10;
+            transition: all 0.3s;
+            -webkit-transition: all 0.3s;
+            -moz-transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .tree li div .sort-left-icon:hover {
+            background-color: #0f172a;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Sort right icon styling */
+        .tree li div .sort-right-icon {
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #1e3a8a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 10;
+            transition: all 0.3s;
+            -webkit-transition: all 0.3s;
+            -moz-transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .tree li div .sort-right-icon:hover {
+            background-color: #0f172a;
+            transform: translateY(-50%) scale(1.1);
+        }
+
         /* Hover effects for edit tree */
         .tree li div:hover, 
         .tree li div:hover+ul li div {
@@ -184,6 +244,16 @@ final class EditTreeCssProvider
         .tree li div:hover .remove-icon {
             background-color: #ffffff;
             color: #dc3545;
+        }
+
+        .tree li div:hover .sort-left-icon {
+            background-color: #ffffff;
+            color: #1e3a8a;
+        }
+
+        .tree li div:hover .sort-right-icon {
+            background-color: #ffffff;
+            color: #1e3a8a;
         }
 
         .tree li div:hover+ul li::after, 
@@ -234,13 +304,19 @@ final class EditTreeCssProvider
 
         /* Responsive design for edit tree */
         @media (max-width: 768px) {
+            .tree li {
+                padding: 20px 12px 0 12px;
+            }
+            
             .tree li div {
                 font-size: 10px;
-                padding: 12px 8px;
+                padding: 12px 15px;
             }
             
             .tree li div .add-icon,
-            .tree li div .remove-icon {
+            .tree li div .remove-icon,
+            .tree li div .sort-left-icon,
+            .tree li div .sort-right-icon {
                 width: 18px;
                 height: 18px;
                 font-size: 11px;
@@ -252,6 +328,14 @@ final class EditTreeCssProvider
             
             .tree li div .remove-icon {
                 top: -10px;
+            }
+            
+            .tree li div .sort-left-icon {
+                left: -10px;
+            }
+            
+            .tree li div .sort-right-icon {
+                right: -10px;
             }
         }
         CSS;
