@@ -78,3 +78,5 @@ fabric.properties
 
 xdebug.info/
 app/coverage-report/
+oauth2-server/private.key
+oauth2-server/public.key
