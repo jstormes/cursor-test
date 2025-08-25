@@ -6,6 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/oauth2-server/src" isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/oauth2-server/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/oauth2-server/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/myclabs/deep-copy" />
@@ -130,6 +133,34 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/string" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/var-exporter" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/vimeo/psalm" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/defuse/php-encryption" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/fig/http-message-util" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/laravel/serializable-closure" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/lcobucci/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/lcobucci/jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/league/event" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/league/oauth2-server" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/league/uri" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/league/uri-interfaces" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/monolog/monolog" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/nikic/fast-route" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/paragonie/random_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/php-di/invoker" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/php-di/php-di" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/php-di/phpdoc-reader" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/http-server-handler" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/http-server-middleware" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/ralouphie/getallheaders" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/slim/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/slim/slim" />
+      <excludeFolder url="file://$MODULE_DIR$/oauth2-server/vendor/symfony/polyfill-php80" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

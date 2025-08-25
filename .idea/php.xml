@@ -140,6 +140,34 @@
       <path value="$PROJECT_DIR$/app/vendor/symfony/var-exporter" />
       <path value="$PROJECT_DIR$/app/vendor/phpmd/phpmd" />
       <path value="$PROJECT_DIR$/app/vendor/pdepend/pdepend" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/slim/psr7" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/defuse/php-encryption" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/laravel/serializable-closure" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/php-di/php-di" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/php-di/phpdoc-reader" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/php-di/invoker" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/nikic/fast-route" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/composer" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/fig/http-message-util" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/clock" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/http-server-handler" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/http-factory" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/league/uri" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/event-dispatcher" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/league/event" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/http-server-middleware" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/league/oauth2-server" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/league/uri-interfaces" />
+      <path value="$PROJECT_DIR$/oauth2-server/vendor/slim/slim" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
@@ -234,6 +262,7 @@
   </component>
   <component name="PhpUnit">
     <phpunit_settings>
+      <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/oauth2-server/phpunit.xml" custom_loader_path="$PROJECT_DIR$/oauth2-server/vendor/autoload.php" use_configuration_file="true" />
       <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/app/phpunit.xml" custom_loader_path="$PROJECT_DIR$/app/vendor/autoload.php" use_configuration_file="true" />
     </phpunit_settings>
   </component>

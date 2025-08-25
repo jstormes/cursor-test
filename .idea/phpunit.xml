@@ -5,6 +5,7 @@
       <list>
         <option value="$PROJECT_DIR$/tests" />
         <option value="$PROJECT_DIR$/app/tests" />
+        <option value="$PROJECT_DIR$/oauth2-server/tests" />
       </list>
     </option>
   </component>
